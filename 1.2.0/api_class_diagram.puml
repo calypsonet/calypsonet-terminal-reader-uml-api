@@ -1,6 +1,6 @@
 @startuml
 title
-    Calypsonet - calypsonet-terminal-reader-java-api - 1.1.+ (05/10/2022)
+    Calypsonet - calypsonet-terminal-reader-java-api - 1.2.+ (10/01/2023)
 end title
 
 ' == THEME ==
@@ -63,8 +63,9 @@ package "org.calypsonet.terminal.reader" as readerApi {
             +boolean isCardPresent ()
         }
         +interface ConfigurableCardReader extends CardReader {
-            +void activateProtocol (String readerProtocol, String cardProtocol)
-            +void deactivateProtocol (String readerProtocol)
+            +void activateProtocol (String logicalProtocolName, String physicalProtocolName)
+            +void deactivateProtocol (String logicalProtocolName)
+            +String getCurrentProtocol ()
         }
         +interface ObservableCardReader extends CardReader {
             +void setReaderObservationExceptionHandler (CardReaderObservationExceptionHandlerSpi exceptionHandler)
@@ -155,7 +156,7 @@ package "org.calypsonet.terminal.reader" as readerApi {
             +ReaderCommunicationException (String message, Throwable cause)
         }
         +class "<<RuntimeException>>\nReaderProtocolNotSupportedException" as ReaderProtocolNotSupportedException {
-            +ReaderProtocolNotSupportedException (String cardProtocol)
+            +ReaderProtocolNotSupportedException (String physicalProtocolName)
         }
         +class "<<RuntimeException>>\nCardCommunicationException" as CardCommunicationException {
             +CardCommunicationException (String message)
