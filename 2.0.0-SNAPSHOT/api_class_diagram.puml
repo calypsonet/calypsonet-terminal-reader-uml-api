@@ -1,6 +1,8 @@
 @startuml
 title
-    Calypsonet Terminal Reader API 2.0.+ (2023-06-01)
+    <img:../assets/logo.png>
+
+    Terminal Reader API 2.0.+ (2023-06-01)
 end title
 
 ' == THEME ==
@@ -51,6 +53,8 @@ hide <<grey>> stereotype
 
 ' == CONTENT ==
 
+package "reader" as reader {
+
 ' SERVICE
 together {
     +class "**final** ReaderApiProperties" as ApiProperties {
@@ -98,7 +102,7 @@ together {
         UNAVAILABLE
     }
     ' SPI
-    package "SPI" as readerSpi {
+    package "spi" as readerSpi {
         +interface CardReaderObserverSpi {
             +void onReaderEvent (CardReaderEvent cardReaderEvent)
         }
@@ -109,7 +113,7 @@ together {
 }
 
 ' SELECTION
-package "Selection" as selectionApi {
+package "selection" as selectionApi {
     ' Selection
     +interface "<color:blue>CardSelectionManagerFactory" as CardSelectionManagerFactory {
         +<color:blue>CardSelectionManager createManager ()
@@ -160,7 +164,7 @@ package "Selection" as selectionApi {
     }
 
     ' Card Extension SPI
-    package "SPI" as selectionSpi {
+    package "spi" as selectionSpi {
         +interface "<color:blue>CardSelectionExtension" as CardSelectionExtension {
         }
         +interface "SmartCard" as SmartCard {
@@ -182,19 +186,19 @@ package "Selection" as selectionApi {
     }
 }
 ' EXCEPTIONS
-'together {
-    +class "<<RuntimeException>>\nReaderCommunicationException" as ReaderCommunicationException {
-        +ReaderCommunicationException (String message)
-        +ReaderCommunicationException (String message, Throwable cause)
-    }
-    +class "<<RuntimeException>>\nReaderProtocolNotSupportedException" as ReaderProtocolNotSupportedException {
-        +ReaderProtocolNotSupportedException (String physicalProtocolName)
-    }
-    +class "<<RuntimeException>>\nCardCommunicationException" as CardCommunicationException {
-        +CardCommunicationException (String message)
-        +CardCommunicationException (String message, Throwable cause)
-    }
-'}
++class "<<RuntimeException>>\nReaderCommunicationException" as ReaderCommunicationException {
+    +ReaderCommunicationException (String message)
+    +ReaderCommunicationException (String message, Throwable cause)
+}
++class "<<RuntimeException>>\nReaderProtocolNotSupportedException" as ReaderProtocolNotSupportedException {
+    +ReaderProtocolNotSupportedException (String physicalProtocolName)
+}
++class "<<RuntimeException>>\nCardCommunicationException" as CardCommunicationException {
+    +CardCommunicationException (String message)
+    +CardCommunicationException (String message, Throwable cause)
+}
+
+}
 
 ' Associations
 
@@ -240,11 +244,12 @@ ReaderCommunicationException -[hidden]right- CardCommunicationException
 
 ' == STYLE ==
 
-package readerSpi #C_GREY1 {}
-package selectionApi #C_GREY1 {}
-package selectionApi.selectionSpi #C_GREY2 {}
+package reader #C_GREY1 {}
+package reader.readerSpi #C_GREY2 {}
+package reader.selectionApi #C_GREY2 {}
+package reader.selectionApi.selectionSpi #C_GREY3 {}
 
-interface selectionApi.CardSelectionManagerFactory <<red>>
-interface selectionApi.CardSelectorFactory <<red>>
+interface reader.selectionApi.CardSelectionManagerFactory <<red>>
+interface reader.selectionApi.CardSelectorFactory <<red>>
 
 @enduml
