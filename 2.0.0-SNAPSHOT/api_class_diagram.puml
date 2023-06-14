@@ -2,7 +2,7 @@
 title
     <img:../assets/logo.png>
 
-    Terminal Reader API 2.0.+ (2023-06-07)
+    Terminal Reader API 2.0.+ (2023-06-14)
 end title
 
 ' == THEME ==
@@ -55,11 +55,18 @@ hide <<grey>> stereotype
 
 package "reader" as reader {
 
++class "**final** ReaderApiProperties" as ApiProperties {
+    +{static} **final** String VERSION
+}
++interface "<color:blue>ReaderApiFactory" as ReaderApiFactory {
+    +<color:blue>CardSelectionManager createCardSelectionManager ()
+
+    +<color:blue>BasicCardSelector createBasicCardSelector ()
+    +<color:blue>IsoCardSelector createIsoCardSelector ()
+}
+
 ' SERVICE
 together {
-    +class "**final** ReaderApiProperties" as ApiProperties {
-        +{static} **final** String VERSION
-    }
     +interface CardReader {
         +String getName ()
         +boolean isContactless ()
@@ -115,9 +122,6 @@ together {
 ' SELECTION
 package "selection" as selectionApi {
     ' Selection
-    +interface "<color:blue>CardSelectionManagerFactory" as CardSelectionManagerFactory {
-        +<color:blue>CardSelectionManager createManager ()
-    }
     +interface CardSelectionManager {
         +void setMultipleSelectionMode ()
 
@@ -134,10 +138,6 @@ package "selection" as selectionApi {
 
         +String exportProcessedCardSelectionScenario ()
         +CardSelectionResult importProcessedCardSelectionScenario (String processedCardSelectionScenario)
-    }
-    +interface "<color:blue>CardSelectorFactory" as CardSelectorFactory {
-        +<color:blue>BasicCardSelector createBasicCardSelector ()
-        +<color:blue>IsoCardSelector createIsoCardSelector ()
     }
     +interface "<color:blue>CardSelector<T extends CardSelector<T>>" as CardSelector {
         +<color:blue>T filterByCardProtocol (String logicalProtocolName)
@@ -206,6 +206,10 @@ package "selection" as selectionApi {
 
 ' Associations
 
+ReaderApiFactory ..> CardSelectionManager #C_LINK : provide >
+ReaderApiFactory ..> BasicCardSelector #C_LINK : provide >
+ReaderApiFactory ..> IsoCardSelector #C_LINK : provide >
+
 ObservableCardReader +-- NotificationMode
 ObservableCardReader +-up- DetectionMode
 ObservableCardReader .up.> DetectionMode #C_USE : use >
@@ -215,12 +219,7 @@ CardReaderEvent +-- CardReaderEventType
 CardReaderEvent ..> CardReaderEventType #C_LINK : provide >
 CardReaderEvent .up.> ScheduledCardSelectionsResponse #C_LINK : provide >
 
-CardSelectionManagerFactory ..> CardSelectionManager #C_LINK : provide >
-
 CardSelectionResult ..> SmartCard #C_LINK : provide >
-
-CardSelectorFactory .up.> BasicCardSelector #C_LINK : provide >
-CardSelectorFactory .up.> IsoCardSelector #C_LINK : provide >
 
 IsoCardSelector +-- FileOccurrence
 IsoCardSelector ..> FileOccurrence #C_USE : use >
@@ -242,7 +241,7 @@ CardReaderObserverSpi ..> CardReaderEvent #C_USE : use >
 
 ' == LAYOUT ==
 
-CardSelectorFactory -[hidden]- ReaderProtocolNotSupportedException
+IsoSmartCard -[hidden]- ReaderProtocolNotSupportedException
 ReaderProtocolNotSupportedException -[hidden]- ReaderCommunicationException
 ReaderCommunicationException -[hidden]right- CardCommunicationException
 
@@ -253,7 +252,6 @@ package reader.readerSpi #C_GREY2 {}
 package reader.selectionApi #C_GREY2 {}
 package reader.selectionApi.selectionSpi #C_GREY3 {}
 
-interface reader.selectionApi.CardSelectionManagerFactory <<red>>
-interface reader.selectionApi.CardSelectorFactory <<red>>
+interface reader.ReaderApiFactory <<red>>
 
 @enduml
