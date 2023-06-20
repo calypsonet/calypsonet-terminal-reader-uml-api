@@ -1,8 +1,8 @@
 @startuml
 title
-    <img:../assets/logo.png>
+    <img:../assets/logo.svg{scale=0.2}>
 
-    Terminal Reader API 2.0.+ (2023-06-14)
+    Terminal Reader API 2.0.+ (2023-06-19)
 end title
 
 ' == THEME ==
@@ -16,6 +16,7 @@ end title
 !define C_GREY6 BDC3C7
 !define C_LINK 3498DB
 !define C_USE 27AE60
+!define C_THROW 2C3E50
 
 ' -- Styles that don't work with new version of plantuml --
 skinparam stereotypeABorderColor #A9DCDF
@@ -53,76 +54,80 @@ hide <<grey>> stereotype
 
 ' == CONTENT ==
 
+legend top
+    __Colors legend__ :
+    * <color:grey>Work in progress...
+end legend
+
 package "reader" as reader {
 
-+class "**final** ReaderApiProperties" as ApiProperties {
++class "**final** ReaderApiProperties" as ApiProperties <<green>> {
     +{static} **final** String VERSION
 }
-+interface "<color:blue>ReaderApiFactory" as ReaderApiFactory {
++interface "<color:blue>ReaderApiFactory" as ReaderApiFactory <<blue>> {
     +<color:blue>CardSelectionManager createCardSelectionManager ()
 
     +<color:blue>BasicCardSelector createBasicCardSelector ()
     +<color:blue>IsoCardSelector createIsoCardSelector ()
+    +<color:grey>MultichannelCardSelector createMultichannelCardSelector ()
 }
 
 ' SERVICE
-together {
-    +interface CardReader {
-        +String getName ()
-        +boolean isContactless ()
-        +boolean isCardPresent ()
-    }
-    +interface ObservableCardReader extends CardReader {
-        +void setReaderObservationExceptionHandler (CardReaderObservationExceptionHandlerSpi exceptionHandler)
++interface CardReader {
+    +String getName ()
+    +boolean isContactless ()
+    +boolean isCardPresent ()
+}
++interface ObservableCardReader extends CardReader {
+    +void setReaderObservationExceptionHandler (CardReaderObservationExceptionHandlerSpi exceptionHandler)
 
-        +void addObserver (CardReaderObserverSpi observer)
-        +void removeObserver (CardReaderObserverSpi observer)
-        +void clearObservers ()
-        +int countObservers ()
+    +void addObserver (CardReaderObserverSpi observer)
+    +void removeObserver (CardReaderObserverSpi observer)
+    +void clearObservers ()
+    +int countObservers ()
 
-        +void startCardDetection (DetectionMode detectionMode)
-        +void stopCardDetection ()
-        +void finalizeCardProcessing ()
+    +void startCardDetection (DetectionMode detectionMode)
+    +void stopCardDetection ()
+    +void finalizeCardProcessing ()
+}
++interface ConfigurableCardReader extends CardReader {
+    +void activateProtocol (String physicalProtocolName, String logicalProtocolName)
+    +void deactivateProtocol (String physicalProtocolName)
+    +String getCurrentProtocol ()
+}
++enum DetectionMode <<green>> {
+    REPEATING
+    SINGLESHOT
+}
++enum NotificationMode <<green>> {
+    ALWAYS
+    MATCHED_ONLY
+}
++interface CardReaderEvent {
+    +String getReaderName ()
+    +Type getType ()
+    +ScheduledCardSelectionsResponse getScheduledCardSelectionsResponse ()
+}
++enum "Type" as CardReaderEventType <<green>> {
+    CARD_INSERTED
+    CARD_MATCHED
+    CARD_REMOVED
+    UNAVAILABLE
+}
+' SPI
+package "spi" as readerSpi {
+    +interface CardReaderObserverSpi <<red>> {
+        +void onReaderEvent (CardReaderEvent cardReaderEvent)
     }
-    +interface ConfigurableCardReader extends CardReader {
-        +void activateProtocol (String physicalProtocolName, String logicalProtocolName)
-        +void deactivateProtocol (String physicalProtocolName)
-        +String getCurrentProtocol ()
-    }
-    +enum DetectionMode {
-        REPEATING
-        SINGLESHOT
-    }
-    +enum NotificationMode {
-        ALWAYS
-        MATCHED_ONLY
-    }
-    +interface CardReaderEvent {
-        +String getReaderName ()
-        +Type getType ()
-        +ScheduledCardSelectionsResponse getScheduledCardSelectionsResponse ()
-    }
-    +enum "Type" as CardReaderEventType {
-        CARD_INSERTED
-        CARD_MATCHED
-        CARD_REMOVED
-        UNAVAILABLE
-    }
-    ' SPI
-    package "spi" as readerSpi {
-        +interface CardReaderObserverSpi {
-            +void onReaderEvent (CardReaderEvent cardReaderEvent)
-        }
-        +interface CardReaderObservationExceptionHandlerSpi {
-            +void onReaderObservationError (String contextInfo, String readerName, Throwable e)
-        }
+    +interface CardReaderObservationExceptionHandlerSpi <<red>> {
+        +void onReaderObservationError (String contextInfo, String readerName, Throwable e)
     }
 }
 
 ' SELECTION
 package "selection" as selectionApi {
     ' Selection
-    +interface CardSelectionManager {
+    +interface CardSelectionManager <<blue>> {
         +void setMultipleSelectionMode ()
 
         +<color:blue>int prepareSelection (CardSelector<?> cardSelector, CardSelectionExtension cardSelectionExtension)
@@ -143,36 +148,41 @@ package "selection" as selectionApi {
         +<color:blue>T filterByCardProtocol (String logicalProtocolName)
         +<color:blue>T filterByPowerOnData (String powerOnDataRegex)
     }
-    +interface "<color:blue>BasicCardSelector" as BasicCardSelector extends CardSelector {
+    +interface "<color:blue>BasicCardSelector" as BasicCardSelector <<blue>> extends CardSelector {
     }
-    +interface "<color:blue>IsoCardSelector" as IsoCardSelector extends CardSelector {
-        +<color:blue>IsoCardSelector filterByDfName (byte[] aid)
-        +<color:blue>IsoCardSelector filterByDfName (String aid)
+    +interface "<color:blue>CommonIsoCardSelector<T extends CardSelector<T>>" as CommonIsoCardSelector extends CardSelector {
+        +<color:blue>T filterByDfName (byte[] aid)
+        +<color:blue>T filterByDfName (String aid)
 
-        +<color:blue>IsoCardSelector setFileOccurrence (FileOccurrence fileOccurrence)
-        +<color:blue>IsoCardSelector setFileControlInformation (FileControlInformation fileControlInformation)
+        +<color:blue>T setFileOccurrence (FileOccurrence fileOccurrence)
+        +<color:blue>T setFileControlInformation (FileControlInformation fileControlInformation)
     }
-    +enum "<color:blue>FileOccurrence" as FileOccurrence {
+    +enum "<color:blue>FileOccurrence" as FileOccurrence <<green>> {
         <color:blue>FIRST
         <color:blue>LAST
         <color:blue>NEXT
         <color:blue>PREVIOUS
     }
-    +enum "<color:blue>FileControlInformation" as FileControlInformation {
+    +enum "<color:blue>FileControlInformation" as FileControlInformation <<green>> {
         <color:blue>FCI
         <color:blue>FCP
         <color:blue>FMD
         <color:blue>NO_RESPONSE
     }
+    +interface "<color:blue>IsoCardSelector" as IsoCardSelector <<blue>> extends CommonIsoCardSelector {
+    }
+    +interface "<color:grey>MultichannelCardSelector" as MultichannelCardSelector <<blue>> extends CommonIsoCardSelector {
+        +<color:grey>MultichannelCardSelector useDedicatedLogicalChannel ()
+    }
 
     ' Card Extension SPI
     package "spi" as selectionSpi {
-        +interface "<color:blue>CardSelectionExtension" as CardSelectionExtension {
+        +interface "<color:blue>CardSelectionExtension" as CardSelectionExtension <<red>> {
         }
-        +interface "SmartCard" as SmartCard {
+        +interface "SmartCard" as SmartCard <<red>> {
             +String getPowerOnData ()
         }
-        +interface "<color:blue>IsoSmartCard" as IsoSmartCard extends SmartCard {
+        +interface "<color:blue>IsoSmartCard" as IsoSmartCard <<red>> extends SmartCard {
             +byte[] getSelectApplicationResponse ()
         }
     }
@@ -180,24 +190,26 @@ package "selection" as selectionApi {
         +Map<Integer, SmartCard> getSmartCards ()
         +SmartCard getActiveSmartCard ()
         +int getActiveSelectionIndex ()
+
+        +<color:grey>CardReader getCardReader ()
     }
     +interface ScheduledCardSelectionsResponse {
     }
 
-    +class "<<RuntimeException>>\nInvalidCardResponseException" as InvalidCardResponseException {
+    +class "<<RuntimeException>>\nInvalidCardResponseException" as InvalidCardResponseException <<green>> {
         +InvalidCardResponseException (String message)
         +InvalidCardResponseException (String message, Throwable cause)
     }
 }
 ' EXCEPTIONS
-+class "<<RuntimeException>>\nReaderCommunicationException" as ReaderCommunicationException {
++class "<<RuntimeException>>\nReaderCommunicationException" as ReaderCommunicationException <<green>> {
     +ReaderCommunicationException (String message)
     +ReaderCommunicationException (String message, Throwable cause)
 }
-+class "<<RuntimeException>>\nReaderProtocolNotSupportedException" as ReaderProtocolNotSupportedException {
++class "<<RuntimeException>>\nReaderProtocolNotSupportedException" as ReaderProtocolNotSupportedException <<green>> {
     +ReaderProtocolNotSupportedException (String physicalProtocolName)
 }
-+class "<<RuntimeException>>\nCardCommunicationException" as CardCommunicationException {
++class "<<RuntimeException>>\nCardCommunicationException" as CardCommunicationException <<green>> {
     +CardCommunicationException (String message)
     +CardCommunicationException (String message, Throwable cause)
 }
@@ -206,11 +218,7 @@ package "selection" as selectionApi {
 
 ' Associations
 
-ReaderApiFactory ..> CardSelectionManager #C_LINK : provide >
-ReaderApiFactory ..> BasicCardSelector #C_LINK : provide >
-ReaderApiFactory ..> IsoCardSelector #C_LINK : provide >
-
-ObservableCardReader +-- NotificationMode
+ObservableCardReader +-up- NotificationMode
 ObservableCardReader +-up- DetectionMode
 ObservableCardReader .up.> DetectionMode #C_USE : use >
 ObservableCardReader ..> CardReaderObservationExceptionHandlerSpi #C_USE : use >
@@ -221,10 +229,10 @@ CardReaderEvent .up.> ScheduledCardSelectionsResponse #C_LINK : provide >
 
 CardSelectionResult ..> SmartCard #C_LINK : provide >
 
-IsoCardSelector +-- FileOccurrence
-IsoCardSelector ..> FileOccurrence #C_USE : use >
-IsoCardSelector +-- FileControlInformation
-IsoCardSelector ..> FileControlInformation #C_USE : use >
+CommonIsoCardSelector +-- FileOccurrence
+CommonIsoCardSelector ..> FileOccurrence #C_USE : use >
+CommonIsoCardSelector +-- FileControlInformation
+CommonIsoCardSelector ..> FileControlInformation #C_USE : use >
 
 CardSelectionManager ..> CardSelector #C_USE : use >
 CardSelectionManager ..> CardSelectionExtension #C_USE : use >
@@ -233,7 +241,7 @@ CardSelectionManager ..> CardSelectionResult #C_LINK : provide >
 CardSelectionManager .right.> CardReader #C_USE : use >
 CardSelectionManager ..> NotificationMode #C_USE : use >
 CardSelectionManager ..> DetectionMode #C_USE : use >
-CardSelectionManager ..> InvalidCardResponseException #C_LINK : throw >
+CardSelectionManager .left.> InvalidCardResponseException #C_THROW : throw >
 
 ObservableCardReader ..> CardReaderObserverSpi #C_USE : use >
 
@@ -241,9 +249,10 @@ CardReaderObserverSpi ..> CardReaderEvent #C_USE : use >
 
 ' == LAYOUT ==
 
-IsoSmartCard -[hidden]- ReaderProtocolNotSupportedException
+ReaderApiFactory -[hidden]- ApiProperties
+ApiProperties -[hidden]- ReaderProtocolNotSupportedException
 ReaderProtocolNotSupportedException -[hidden]- ReaderCommunicationException
-ReaderCommunicationException -[hidden]right- CardCommunicationException
+ReaderCommunicationException -[hidden]- CardCommunicationException
 
 ' == STYLE ==
 
@@ -251,7 +260,5 @@ package reader #C_GREY1 {}
 package reader.readerSpi #C_GREY2 {}
 package reader.selectionApi #C_GREY2 {}
 package reader.selectionApi.selectionSpi #C_GREY3 {}
-
-interface reader.ReaderApiFactory <<red>>
 
 @enduml
