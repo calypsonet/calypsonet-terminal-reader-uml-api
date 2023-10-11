@@ -2,7 +2,7 @@
 title
     <img:../assets/logo.svg{scale=0.2}>
 
-    Terminal Reader API 2.0.+ (2023-06-19)
+    Terminal Reader API 2.0.+ (2023-10-11)
 end title
 
 ' == THEME ==
@@ -86,7 +86,8 @@ package "reader" as reader {
     +void clearObservers ()
     +int countObservers ()
 
-    +void startCardDetection (DetectionMode detectionMode)
+    +<color:red><s>void startCardDetection (DetectionMode detectionMode)
+    +<color:blue>void startCardDetection ()
     +void stopCardDetection ()
     +void finalizeCardProcessing ()
 }
