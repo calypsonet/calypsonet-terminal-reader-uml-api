@@ -2,7 +2,7 @@
 title
     <img:../assets/logo.svg{scale=0.2}>
 
-    Terminal Reader API 2.0.+ (2023-10-11)
+    Terminal Reader API 2.0.+ (2023-10-16)
 end title
 
 ' == THEME ==
@@ -86,8 +86,7 @@ package "reader" as reader {
     +void clearObservers ()
     +int countObservers ()
 
-    +<color:red><s>void startCardDetection (DetectionMode detectionMode)
-    +<color:blue>void startCardDetection ()
+    +void startCardDetection (DetectionMode detectionMode)
     +void stopCardDetection ()
     +void finalizeCardProcessing ()
 }
@@ -139,7 +138,8 @@ package "selection" as selectionApi {
 
         +CardSelectionResult processCardSelectionScenario (CardReader cardReader)
 
-        +void scheduleCardSelectionScenario (ObservableCardReader observableCardReader, DetectionMode detectionMode, NotificationMode notificationMode)
+        +<color:red><s>void scheduleCardSelectionScenario (ObservableCardReader observableCardReader, DetectionMode detectionMode, NotificationMode notificationMode)
+        +<color:blue>void scheduleCardSelectionScenario (ObservableCardReader observableCardReader, NotificationMode notificationMode)
         +CardSelectionResult parseScheduledCardSelectionsResponse (ScheduledCardSelectionsResponse scheduledCardSelectionsResponse)
 
         +String exportProcessedCardSelectionScenario ()
