@@ -138,7 +138,6 @@ package "selection" as selectionApi {
 
         +CardSelectionResult processCardSelectionScenario (CardReader cardReader)
 
-        +<color:red><s>void scheduleCardSelectionScenario (ObservableCardReader observableCardReader, DetectionMode detectionMode, NotificationMode notificationMode)
         +<color:blue>void scheduleCardSelectionScenario (ObservableCardReader observableCardReader, NotificationMode notificationMode)
         +CardSelectionResult parseScheduledCardSelectionsResponse (ScheduledCardSelectionsResponse scheduledCardSelectionsResponse)
 
@@ -219,14 +218,17 @@ package "selection" as selectionApi {
 
 ' Associations
 
-ObservableCardReader +-up- NotificationMode
-ObservableCardReader +-up- DetectionMode
-ObservableCardReader .up.> DetectionMode #C_USE : use >
-ObservableCardReader ..> CardReaderObservationExceptionHandlerSpi #C_USE : use >
+ObservableCardReader +-right- NotificationMode
+ObservableCardReader +-- DetectionMode
+ObservableCardReader ..> DetectionMode #C_USE : use >
+ObservableCardReader ...> CardReaderObserverSpi #C_USE : use >
+ObservableCardReader ...> CardReaderObservationExceptionHandlerSpi #C_USE : use >
 
-CardReaderEvent +-- CardReaderEventType
-CardReaderEvent ..> CardReaderEventType #C_LINK : provide >
-CardReaderEvent .up.> ScheduledCardSelectionsResponse #C_LINK : provide >
+CardReaderEvent +-right- CardReaderEventType
+CardReaderEvent .right.> CardReaderEventType #C_LINK : provide >
+CardReaderEvent ..> ScheduledCardSelectionsResponse #C_LINK : provide >
+
+CardReaderObserverSpi ..> CardReaderEvent #C_USE : use >
 
 CardSelectionResult ..> SmartCard #C_LINK : provide >
 
@@ -241,12 +243,7 @@ CardSelectionManager ..> ScheduledCardSelectionsResponse #C_USE : use >
 CardSelectionManager ..> CardSelectionResult #C_LINK : provide >
 CardSelectionManager .right.> CardReader #C_USE : use >
 CardSelectionManager ..> NotificationMode #C_USE : use >
-CardSelectionManager ..> DetectionMode #C_USE : use >
-CardSelectionManager .left.> InvalidCardResponseException #C_THROW : throw >
-
-ObservableCardReader ..> CardReaderObserverSpi #C_USE : use >
-
-CardReaderObserverSpi ..> CardReaderEvent #C_USE : use >
+CardSelectionManager .right.> InvalidCardResponseException #C_THROW : throw >
 
 ' == LAYOUT ==
 
