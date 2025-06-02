@@ -38,7 +38,11 @@ do
   cd "$directory" || exit
   for file in  $(ls -r *.svg 2>/dev/null | cut -f1 -d'/')
   do
-    diagrams="$diagrams[$file]($directory/$file)<br/>"
+    if [ "$directory" = "$latest_stable" ]; then
+      diagrams="$diagrams[$file](latest-stable/$file)<br/>"
+    else
+      diagrams="$diagrams[$file]($directory/$file)<br/>"
+    fi
   done
   cd ..
   # If this is the stable version, write latest-stable entry first
