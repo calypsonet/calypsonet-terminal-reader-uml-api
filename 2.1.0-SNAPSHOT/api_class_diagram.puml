@@ -2,7 +2,7 @@
 title
     <img:../assets/logo.svg{scale=0.2}>
 
-    Terminal Reader API 2.1.+ (2023-10-16)
+    Terminal Reader API 2.1.+ (2025-11-05)
 end title
 
 ' == THEME ==
@@ -103,6 +103,10 @@ package "reader" as reader {
     ALWAYS
     MATCHED_ONLY
 }
++enum "<color:blue>ChannelControl" as ChannelControl <<green>> {
+    <color:blue>KEEP_OPEN
+    <color:blue>CLOSE_AFTER
+}
 +interface CardReaderEvent {
     +String getReaderName ()
     +Type getType ()
@@ -131,14 +135,17 @@ package "selection" as selectionApi {
         +void setMultipleSelectionMode ()
 
         +int prepareSelection (CardSelector<?> cardSelector, CardSelectionExtension cardSelectionExtension)
-        +void prepareReleaseChannel ()
+        +<color:red><s>void prepareReleaseChannel ()
 
-        +String exportCardSelectionScenario ()
+        +<color:red><s>String exportCardSelectionScenario ()
+        +<color:blue>String exportCardSelectionScenario (ChannelControl channelControl)
         +int importCardSelectionScenario (String cardSelectionScenario)
 
-        +CardSelectionResult processCardSelectionScenario (CardReader cardReader)
+        +<color:red><s>CardSelectionResult processCardSelectionScenario (CardReader cardReader)
+        +<color:blue>CardSelectionResult processCardSelectionScenario (CardReader cardReader, ChannelControl channelControl)
 
-        +void scheduleCardSelectionScenario (ObservableCardReader observableCardReader, NotificationMode notificationMode)
+        +<color:red><s>void scheduleCardSelectionScenario (ObservableCardReader observableCardReader, NotificationMode notificationMode)
+        +<color:blue>void scheduleCardSelectionScenario (ObservableCardReader observableCardReader, NotificationMode notificationMode, ChannelControl channelControl)
         +CardSelectionResult parseScheduledCardSelectionsResponse (ScheduledCardSelectionsResponse scheduledCardSelectionsResponse)
 
         +String exportProcessedCardSelectionScenario ()
@@ -201,6 +208,16 @@ package "selection" as selectionApi {
         +InvalidCardResponseException (String message, Throwable cause)
     }
 }
+
+' TRANSACTION
+package "transaction" as transactionApi {
+    package "spi" as transactionSpi {
+        +interface "<color:blue>CardTransactionManager" as CardTransactionManager<T extends CardTransactionManager<T>> <<red>> {
+            +<color:blue>T processCommands (ChannelControl channelControl)
+        }
+    }
+}
+
 ' EXCEPTIONS
 +class "<<RuntimeException>>\nReaderCommunicationException" as ReaderCommunicationException <<green>> {
     +ReaderCommunicationException (String message)
@@ -237,13 +254,16 @@ CommonIsoCardSelector ..> FileOccurrence #C_USE : use >
 CommonIsoCardSelector +-- FileControlInformation
 CommonIsoCardSelector ..> FileControlInformation #C_USE : use >
 
+CardSelectionManager .up.> ChannelControl #C_USE : use >
 CardSelectionManager ..> CardSelector #C_USE : use >
 CardSelectionManager ..> CardSelectionExtension #C_USE : use >
 CardSelectionManager ..> ScheduledCardSelectionsResponse #C_USE : use >
 CardSelectionManager ..> CardSelectionResult #C_LINK : provide >
 CardSelectionManager .right.> CardReader #C_USE : use >
-CardSelectionManager ..> NotificationMode #C_USE : use >
+CardSelectionManager .up.> NotificationMode #C_USE : use >
 CardSelectionManager .right.> InvalidCardResponseException #C_THROW : throw >
+
+CardTransactionManager .left.> ChannelControl #C_USE : use >
 
 ' == LAYOUT ==
 
@@ -251,6 +271,7 @@ ReaderApiFactory -[hidden]- ApiProperties
 ApiProperties -[hidden]- ReaderProtocolNotSupportedException
 ReaderProtocolNotSupportedException -[hidden]- ReaderCommunicationException
 ReaderCommunicationException -[hidden]- CardCommunicationException
+CardSelectionManager -[hidden]up- CardTransactionManager
 
 ' == STYLE ==
 
@@ -258,5 +279,7 @@ package reader #C_GREY1 {}
 package reader.readerSpi #C_GREY2 {}
 package reader.selectionApi #C_GREY2 {}
 package reader.selectionApi.selectionSpi #C_GREY3 {}
+package reader.transactionApi #C_GREY2 {}
+package reader.transactionApi.transactionSpi #C_GREY3 {}
 
 @enduml
