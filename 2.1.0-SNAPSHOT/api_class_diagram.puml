@@ -2,7 +2,7 @@
 title
     <img:../assets/logo.svg{scale=0.2}>
 
-    Terminal Reader API 2.1.+ (2025-11-05)
+    Terminal Reader API 2.1.+ (2025-11-10)
 end title
 
 ' == THEME ==
@@ -203,7 +203,7 @@ package "selection" as selectionApi {
     +interface ScheduledCardSelectionsResponse {
     }
 
-    +class "<<RuntimeException>>\nInvalidCardResponseException" as InvalidCardResponseException <<green>> {
+    +class "<<RuntimeException>>\nInvalidCardResponseException" as InvalidCardResponseExceptionOld <<green>> {
         +InvalidCardResponseException (String message)
         +InvalidCardResponseException (String message, Throwable cause)
     }
@@ -229,6 +229,10 @@ package "transaction" as transactionApi {
 +class "<<RuntimeException>>\nCardCommunicationException" as CardCommunicationException <<green>> {
     +CardCommunicationException (String message)
     +CardCommunicationException (String message, Throwable cause)
+}
++class "<color:blue>InvalidCardResponseException" as InvalidCardResponseException <<green>> extends reader.selectionApi.InvalidCardResponseExceptionOld {
+    +<color:blue>InvalidCardResponseException (String message)
+    +<color:blue>InvalidCardResponseException (String message, Throwable cause)
 }
 
 }
@@ -261,7 +265,7 @@ CardSelectionManager ..> ScheduledCardSelectionsResponse #C_USE : use >
 CardSelectionManager ..> CardSelectionResult #C_LINK : provide >
 CardSelectionManager .right.> CardReader #C_USE : use >
 CardSelectionManager .up.> NotificationMode #C_USE : use >
-CardSelectionManager .right.> InvalidCardResponseException #C_THROW : throw >
+CardSelectionManager .right.> InvalidCardResponseExceptionOld #C_THROW : throw >
 
 CardTransactionManager .left.> ChannelControl #C_USE : use >
 
