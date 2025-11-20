@@ -2,7 +2,7 @@
 title
     <img:../assets/logo.svg{scale=0.2}>
 
-    Terminal Reader API 2.0.+ (2023-10-16)
+    Terminal Reader API 2.1.+ (2025-11-19)
 end title
 
 ' == THEME ==
@@ -64,11 +64,11 @@ package "reader" as reader {
 +class "**final** ReaderApiProperties" as ApiProperties <<green>> {
     +{static} **final** String VERSION
 }
-+interface "<color:blue>ReaderApiFactory" as ReaderApiFactory <<blue>> {
-    +<color:blue>CardSelectionManager createCardSelectionManager ()
++interface "ReaderApiFactory" as ReaderApiFactory <<blue>> {
+    +CardSelectionManager createCardSelectionManager ()
 
-    +<color:blue>BasicCardSelector createBasicCardSelector ()
-    +<color:blue>IsoCardSelector createIsoCardSelector ()
+    +BasicCardSelector createBasicCardSelector ()
+    +IsoCardSelector createIsoCardSelector ()
     +<color:grey>MultichannelCardSelector createMultichannelCardSelector ()
 }
 
@@ -103,6 +103,10 @@ package "reader" as reader {
     ALWAYS
     MATCHED_ONLY
 }
++enum "<color:blue>ChannelControl" as ChannelControl <<green>> {
+    <color:blue>KEEP_OPEN
+    <color:blue>CLOSE_AFTER
+}
 +interface CardReaderEvent {
     +String getReaderName ()
     +Type getType ()
@@ -130,7 +134,7 @@ package "selection" as selectionApi {
     +interface CardSelectionManager <<blue>> {
         +void setMultipleSelectionMode ()
 
-        +<color:blue>int prepareSelection (CardSelector<?> cardSelector, CardSelectionExtension cardSelectionExtension)
+        +int prepareSelection (CardSelector<?> cardSelector, CardSelectionExtension cardSelectionExtension)
         +void prepareReleaseChannel ()
 
         +String exportCardSelectionScenario ()
@@ -138,38 +142,38 @@ package "selection" as selectionApi {
 
         +CardSelectionResult processCardSelectionScenario (CardReader cardReader)
 
-        +<color:blue>void scheduleCardSelectionScenario (ObservableCardReader observableCardReader, NotificationMode notificationMode)
+        +void scheduleCardSelectionScenario (ObservableCardReader observableCardReader, NotificationMode notificationMode)
         +CardSelectionResult parseScheduledCardSelectionsResponse (ScheduledCardSelectionsResponse scheduledCardSelectionsResponse)
 
         +String exportProcessedCardSelectionScenario ()
         +CardSelectionResult importProcessedCardSelectionScenario (String processedCardSelectionScenario)
     }
-    +interface "<color:blue>CardSelector<T extends CardSelector<T>>" as CardSelector {
-        +<color:blue>T filterByCardProtocol (String logicalProtocolName)
-        +<color:blue>T filterByPowerOnData (String powerOnDataRegex)
+    +interface "CardSelector<T extends CardSelector<T>>" as CardSelector {
+        +T filterByCardProtocol (String logicalProtocolName)
+        +T filterByPowerOnData (String powerOnDataRegex)
     }
-    +interface "<color:blue>BasicCardSelector" as BasicCardSelector <<blue>> extends CardSelector {
+    +interface "BasicCardSelector" as BasicCardSelector <<blue>> extends CardSelector {
     }
-    +interface "<color:blue>CommonIsoCardSelector<T extends CardSelector<T>>" as CommonIsoCardSelector extends CardSelector {
-        +<color:blue>T filterByDfName (byte[] aid)
-        +<color:blue>T filterByDfName (String aid)
+    +interface "CommonIsoCardSelector<T extends CardSelector<T>>" as CommonIsoCardSelector extends CardSelector {
+        +T filterByDfName (byte[] aid)
+        +T filterByDfName (String aid)
 
-        +<color:blue>T setFileOccurrence (FileOccurrence fileOccurrence)
-        +<color:blue>T setFileControlInformation (FileControlInformation fileControlInformation)
+        +T setFileOccurrence (FileOccurrence fileOccurrence)
+        +T setFileControlInformation (FileControlInformation fileControlInformation)
     }
-    +enum "<color:blue>FileOccurrence" as FileOccurrence <<green>> {
-        <color:blue>FIRST
-        <color:blue>LAST
-        <color:blue>NEXT
-        <color:blue>PREVIOUS
+    +enum "FileOccurrence" as FileOccurrence <<green>> {
+        FIRST
+        LAST
+        NEXT
+        PREVIOUS
     }
-    +enum "<color:blue>FileControlInformation" as FileControlInformation <<green>> {
-        <color:blue>FCI
-        <color:blue>FCP
-        <color:blue>FMD
-        <color:blue>NO_RESPONSE
+    +enum "FileControlInformation" as FileControlInformation <<green>> {
+        FCI
+        FCP
+        FMD
+        NO_RESPONSE
     }
-    +interface "<color:blue>IsoCardSelector" as IsoCardSelector <<blue>> extends CommonIsoCardSelector {
+    +interface "IsoCardSelector" as IsoCardSelector <<blue>> extends CommonIsoCardSelector {
     }
     +interface "<color:grey>MultichannelCardSelector" as MultichannelCardSelector <<blue>> extends CommonIsoCardSelector {
         +<color:grey>MultichannelCardSelector useDedicatedLogicalChannel ()
@@ -177,12 +181,12 @@ package "selection" as selectionApi {
 
     ' Card Extension SPI
     package "spi" as selectionSpi {
-        +interface "<color:blue>CardSelectionExtension" as CardSelectionExtension <<red>> {
+        +interface "CardSelectionExtension" as CardSelectionExtension <<red>> {
         }
         +interface "SmartCard" as SmartCard <<red>> {
             +String getPowerOnData ()
         }
-        +interface "<color:blue>IsoSmartCard" as IsoSmartCard <<red>> extends SmartCard {
+        +interface "IsoSmartCard" as IsoSmartCard <<red>> extends SmartCard {
             +byte[] getSelectApplicationResponse ()
         }
     }
@@ -196,11 +200,21 @@ package "selection" as selectionApi {
     +interface ScheduledCardSelectionsResponse {
     }
 
-    +class "<<RuntimeException>>\nInvalidCardResponseException" as InvalidCardResponseException <<green>> {
+    +class "<<RuntimeException>>\nInvalidCardResponseException" as InvalidCardResponseExceptionOld <<green>> {
         +InvalidCardResponseException (String message)
         +InvalidCardResponseException (String message, Throwable cause)
     }
 }
+
+' TRANSACTION
+package "transaction" as transactionApi {
+    package "spi" as transactionSpi {
+        +interface "<color:blue>CardTransactionManager" as CardTransactionManager<T extends CardTransactionManager<T>> <<red>> {
+            +<color:blue>T processCommands (ChannelControl channelControl)
+        }
+    }
+}
+
 ' EXCEPTIONS
 +class "<<RuntimeException>>\nReaderCommunicationException" as ReaderCommunicationException <<green>> {
     +ReaderCommunicationException (String message)
@@ -212,6 +226,10 @@ package "selection" as selectionApi {
 +class "<<RuntimeException>>\nCardCommunicationException" as CardCommunicationException <<green>> {
     +CardCommunicationException (String message)
     +CardCommunicationException (String message, Throwable cause)
+}
++class "<<RuntimeException>>\n<color:blue>InvalidCardResponseException" as InvalidCardResponseException <<green>> {
+    +<color:blue>InvalidCardResponseException (String message)
+    +<color:blue>InvalidCardResponseException (String message, Throwable cause)
 }
 
 }
@@ -242,8 +260,10 @@ CardSelectionManager ..> CardSelectionExtension #C_USE : use >
 CardSelectionManager ..> ScheduledCardSelectionsResponse #C_USE : use >
 CardSelectionManager ..> CardSelectionResult #C_LINK : provide >
 CardSelectionManager .right.> CardReader #C_USE : use >
-CardSelectionManager ..> NotificationMode #C_USE : use >
-CardSelectionManager .right.> InvalidCardResponseException #C_THROW : throw >
+CardSelectionManager .up.> NotificationMode #C_USE : use >
+CardSelectionManager .right.> InvalidCardResponseExceptionOld #C_THROW : throw >
+
+CardTransactionManager .left.> ChannelControl #C_USE : use >
 
 ' == LAYOUT ==
 
@@ -251,6 +271,9 @@ ReaderApiFactory -[hidden]- ApiProperties
 ApiProperties -[hidden]- ReaderProtocolNotSupportedException
 ReaderProtocolNotSupportedException -[hidden]- ReaderCommunicationException
 ReaderCommunicationException -[hidden]- CardCommunicationException
+CardCommunicationException -[hidden]- InvalidCardResponseException
+CardSelectionManager -[hidden]up- CardTransactionManager
+CardSelectionManager .[hidden]up.> ChannelControl
 
 ' == STYLE ==
 
@@ -258,5 +281,7 @@ package reader #C_GREY1 {}
 package reader.readerSpi #C_GREY2 {}
 package reader.selectionApi #C_GREY2 {}
 package reader.selectionApi.selectionSpi #C_GREY3 {}
+package reader.transactionApi #C_GREY2 {}
+package reader.transactionApi.transactionSpi #C_GREY3 {}
 
 @enduml

@@ -2,7 +2,7 @@
 title
     <img:../assets/logo.svg{scale=0.2}>
 
-    Terminal Reader API 2.1.+ (2025-11-10)
+    Terminal Reader API 2.1.+ (2025-11-19)
 end title
 
 ' == THEME ==
@@ -135,17 +135,14 @@ package "selection" as selectionApi {
         +void setMultipleSelectionMode ()
 
         +int prepareSelection (CardSelector<?> cardSelector, CardSelectionExtension cardSelectionExtension)
-        +<color:red><s>void prepareReleaseChannel ()
+        +void prepareReleaseChannel ()
 
-        +<color:red><s>String exportCardSelectionScenario ()
-        +<color:blue>String exportCardSelectionScenario (ChannelControl channelControl)
+        +String exportCardSelectionScenario ()
         +int importCardSelectionScenario (String cardSelectionScenario)
 
-        +<color:red><s>CardSelectionResult processCardSelectionScenario (CardReader cardReader)
-        +<color:blue>CardSelectionResult processCardSelectionScenario (CardReader cardReader, ChannelControl channelControl)
+        +CardSelectionResult processCardSelectionScenario (CardReader cardReader)
 
-        +<color:red><s>void scheduleCardSelectionScenario (ObservableCardReader observableCardReader, NotificationMode notificationMode)
-        +<color:blue>void scheduleCardSelectionScenario (ObservableCardReader observableCardReader, NotificationMode notificationMode, ChannelControl channelControl)
+        +void scheduleCardSelectionScenario (ObservableCardReader observableCardReader, NotificationMode notificationMode)
         +CardSelectionResult parseScheduledCardSelectionsResponse (ScheduledCardSelectionsResponse scheduledCardSelectionsResponse)
 
         +String exportProcessedCardSelectionScenario ()
@@ -230,7 +227,7 @@ package "transaction" as transactionApi {
     +CardCommunicationException (String message)
     +CardCommunicationException (String message, Throwable cause)
 }
-+class "<color:blue>InvalidCardResponseException" as InvalidCardResponseException <<green>> extends reader.selectionApi.InvalidCardResponseExceptionOld {
++class "<<RuntimeException>>\n<color:blue>InvalidCardResponseException" as InvalidCardResponseException <<green>> {
     +<color:blue>InvalidCardResponseException (String message)
     +<color:blue>InvalidCardResponseException (String message, Throwable cause)
 }
@@ -258,7 +255,6 @@ CommonIsoCardSelector ..> FileOccurrence #C_USE : use >
 CommonIsoCardSelector +-- FileControlInformation
 CommonIsoCardSelector ..> FileControlInformation #C_USE : use >
 
-CardSelectionManager .up.> ChannelControl #C_USE : use >
 CardSelectionManager ..> CardSelector #C_USE : use >
 CardSelectionManager ..> CardSelectionExtension #C_USE : use >
 CardSelectionManager ..> ScheduledCardSelectionsResponse #C_USE : use >
@@ -275,7 +271,9 @@ ReaderApiFactory -[hidden]- ApiProperties
 ApiProperties -[hidden]- ReaderProtocolNotSupportedException
 ReaderProtocolNotSupportedException -[hidden]- ReaderCommunicationException
 ReaderCommunicationException -[hidden]- CardCommunicationException
+CardCommunicationException -[hidden]- InvalidCardResponseException
 CardSelectionManager -[hidden]up- CardTransactionManager
+CardSelectionManager .[hidden]up.> ChannelControl
 
 ' == STYLE ==
 
