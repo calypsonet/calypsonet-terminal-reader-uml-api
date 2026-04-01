@@ -79,6 +79,7 @@ package "reader" as reader {
 
     +boolean isCardPresent ()
     +<color:blue>void finalizeCardProcessing ()
+    +<color:blue>void closeLogicalChannel (IsoSmartCard isoSmartCard)
 }
 +interface ObservableCardReader extends CardReader {
     +<color:red><s>void setReaderObservationExceptionHandler (CardReaderObservationExceptionHandlerSpi exceptionHandler)</s>
@@ -105,9 +106,9 @@ package "reader" as reader {
     ALWAYS
     MATCHED_ONLY
 }
-+enum "ChannelControl" as ChannelControl <<green>> {
-    KEEP_OPEN
-    CLOSE_AFTER
++enum "<color:red><s>ChannelControl" as ChannelControl <<green>> {
+    <color:red><s>KEEP_OPEN
+    <color:red><s>CLOSE_AFTER
 }
 +interface CardReaderEvent {
     +String getReaderName ()
@@ -160,12 +161,14 @@ package "selection" as selectionApi {
     }
     +interface "BasicCardSelector" as BasicCardSelector <<blue>> extends CardSelector {
     }
-    +interface "CommonIsoCardSelector<T extends CardSelector<T>>" as CommonIsoCardSelector extends CardSelector {
-        +T filterByDfName (byte[] aid)
-        +T filterByDfName (String aid)
+    +interface "IsoCardSelector" as IsoCardSelector <<blue>> extends CardSelector {
+        +IsoCardSelector filterByDfName (byte[] aid)
+        +IsoCardSelector filterByDfName (String aid)
 
-        +T setFileOccurrence (FileOccurrence fileOccurrence)
-        +T setFileControlInformation (FileControlInformation fileControlInformation)
+        +IsoCardSelector setFileOccurrence (FileOccurrence fileOccurrence)
+        +IsoCardSelector setFileControlInformation (FileControlInformation fileControlInformation)
+
+        +<color:blue>IsoCardSelector useDedicatedLogicalChannel ()
     }
     +enum "FileOccurrence" as FileOccurrence <<green>> {
         FIRST
@@ -178,11 +181,6 @@ package "selection" as selectionApi {
         FCP
         FMD
         NO_RESPONSE
-    }
-    +interface "IsoCardSelector" as IsoCardSelector <<blue>> extends CommonIsoCardSelector {
-    }
-    +interface "<color:grey>MultichannelCardSelector" as MultichannelCardSelector <<blue>> extends CommonIsoCardSelector {
-        +<color:grey>MultichannelCardSelector useDedicatedLogicalChannel ()
     }
 
     ' Card Extension SPI
@@ -200,8 +198,8 @@ package "selection" as selectionApi {
         +Map<Integer, SmartCard> getSmartCards ()
         +SmartCard getActiveSmartCard ()
         +int getActiveSelectionIndex ()
-
-        +<color:grey>CardReader getCardReader ()
+        +<color:blue>+Map<Integer, SmartCard> getActiveSmartCards ()
+        ' RFU +<color:grey>CardReader getCardReader ()
     }
     +interface ScheduledCardSelectionsResponse {
     }
@@ -216,7 +214,8 @@ package "selection" as selectionApi {
 package "transaction" as transactionApi {
     package "spi" as transactionSpi {
         +interface "CardTransactionManager" as CardTransactionManager<T extends CardTransactionManager<T>> <<red>> {
-            +T processCommands (ChannelControl channelControl)
+            +<color:red><s>T processCommands (ChannelControl channelControl)
+            +<color:blue>T processCommands ()
         }
     }
 }
@@ -259,10 +258,10 @@ CardReaderEventHandler ..> CardReaderEvent #C_USE : use >
 
 CardSelectionResult ..> SmartCard #C_LINK : provide >
 
-CommonIsoCardSelector +-- FileOccurrence
-CommonIsoCardSelector ..> FileOccurrence #C_USE : use >
-CommonIsoCardSelector +-- FileControlInformation
-CommonIsoCardSelector ..> FileControlInformation #C_USE : use >
+IsoCardSelector +-- FileOccurrence
+IsoCardSelector ..> FileOccurrence #C_USE : use >
+IsoCardSelector +-- FileControlInformation
+IsoCardSelector ..> FileControlInformation #C_USE : use >
 
 CardSelectionManager ..> CardSelector #C_USE : use >
 CardSelectionManager ..> CardSelectionExtension #C_USE : use >
