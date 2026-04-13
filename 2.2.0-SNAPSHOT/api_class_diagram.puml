@@ -77,8 +77,8 @@ package "reader" as reader {
     +boolean isContactless ()
 
     +boolean isCardPresent ()
+    +<color:blue>void closeChannel (IsoSmartCard isoSmartCard)
     +<color:blue>void finalizeCardProcessing ()
-    +<color:blue>void closeLogicalChannel (IsoSmartCard isoSmartCard)
 }
 +interface ObservableCardReader extends CardReader {
     +<color:red><s>void setReaderObservationExceptionHandler (CardReaderObservationExceptionHandlerSpi exceptionHandler)</s>
@@ -124,7 +124,7 @@ package "reader" as reader {
 package "spi" as readerSpi {
     +interface "<color:blue>CardReaderEventHandler" as CardReaderEventHandler <<red>> {
         +<color:blue>void onReaderEvent (CardReaderEvent cardReaderEvent)
-        +<color:blue>void onError (String contextInfo, String readerName, Throwable e)
+        +<color:blue>void onReaderError (String context, String readerName, Throwable e)
     }
     +interface "<color:red><s>CardReaderObserverSpi</s>" as CardReaderObserverSpi <<red>> {
         +<color:red><s>void onReaderEvent (CardReaderEvent cardReaderEvent)</s>
@@ -139,10 +139,9 @@ package "selection" as selectionApi {
     ' Selection
     +interface CardSelectionManager <<blue>> {
         +void setMultipleSelectionMode ()
-        +<color:blue><back:pink>void setMultichannelSelectionMode ()
 
         +int prepareSelection (CardSelector<?> cardSelector, CardSelectionExtension cardSelectionExtension)
-        +void prepareReleaseChannel ()
+        +<color:red><s>void prepareReleaseChannel ()
 
         +String exportCardSelectionScenario ()
         +int importCardSelectionScenario (String cardSelectionScenario)
@@ -168,8 +167,6 @@ package "selection" as selectionApi {
 
         +IsoCardSelector setFileOccurrence (FileOccurrence fileOccurrence)
         +IsoCardSelector setFileControlInformation (FileControlInformation fileControlInformation)
-
-        +<color:blue><back:pink>IsoCardSelector useDedicatedLogicalChannel ()
     }
     +enum "FileOccurrence" as FileOccurrence <<green>> {
         FIRST
@@ -192,6 +189,7 @@ package "selection" as selectionApi {
             +String getPowerOnData ()
         }
         +interface "IsoSmartCard" as IsoSmartCard <<red>> extends SmartCard {
+            +<color:blue>boolean isBasicChannel ()
             +byte[] getSelectApplicationResponse ()
         }
     }
@@ -200,7 +198,9 @@ package "selection" as selectionApi {
         +SmartCard getActiveSmartCard ()
         +int getActiveSelectionIndex ()
         +<color:blue>List<Integer> getActiveSelectionIndexes ()
-        ' RFU +<color:grey>CardReader getCardReader ()
+        +<color:grey>CardReader getCardReader () ???
+        .. comments ..
+        <i>getActiveSmartCard returns the active smart card on channel 0
     }
     +interface ScheduledCardSelectionsResponse {
     }
