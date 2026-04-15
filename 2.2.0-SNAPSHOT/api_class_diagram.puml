@@ -2,7 +2,7 @@
 title
     <img:../assets/logo.svg{scale=0.2}>
 
-    Terminal Reader API 2.2.+ (2026-04-01)
+    Terminal Reader API 2.2.+ (2026-04-15)
 end title
 
 ' == THEME ==
@@ -77,8 +77,9 @@ package "reader" as reader {
     +boolean isContactless ()
 
     +boolean isCardPresent ()
-    +<color:blue>void closeChannel (IsoSmartCard isoSmartCard)
     +<color:blue>void finalizeCardProcessing ()
+
+    +<color:blue>void closeChannel (IsoSmartCard multichannelCard)
 }
 +interface ObservableCardReader extends CardReader {
     +<color:red><s>void setReaderObservationExceptionHandler (CardReaderObservationExceptionHandlerSpi exceptionHandler)</s>
