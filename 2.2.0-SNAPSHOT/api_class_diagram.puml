@@ -2,7 +2,7 @@
 title
     <img:../assets/logo.svg{scale=0.2}>
 
-    Terminal Reader API 2.2.+ (2026-04-21)
+    Terminal Reader API 2.2.+ (2026-04-29)
 end title
 
 ' == THEME ==
@@ -77,7 +77,7 @@ package "reader" as reader {
     +boolean isContactless ()
 
     +boolean isCardPresent ()
-    +<color:blue>void closePhysicalChannel ()
+    +<color:blue><s>void closePhysicalChannel ()
 }
 +interface ObservableCardReader extends CardReader {
     +<color:red><s>void setReaderObservationExceptionHandler (CardReaderObservationExceptionHandlerSpi exceptionHandler)</s>
@@ -100,11 +100,12 @@ package "reader" as reader {
 }
 +enum DetectionMode <<green>> {
     REPEATING
-    SINGLESHOT
+    <color:red><s>SINGLESHOT
+    <color:blue>SINGLE_SHOT
 }
-+enum NotificationMode <<green>> {
-    ALWAYS
-    MATCHED_ONLY
++enum "<color:red><s>NotificationMode" as NotificationMode <<green>> {
+    <color:red><s>ALWAYS
+    <color:red><s>MATCHED_ONLY
 }
 +enum "<color:red><s>ChannelControl" as ChannelControl <<green>> {
     <color:red><s>KEEP_OPEN
@@ -119,7 +120,8 @@ package "reader" as reader {
     CARD_INSERTED
     CARD_MATCHED
     CARD_REMOVED
-    UNAVAILABLE
+    <color:red><s>UNAVAILABLE
+    <color:blue>READER_UNREGISTERED
 }
 ' SPI
 package "spi" as readerSpi {
@@ -139,7 +141,7 @@ package "spi" as readerSpi {
 package "selection" as selectionApi {
     ' Selection
     +interface CardSelectionManager <<blue>> {
-        +void setMultipleSelectionMode ()
+        +<color:red><s>void setMultipleSelectionMode ()
 
         +int prepareSelection (CardSelector<?> cardSelector, CardSelectionExtension cardSelectionExtension)
         +<color:red><s>void prepareReleaseChannel ()
@@ -147,14 +149,29 @@ package "selection" as selectionApi {
         +String exportCardSelectionScenario ()
         +int importCardSelectionScenario (String cardSelectionScenario)
 
-        +CardSelectionResult processCardSelectionScenario (CardReader cardReader)
-        +<color:blue>CardSelectionResult processMultichannelCardSelectionScenario (CardReader cardReader)
+        +<color:red><s>CardSelectionResult processCardSelectionScenario (CardReader cardReader)
+        +<color:blue>CardSelectionResult processCardSelectionScenario (CardReader cardReader, SelectionExecutionPolicy selectionExecutionPolicy)
 
-        +void scheduleCardSelectionScenario (ObservableCardReader observableCardReader, NotificationMode notificationMode)
+        +<color:red><s>void scheduleCardSelectionScenario (ObservableCardReader observableCardReader, NotificationMode notificationMode)
+        +<color:blue>void scheduleCardSelectionScenario (ObservableCardReader observableCardReader, CardPresenceNotificationPolicy cardPresenceNotificationPolicy, SelectionExecutionPolicy selectionExecutionPolicy)
         +CardSelectionResult parseScheduledCardSelectionsResponse (ScheduledCardSelectionsResponse scheduledCardSelectionsResponse)
+
+        +<color:blue>CardSelectionResult processMultichannelCardSelectionScenario (CardReader cardReader, ChannelSelectionPolicy channelSelectionPolicy)
 
         +String exportProcessedCardSelectionScenario ()
         +CardSelectionResult importProcessedCardSelectionScenario (String processedCardSelectionScenario)
+    }
+    +enum "<color:blue>CardPresenceNotificationPolicy" as CardPresenceNotificationPolicy <<green>> {
+        <color:blue>ALWAYS
+        <color:blue>MATCHED_ONLY
+    }
+    +enum "<color:blue>SelectionExecutionPolicy" as SelectionExecutionPolicy <<green>> {
+        <color:blue>STOP_ON_FIRST_MATCH
+        <color:blue>PROCESS_ALL
+    }
+    +enum "<color:blue>ChannelSelectionPolicy" as ChannelSelectionPolicy <<green>> {
+        <color:blue>ALLOW_BASIC_CHANNEL
+        <color:blue>LOGICAL_CHANNEL_ONLY
     }
     +interface "CardSelector<T extends CardSelector<T>>" as CardSelector {
         +T filterByCardProtocol (String logicalProtocolName)
@@ -279,6 +296,12 @@ CardSelectionManager ..> CardSelectionResult #C_LINK : provide >
 CardSelectionManager .right.> CardReader #C_USE : use >
 CardSelectionManager .up.> NotificationMode #C_USE : use >
 CardSelectionManager .right.> InvalidCardResponseExceptionOld #C_THROW : throw >
+CardSelectionManager +-- CardPresenceNotificationPolicy
+CardSelectionManager ..> CardPresenceNotificationPolicy #C_USE : use >
+CardSelectionManager +-- SelectionExecutionPolicy
+CardSelectionManager ..> SelectionExecutionPolicy #C_USE : use >
+CardSelectionManager +-- ChannelSelectionPolicy
+CardSelectionManager ..> ChannelSelectionPolicy #C_USE : use >
 
 CardTransactionManager .up.> ChannelControl #C_USE : use >
 
