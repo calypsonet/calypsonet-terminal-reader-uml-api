@@ -2,7 +2,7 @@
 title
     <img:../assets/logo.svg{scale=0.2}>
 
-    Terminal Reader API 2.2.+ (2026-04-29)
+    Terminal Reader API 2.2.+ (2026-05-05)
 end title
 
 ' == THEME ==
@@ -77,7 +77,6 @@ package "reader" as reader {
     +boolean isContactless ()
 
     +boolean isCardPresent ()
-    +<color:blue><s>void closePhysicalChannel ()
 }
 +interface ObservableCardReader extends CardReader {
     +<color:red><s>void setReaderObservationExceptionHandler (CardReaderObservationExceptionHandlerSpi exceptionHandler)</s>
@@ -91,7 +90,8 @@ package "reader" as reader {
     +<color:blue>void startCardDetection (DetectionMode detectionMode, CardReaderEventHandler eventHandler)
     +void stopCardDetection ()
 
-    +void finalizeCardProcessing ()
+    +<color:red><s>void finalizeCardProcessing ()
+    +<color:blue>void endCardProcessing ()
 }
 +interface ConfigurableCardReader extends CardReader {
     +void activateProtocol (String physicalProtocolName, String logicalProtocolName)
