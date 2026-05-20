@@ -1,5 +1,19 @@
 # Changements apportés par la version 3.0.0 des APIs Terminaux
 
+## Préambule
+
+Ce document a pour objectif de **présenter les évolutions des APIs terminaux** (`Reader API`, `Card API` et `Calypso Card API`) introduites par leur version majeure **3.0.0**, **en vue d'une validation par les membres du TC Terminal** (Technical Committee Terminal) de la **Calypso Networks Association** (CNA).
+
+Il décrit, pour chaque thème d'évolution :
+
+- la **motivation** (le « pourquoi ») ;
+- le **détail des changements** dans chacune des trois APIs concernées ;
+- la **justification de conception** (le « pourquoi de ce choix-là plutôt qu'un autre »).
+
+Il sert également de référence pour la **mise en cohérence** ultérieure des implémentations Java Keypop (`keypop-reader-java-api`, `keypop-card-java-api`, `keypop-calypso-card-java-api`), qui n'ont pas encore été alignées sur la 3.0.0 au moment de la rédaction (cf. §7).
+
+---
+
 > Périmètre : **Reader API**, **Card API** et **Calypso Card API**
 > Source : diagrammes UML de référence (`3.0.0-SNAPSHOT/api_class_diagram.puml` de chaque module)
 >
