@@ -12,6 +12,13 @@ Il décrit, pour chaque thème d'évolution :
 
 Il sert également de référence pour la **mise en cohérence** ultérieure des implémentations Java Keypop (`keypop-reader-java-api`, `keypop-card-java-api`, `keypop-calypso-card-java-api`), qui n'ont pas encore été alignées sur la 3.0.0 au moment de la rédaction (cf. §7).
 
+> **Visibilité des APIs vis-à-vis des audiences**
+>
+> - La **Reader API** et la **Calypso Card API** sont des APIs **publiques**, manipulées directement par l'**intégrateur** (le code applicatif).
+> - La **Card API** est une API **interne** : elle sert de contrat d'intégration entre les implémentations de lecteurs et les extensions de cartes. **L'intégrateur n'y a pas accès**.
+>
+> Le présent document décrit les évolutions des trois APIs car elles sont solidaires sur le plan de la conception (en particulier pour les thèmes 1 et 2). Mais lorsque le document s'adresse spécifiquement à l'intégrateur (notamment au §8 « Procédure de migration »), il ne mentionne que des éléments des deux APIs publiques.
+
 ---
 
 > Périmètre : **Reader API**, **Card API** et **Calypso Card API**
@@ -34,6 +41,7 @@ Il sert également de référence pour la **mise en cohérence** ultérieure des
 5. [Thème 4 — Connaissance de l'état courant de la session sécurisée](#5-thème-4--connaissance-de-létat-courant-de-la-session-sécurisée)
 6. [Thème 5 — Améliorations sémantiques (renommages et migration de concepts)](#6-thème-5--améliorations-sémantiques-renommages-et-migration-de-concepts)
 7. [Impacts sur les implémentations Keypop (Java)](#7-impacts-sur-les-implémentations-keypop-java)
+8. [Procédure de migration (à destination de l'intégrateur)](#8-procédure-de-migration-à-destination-de-lintégrateur)
 
 ---
 
@@ -357,3 +365,42 @@ Conséquence sur les signatures :
 - Compléter la **Javadoc** (motivation attaque relai, sémantique du `csnMin`, contrat de `SecureSessionStatus`, etc.).
 
 > **Recommandation** : traiter les trois modules dans l'ordre `card` → `reader` → `calypso-card`, car les dépendances Javadoc et les références croisées (`<<…>>` dans les diagrammes Calypso) suivent cet ordre.
+
+---
+
+## 8. Procédure de migration (à destination de l'intégrateur)
+
+Cette section s'adresse aux **intégrateurs** ayant déjà du code applicatif construit sur les versions 1.x ou 2.x des APIs terminaux **publiques** (`Reader API` et `Calypso Card API`) et qui souhaitent passer à la 3.0.0.
+
+> Rappel : la **Card API** est interne et n'est pas exposée à l'intégrateur. Les évolutions qui la concernent (cf. §2.3, §3.2, §6.2) ne nécessitent **aucune action** de la part de l'intégrateur ; elles sont absorbées par les implémentations Keypop.
+
+**À ce stade, la procédure de migration détaillée n'est pas reprise dans le présent document.** Elle fera l'objet d'un **guide technique de migration dédié**, publié séparément après validation de la 3.0.0 par le TC Terminal de la CNA et après alignement des modules Keypop Java associés.
+
+### 8.1 Ce que le guide de migration couvrira
+
+Le futur guide technique de migration fournira, pour chacun des cinq thèmes du présent document (limité aux **APIs publiques** `Reader API` et `Calypso Card API`) :
+
+- la **liste exhaustive des éléments retirés / renommés / refondus**, avec leur **correspondance 1:1** vers la 3.0.0 ;
+- des **patrons de réécriture** (`avant` / `après`) pour les cas d'usage les plus fréquents — par exemple :
+  - migration du couple `addObserver` / `setReaderObservationExceptionHandler` vers `startCardDetection(DetectionMode, CardReaderEventHandler)` ;
+  - migration de `setMultipleSelectionMode()` + `processCardSelectionScenario(...)` vers `processCardSelectionScenario(..., SelectionExecutionPolicy.PROCESS_ALL)` ;
+  - migration des appels `processCommands(ChannelControl.CLOSE_AFTER)` (côté Calypso `TransactionManager`) vers `processCommandsAndCloseChannel()` du nouveau `MultichannelTransactionManager`, accessible via `TransactionManager.getLogicalChannelSupport()` ;
+  - adoption des nouvelles signatures de `CardSelectionManager` (passage de `NotificationMode` à `CardPresenceNotificationPolicy` + `SelectionExecutionPolicy`) ;
+- les **règles d'adoption progressive** lorsque cela est possible (typiquement : isoler les appels au modèle multicanal derrière un adaptateur applicatif pour faciliter la transition) ;
+- les **pièges connus** liés à la suppression de tout l'héritage déprécié (cf. §1) et au nouveau cycle de vie des `SmartCard` (cf. §2.3.2), notamment l'impact sur le code applicatif qui conservait des références longues à des `SmartCard` au-delà du `endCardProcessing()`.
+
+### 8.2 Recommandations préliminaires (avant publication du guide)
+
+En attendant la publication du guide :
+
+- **Ne pas démarrer** la migration d'un code de production tant que les modules Java Keypop publics (`keypop-reader-java-api` et `keypop-calypso-card-java-api`) n'ont pas été alignés sur la 3.0.0 (cf. §7) ;
+- **Auditer** dès maintenant le code applicatif pour repérer les usages des éléments **publics** destinés à disparaître :
+  - **Reader API** : `ChannelControl`, `addObserver` / `removeObserver` / `clearObservers` / `countObservers` / `setReaderObservationExceptionHandler`, `finalizeCardProcessing`, `NotificationMode`, `setMultipleSelectionMode`, `prepareReleaseChannel`, `CommonIsoCardSelector`, `MultichannelCardSelector`, `DetectionMode.SINGLESHOT`, `CardReaderEvent.Type.UNAVAILABLE` ;
+  - **Calypso Card API** : `TransactionManager.processCommands(ChannelControl)`, exceptions `UnexpectedCommandStatusException` / `ReaderIOException` / `CardIOException` ;
+  - ainsi que tout élément déjà marqué `@Deprecated` dans les versions 1.x ou 2.x de ces deux APIs.
+
+  Un simple `grep` ou une recherche IDE suffit pour produire l'inventaire ;
+- **Recenser** les points d'usage du patron Observer (`CardReaderObserverSpi`, `CardReaderObservationExceptionHandlerSpi`) qui devront être fusionnés en une implémentation unique de `CardReaderEventHandler` ;
+- **Identifier** les références longues à des `SmartCard` (et à `CalypsoCard`) conservées par le code applicatif au-delà de `endCardProcessing()` : ces références deviendront systématiquement `isActive() == false` dans la 3.0.0 et devront être ré-acquises via une nouvelle sélection.
+
+Ces préparations rendront l'application du futur guide de migration nettement plus rapide.
