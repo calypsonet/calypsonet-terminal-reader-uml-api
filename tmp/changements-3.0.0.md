@@ -33,19 +33,39 @@ Il sert également de référence pour la **mise en cohérence** ultérieure des
 
 ---
 
-> Périmètre : **Reader API**, **Card API** et **Calypso Card API** — auxquelles s'ajoute, en tant que **nouvelle API socle**, la **Terminal Definitions API** (cf. encadré ci-dessous et Thème 6).
-> Source : diagrammes UML de référence — `3.0.0-SNAPSHOT/api_class_diagram.puml` de chaque module existant et `1.0.0-SNAPSHOT/api_class_diagram.puml` du nouveau dépôt `calypsonet-terminal-definitions-uml-api`.
+## Diagrammes UML de référence
+
+Les diagrammes UML sont disponibles sur la branche **`develop`** de chacun des dépôts CNA hébergés sur [github.com/calypsonet](https://github.com/calypsonet/). Pour chaque dépôt (sauf la Terminal Definitions API qui est nouvelle), **deux variantes** sont fournies :
+
+- **Diagramme final** (`api_class_diagram.svg`) — version **nettoyée** de tous les éléments barrés, en rouge et en gris ; c'est ce qui sera publié à la sortie de la 3.0.0.
+- **Diagramme avec diff** (`api_class_diagram_diff.svg`) — version **conservant** les éléments barrés, en rouge et en gris pour permettre la **lecture du delta** entre la 2.x et la 3.0.0.
+
+Les liens ci-dessous pointent directement vers les fichiers SVG, qui se rendent visuellement dans l'interface GitHub.
+
+| Module | Version | Diagramme final | Diagramme avec diff |
+|---|---|---|---|
+| **Terminal Reader API** | 3.0.0-SNAPSHOT | [SVG final](https://github.com/calypsonet/calypsonet-terminal-reader-uml-api/blob/develop/3.0.0-SNAPSHOT/api_class_diagram.svg) | [SVG avec diff](https://github.com/calypsonet/calypsonet-terminal-reader-uml-api/blob/develop/3.0.0-SNAPSHOT/api_class_diagram_diff.svg) |
+| **Terminal Card API** *(interne)* | 3.0.0-SNAPSHOT | [SVG final](https://github.com/calypsonet/calypsonet-terminal-card-uml-api/blob/develop/3.0.0-SNAPSHOT/api_class_diagram.svg) | [SVG avec diff](https://github.com/calypsonet/calypsonet-terminal-card-uml-api/blob/develop/3.0.0-SNAPSHOT/api_class_diagram_diff.svg) |
+| **Terminal Calypso Card API** | 3.0.0-SNAPSHOT | [SVG final](https://github.com/calypsonet/calypsonet-terminal-calypso-card-uml-api/blob/develop/3.0.0-SNAPSHOT/api_class_diagram.svg) | [SVG avec diff](https://github.com/calypsonet/calypsonet-terminal-calypso-card-uml-api/blob/develop/3.0.0-SNAPSHOT/api_class_diagram_diff.svg) |
+| **Terminal Definitions API** *(nouveau)* | 1.0.0-SNAPSHOT | [SVG final](https://github.com/calypsonet/calypsonet-terminal-definitions-uml-api/blob/develop/1.0.0-SNAPSHOT/api_class_diagram.svg) | — *(API nouvelle, pas de diff)* |
+
+> Les sources PlantUML (`.puml`) sont également disponibles dans les mêmes dossiers de chaque dépôt, pour ceux qui souhaitent regénérer le rendu ou inspecter les annotations.
+
+---
+
+> Périmètre : **Reader API**, **Card API** et **Calypso Card API** — auxquelles s'ajoute, en tant que **nouvelle API socle**, la **Terminal Definitions API** (cf. encadré du préambule et Thème 6).
 >
-> **Conventions de lecture** :
-> - Les éléments **barrés** (`<s>`) dans les diagrammes 3.0.0 ne sont conservés que pour faciliter la lecture du delta entre la 2.x et la 3.0.0. Ils seront **absents** de la version finale 3.0.0.
-> - Les éléments en **bleu** sont les **ajouts** de la 3.0.0.
-> - Les éléments en **gris** (`<color:grey>`) sont des éléments **en cours d'étude** (« work in progress ») qui n'avaient jamais été implémentés dans Keypop Java. La 3.0.0 fait le ménage : ces éléments sont retirés des diagrammes finaux (ou seront marqués comme tels pour la version finale). Ils sont mentionnés ici quand cela aide à comprendre la trajectoire d'une notion (par exemple le retrait du `MultichannelCardSelector` expérimental au profit du nouveau modèle multicanal porté par le `CardSelectionManager`).
-> - Les relations UML notées `+-` (composition par agrégation) indiquent que l'élément pointé est une **classe interne** (`inner class` / type imbriqué) du conteneur — par exemple `CardReaderEvent.Type` est une énumération interne de `CardReaderEvent`, et `IsoCardSelector.FileOccurrence` / `IsoCardSelector.FileControlInformation` sont des énumérations internes d'`IsoCardSelector`. Cette convention conditionne les imports et la nomenclature Java.
+> **Conventions de lecture des diagrammes** :
+> - **(diff uniquement)** Les éléments **barrés** (`<s>`) dans les diagrammes `_diff` ne sont conservés que pour faciliter la lecture du delta entre la 2.x et la 3.0.0. Ils **n'apparaissent pas** dans les diagrammes finaux.
+> - **(diff uniquement)** Les éléments en **bleu** sont les **ajouts** de la 3.0.0.
+> - **(diff uniquement)** Les éléments en **gris** (`<color:grey>`) sont des éléments **en cours d'étude** (« work in progress ») qui n'avaient jamais été implémentés dans Keypop Java. La 3.0.0 fait le ménage : ces éléments **n'apparaissent pas** dans les diagrammes finaux. Ils sont mentionnés ici quand cela aide à comprendre la trajectoire d'une notion (par exemple le retrait du `MultichannelCardSelector` expérimental au profit du nouveau modèle multicanal porté par le `CardSelectionManager`).
+> - **(final et diff)** Les relations UML notées `+-` (composition par agrégation) indiquent que l'élément pointé est une **classe interne** (`inner class` / type imbriqué) du conteneur — par exemple `CardReaderEvent.Type` est une énumération interne de `CardReaderEvent`, et `IsoCardSelector.FileOccurrence` / `IsoCardSelector.FileControlInformation` sont des énumérations internes d'`IsoCardSelector`. Cette convention conditionne les imports et la nomenclature Java.
 
 ---
 
 ## Table des matières
 
+0. [Diagrammes UML de référence](#diagrammes-uml-de-référence)
 1. [Vue d'ensemble](#1-vue-densemble)
 2. [Thème 1 — Support des canaux logiques multiples](#2-thème-1--support-des-canaux-logiques-multiples)
 3. [Thème 2 — Contre-mesure de la faille de sécurité par attaque relai](#3-thème-2--contre-mesure-de-la-faille-de-sécurité-par-attaque-relai)
@@ -630,7 +650,7 @@ Le présent document soumet à la validation du **TC Terminal de la CNA** les é
    - le **modèle builder `CardDetectionSettings`** pour la paramétrisation de la détection (§7.4) ;
    - le **filtre `CardSelector.filterByCardType`** comme critère unique de filtrage typé à la sélection (§7.3) ;
    - l'**exposition du `CardType` détecté sur `CardSelectionResult`** (§7.5).
-3. **Le contenu détaillé** des diagrammes UML `3.0.0-SNAPSHOT` des trois APIs existantes (`Reader`, `Card`, `Calypso Card`) et `1.0.0-SNAPSHOT` du nouveau dépôt UML `calypsonet-terminal-definitions-uml-api`, qui matérialisent ces choix.
+3. **Le contenu détaillé** des diagrammes UML `3.0.0-SNAPSHOT` des trois APIs existantes (`Reader`, `Card`, `Calypso Card`) et `1.0.0-SNAPSHOT` du nouveau dépôt UML `calypsonet-terminal-definitions-uml-api`, qui matérialisent ces choix — **accessibles directement** via les liens fournis dans la section [Diagrammes UML de référence](#diagrammes-uml-de-référence) en tête de document, sous deux formes : version finale et version avec diff 2.x → 3.0.0.
 4. **L'introduction** de la nouvelle API socle (dépôt UML créé, module Java `keypop-definitions-jvm-api` à créer).
 5. **La trajectoire** d'alignement Java décrite au §8 et le principe de la procédure de migration intégrateur décrite au §9.
 
