@@ -23,7 +23,7 @@ Il sert également de référence pour la **mise en cohérence** ultérieure des
 >
 > **Nouvelle API : Terminal Definitions API**
 >
-> La version 3.0.0 introduit une nouvelle API **socle** dédiée à l'hébergement des **types énumérés transverses** aux APIs Terminaux. Elle est créée à l'occasion du Thème 6 pour accueillir `RfTechnology` et `CardType`, mais sa vocation est plus large : elle est **destinée à recevoir progressivement les autres énumérations** qui constituent des **constantes globales** partagées par plusieurs APIs Terminaux. La Terminal Reader API **dépend** désormais de cette nouvelle API ; les autres APIs Terminaux pourront en dépendre à leur tour selon les évolutions futures.
+> La version 3.0.0 introduit une nouvelle API **socle** dédiée à l'hébergement des **types énumérés transverses** aux APIs Terminaux. Elle est créée à l'occasion du Thème 6 pour accueillir `RfTechnology` et `CardType`, mais sa vocation est plus large : elle est **destinée à recevoir potentiellement d'autres énumérations** qui constituent des **constantes globales** partagées par plusieurs APIs Terminaux. La Terminal Reader API **dépend** désormais de cette nouvelle API ; les autres APIs Terminaux pourront en dépendre à leur tour selon les évolutions futures.
 >
 > Concrètement, cela se traduit par :
 >
@@ -75,7 +75,7 @@ La version 3.0.0 est une **version majeure** : elle introduit des ruptures de co
 Les conséquences transverses :
 
 - **Suppression de tout l'héritage déprécié** : la version majeure 3.0.0 est l'occasion de faire le ménage. Tous les éléments qui avaient été marqués `@Deprecated` dans les versions 1.x ou 2.x — y compris ceux qui n'avaient été dépréciés que tardivement — sont supprimés sans alternative de compatibilité. Plus aucun élément déprécié ne subsiste dans la 3.0.0.
-- **Suppression des éléments « work in progress »** (en gris, `<color:grey>`) qui n'avaient **jamais été implémentés dans Keypop Java**. Ils figuraient dans les diagrammes uniquement à titre prospectif. Sont concernés :
+- **Suppression des éléments « work in progress »** (en gris, `<color:grey>`). Ils figuraient dans les diagrammes uniquement à titre prospectif. Sont concernés :
   - **Reader API (gris en 2.x, retirés en 3.0.0)** : `ReaderApiFactory.createMultichannelCardSelector()`, l'interface `MultichannelCardSelector` et sa méthode `useDedicatedLogicalChannel()`, ainsi que `CardSelectionResult.getCardReader()`. La notion qu'ils préfiguraient (multicanal) est traitée proprement par le nouveau modèle décrit au §2.
   - **Calypso Card API (encore gris dans le snapshot 3.0.0)** : `AsymmetricCryptoSecuritySetting.authorizeAllTrustedCa()`, `authorizeOnlyConfiguredCa()` et `revokeCa(byte[])`. Ces méthodes de gestion fine de la révocation PKI sont laissées en gris dans le diagramme courant : elles **n'apparaîtront pas dans la version finale** 3.0.0 publiée.
 - Disparition complète de l'énum `ChannelControl` (Reader API et Card API). La fermeture du canal n'est plus pilotée par un paramètre passé aux commandes, mais devient une **opération explicite** sur les nouvelles méthodes dédiées (`closeChannel`, `transmitCardRequestAndCloseChannel`, `processCommandsAndCloseChannel`).
