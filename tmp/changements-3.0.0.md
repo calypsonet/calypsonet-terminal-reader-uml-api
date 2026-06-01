@@ -12,14 +12,14 @@ Il décrit, pour chaque thème d'évolution :
 - le **détail des changements** dans chacune des quatre APIs concernées ;
 - la **justification de conception** (le « pourquoi de ce choix-là plutôt qu'un autre »).
 
-Il sert également de référence pour la **mise en cohérence** ultérieure des implémentations Java Keypop (`keypop-reader-java-api`, `keypop-card-java-api`, `keypop-calypso-card-java-api`, et le nouveau `keypop-definitions-jvm-api`), qui n'ont pas encore été alignées sur la 3.0.0 au moment de la rédaction (cf. §8).
+L'alignement des implémentations Java Keypop sur la 3.0.0 et la rédaction d'un **guide technique de migration** à destination des intégrateurs interviendront ultérieurement, après validation de la 3.0.0 par le TC Terminal (cf. §8).
 
 > **Visibilité des APIs vis-à-vis des audiences**
 >
 > - La **Reader API**, la **Calypso Card API** et la nouvelle **Terminal Definitions API** sont des APIs **publiques**, manipulées directement par l'**intégrateur** (le code applicatif).
 > - La **Card API** est une API **interne** : elle sert de contrat d'intégration entre les implémentations de lecteurs et les extensions de cartes. **L'intégrateur n'y a pas accès**.
 >
-> Le présent document décrit les évolutions des quatre APIs car elles sont solidaires sur le plan de la conception (en particulier pour les thèmes 1, 2 et 6). Mais lorsque le document s'adresse spécifiquement à l'intégrateur (notamment au §9 « Procédure de migration »), il ne mentionne que des éléments des APIs publiques.
+> Le présent document décrit les évolutions des quatre APIs car elles sont solidaires sur le plan de la conception (en particulier pour les thèmes 1, 2 et 6). La **Card API étant interne**, ses évolutions (cf. §2.3, §3.2, §6.2) ne nécessitent **aucune action** de la part de l'intégrateur ; elles sont absorbées par les implémentations Keypop.
 >
 > **Nouvelle API : Terminal Definitions API**
 >
@@ -73,9 +73,8 @@ Les liens ci-dessous pointent directement vers les fichiers SVG, qui se rendent 
 5. [Thème 4 — Connaissance de l'état courant de la session sécurisée](#5-thème-4--connaissance-de-létat-courant-de-la-session-sécurisée)
 6. [Thème 5 — Améliorations sémantiques (renommages et migration de concepts)](#6-thème-5--améliorations-sémantiques-renommages-et-migration-de-concepts)
 7. [Thème 6 — Typage strict des technologies RF et des types de carte (support ECP)](#7-thème-6--typage-strict-des-technologies-rf-et-des-types-de-carte-support-ecp)
-8. [Impacts sur les implémentations Keypop (Java)](#8-impacts-sur-les-implémentations-keypop-java)
-9. [Procédure de migration (à destination de l'intégrateur)](#9-procédure-de-migration-à-destination-de-lintégrateur)
-10. [Suite et validation par le TC Terminal](#10-suite-et-validation-par-le-tc-terminal)
+8. [Procédure de migration](#8-procédure-de-migration)
+9. [Suite et validation par le TC Terminal](#9-suite-et-validation-par-le-tc-terminal)
 
 ---
 
@@ -523,120 +522,17 @@ Ce placement homogénéise la surface d'API : `CardSelectionResult` est le point
 
 ---
 
-## 8. Impacts sur les implémentations Keypop (Java)
+## 8. Procédure de migration
 
-À ce stade, les **diagrammes UML** des trois APIs existantes ont été mis à jour pour 3.0.0, et le **dépôt UML de la Terminal Definitions API** est créé (version `1.0.0-SNAPSHOT`, cf. §7.2). Les modules Java associés (`keypop-reader-java-api`, `keypop-card-java-api`, `keypop-calypso-card-java-api`) doivent encore être alignés, et un **nouveau module Java** (`keypop-definitions-jvm-api`) doit être créé. Les chantiers à mener côté Java sont, par module :
+La migration du code applicatif depuis les versions 1.x ou 2.x vers la 3.0.0 fera l'objet d'un **guide technique de migration dédié**, publié séparément après validation de la 3.0.0 par le TC Terminal et après alignement des implémentations Java Keypop associées.
 
-### `keypop-definitions-jvm-api` (à créer)
-
-- **Initialiser** le projet selon les conventions Keypop (build Gradle, licence, README, structure `src/main/java/org/eclipse/keypop/definitions/…`, etc.) ;
-- **Créer** la classe `DefinitionsApiProperties` (sur le modèle de `ReaderApiProperties`, `CardApiProperties`, etc.) avec sa constante `VERSION` ;
-- **Créer** les énumérations `RfTechnology` et `CardType` (cf. §7.2) avec leur **Javadoc complète** (sémantique de chaque valeur, références aux standards ISO/IEC, NFC Forum, Innovatron, Sony, etc., et — important — **table de correspondance avec les anciennes valeurs `String`** utilisées en 2.x, pour faciliter la migration côté intégrateur) ;
-- **Publier** le module conformément à la procédure Eclipse Keypop.
-
-### `keypop-reader-java-api`
-
-- Supprimer :
-  - `ChannelControl.java` ;
-  - `selection/InvalidCardResponseException.java` (doublon de la racine) ;
-  - `selection/CommonIsoCardSelector.java` ;
-  - les méthodes obsolètes de `ObservableCardReader` (cf. §4.2) et la SPI `spi/CardReaderObserverSpi`, `spi/CardReaderObservationExceptionHandlerSpi` ;
-  - `ConfigurableCardReader.java` (Thème 6 — disparition totale) ;
-  - `CardSelector#filterByCardProtocol(String)` (Thème 6).
-- Renommer / refondre :
-  - `DetectionMode.SINGLESHOT` → `SINGLE_SHOT` ;
-  - `CardReaderEvent.Type.UNAVAILABLE` → `READER_UNREGISTERED` ;
-  - `ObservableCardReader.finalizeCardProcessing` → `endCardProcessing` ;
-  - déplacer/renommer `NotificationMode` → `selection/CardPresenceNotificationPolicy` ;
-  - refondre la signature de `ObservableCardReader.startCardDetection` en `(CardDetectionSettings, CardReaderEventHandler)` ;
-  - déplacer `DetectionMode` pour qu'il devienne l'**énumération interne** de `CardDetectionSettings` (et non plus d'`ObservableCardReader`).
-- Créer :
-  - `spi/CardReaderEventHandler` ;
-  - `selection/SelectionExecutionPolicy`, `selection/ChannelSelectionPolicy` ;
-  - `transaction/spi/MultichannelCardTransactionManager` ;
-  - méthodes `processMultichannelCardSelectionScenario`, `getActiveSelectionIndexes`, `isActive`, `isBasicChannel` ;
-  - **Thème 6** — interface `CardDetectionSettings` (builder, avec setters `setDetectionMode`, `setRfTechnologies`, `setEcpFrame`) ;
-  - **Thème 6** — méthode factory `ReaderApiFactory#createCardDetectionSettings()` ;
-  - **Thème 6** — méthode `CardSelectionResult#getCardType()` ;
-  - **Thème 6** — méthode `CardSelector#filterByCardType(CardType)`.
-- **Thème 6** — Ajouter la **dépendance** (Gradle) vers le nouveau module `keypop-definitions-jvm-api`. Cette dépendance doit être déclarée en **`api`** (et non `implementation`) pour qu'elle soit **transitive** : les enums `RfTechnology` et `CardType` apparaissent dans les signatures publiques de la Reader API et doivent donc être accessibles aux consommateurs sans déclaration supplémentaire.
-- **Thème 6** — Les énumérations `RfTechnology` et `CardType` ne sont **pas** créées dans ce module : elles sont importées depuis `keypop-definitions-jvm-api` (cf. ci-dessus).
-- Mettre à jour la signature des deux `process*` / `schedule*` de `CardSelectionManager`.
-- Rédiger la **Javadoc** complète pour chaque ajout/renommage en respectant les conventions du module — en particulier, documenter sur `CardDetectionSettings` quels setters sont effectifs selon le type de lecteur (par exemple, `setEcpFrame` ignoré sur un lecteur à contact) et quelles incohérences déclenchent quelle erreur à l'exécution.
-
-### `keypop-card-java-api`
-
-- Supprimer : `ChannelControl.java`, `ProxyReaderApi#releaseChannel`, `CardResponseApi#isLogicalChannelOpen`.
-- Ajouter :
-  - `spi/MultichannelSmartCardSpi` ;
-  - méthodes de relai-fighting : `ApduRequestSpi#getApduExchangeMaxDuration`, `ApduResponseApi#getApduExchangeDuration` ;
-  - `ApduExchangeDurationExceededException` (étend `AbstractApduException`) ;
-  - méthode `SmartCardSpi#deactivate` ;
-  - méthode `CardSelectionResponseApi#getChannel` ;
-  - les trois nouvelles signatures de `ProxyReaderApi` (cf. §2.3).
-
-### `keypop-calypso-card-java-api`
-
-- Supprimer : `processCommands(ChannelControl)` sur `TransactionManager`, exceptions `UnexpectedCommandStatusException`, `ReaderIOException`, `CardIOException`.
-- Ajouter :
-  - `transaction/SecureSessionStatus` + `transaction/SecureSessionType` ;
-  - `transaction/MultichannelTransactionManager` ;
-  - méthodes `TransactionManager#getSecureSessionStatus`, `TransactionManager#getLogicalChannelSupport` ;
-  - méthodes `assignOpenSecureSessionMaxDuration(...)` et `assignSvOperationMaxDuration(...)` sur les deux interfaces de `*CryptoSecuritySetting`.
-- Compléter la **Javadoc** (motivation attaque relai, sémantique du `csnMin`, contrat de `SecureSessionStatus`, etc.).
-
-> **Recommandation d'ordre de traitement** : `definitions` (création) → `card` → `reader` → `calypso-card`. Le nouveau module `keypop-definitions-jvm-api` est à publier **en premier** car `keypop-reader-java-api` en dépend ; pour les trois autres, l'ordre `card` → `reader` → `calypso-card` reste pertinent (les dépendances Javadoc et les références croisées `<<…>>` dans les diagrammes Calypso suivent cet ordre).
+Ce guide aura pour objectif de **simplifier autant que possible la transition** vers la version 3.0.0 : correspondance 1:1 des éléments retirés / renommés / refondus, patrons de réécriture (`avant` / `après`) pour les cas d'usage les plus fréquents, règles d'adoption progressive et pièges connus.
 
 ---
 
-## 9. Procédure de migration (à destination de l'intégrateur)
+## 9. Suite et validation par le TC Terminal
 
-Cette section s'adresse aux **intégrateurs** ayant déjà du code applicatif construit sur les versions 1.x ou 2.x des APIs terminaux **publiques** (`Reader API` et `Calypso Card API`) et qui souhaitent passer à la 3.0.0.
-
-> Rappel : la **Card API** est interne et n'est pas exposée à l'intégrateur. Les évolutions qui la concernent (cf. §2.3, §3.2, §6.2) ne nécessitent **aucune action** de la part de l'intégrateur ; elles sont absorbées par les implémentations Keypop.
->
-> **Nouvelle dépendance publique** : la **Terminal Definitions API** (`keypop-definitions-jvm-api`) devient une dépendance directe de la Reader API 3.0.0. Côté intégrateur, cela se traduit par un **import supplémentaire** pour accéder aux énumérations `RfTechnology` et `CardType` lorsqu'elles sont utilisées dans `CardSelector.filterByCardType(…)`, `CardDetectionSettings.setRfTechnologies(…)` et `CardSelectionResult.getCardType()`. Comme la dépendance est déclarée en `api` côté Reader (cf. §8), elle est **transitive** : aucune déclaration de dépendance supplémentaire n'est requise dans le `build.gradle` (ou équivalent) de l'application intégrée — seul le module Reader continue à être référencé explicitement.
-
-**À ce stade, la procédure de migration détaillée n'est pas reprise dans le présent document.** Elle fera l'objet d'un **guide technique de migration dédié**, publié séparément après validation de la 3.0.0 par le TC Terminal de la CNA et après alignement des modules Keypop Java associés.
-
-### 9.1 Ce que le guide de migration couvrira
-
-Le futur guide technique de migration fournira, pour chacun des six thèmes du présent document (limité aux **APIs publiques** `Reader API`, `Calypso Card API` et `Terminal Definitions API`) :
-
-- la **liste exhaustive des éléments retirés / renommés / refondus**, avec leur **correspondance 1:1** vers la 3.0.0 ;
-- des **patrons de réécriture** (`avant` / `après`) pour les cas d'usage les plus fréquents — par exemple :
-  - migration du couple `addObserver` / `setReaderObservationExceptionHandler` vers `startCardDetection(cardDetectionSettings, CardReaderEventHandler)` ;
-  - migration de `setMultipleSelectionMode()` + `processCardSelectionScenario(...)` vers `processCardSelectionScenario(..., SelectionExecutionPolicy.PROCESS_ALL)` ;
-  - migration des appels `processCommands(ChannelControl.CLOSE_AFTER)` (côté Calypso `TransactionManager`) vers `processCommandsAndCloseChannel()` du nouveau `MultichannelTransactionManager`, accessible via `TransactionManager.getLogicalChannelSupport()` ;
-  - adoption des nouvelles signatures de `CardSelectionManager` (passage de `NotificationMode` à `CardPresenceNotificationPolicy` + `SelectionExecutionPolicy`) ;
-  - migration de `ConfigurableCardReader.activateProtocol("…","…")` + `CardSelector.filterByCardProtocol("…")` vers la combinaison `CardDetectionSettings.setRfTechnologies(…)` (déclaration en amont, lors du démarrage de la détection) + `CardSelector.filterByCardType(…)` (filtrage à la sélection) ;
-  - pour les déploiements ECP : utilisation de `CardDetectionSettings.setEcpFrame(…)` au moment de l'appel à `startCardDetection(…)` ;
-- les **règles d'adoption progressive** lorsque cela est possible (typiquement : isoler les appels au modèle multicanal derrière un adaptateur applicatif pour faciliter la transition) ;
-- les **pièges connus** liés à la suppression de tout l'héritage déprécié (cf. §1) et au nouveau cycle de vie des `SmartCard` (cf. §2.3.2), notamment l'impact sur le code applicatif qui conservait des références longues à des `SmartCard` au-delà du `endCardProcessing()`.
-
-### 9.2 Recommandations préliminaires (avant publication du guide)
-
-En attendant la publication du guide :
-
-- **Ne pas démarrer** la migration d'un code de production tant que les modules Java Keypop publics (`keypop-reader-java-api` et `keypop-calypso-card-java-api`) n'ont pas été alignés sur la 3.0.0 (cf. §8) ;
-- **Auditer** dès maintenant le code applicatif pour repérer les usages des éléments **publics** destinés à disparaître :
-  - **Reader API** : `ChannelControl`, `addObserver` / `removeObserver` / `clearObservers` / `countObservers` / `setReaderObservationExceptionHandler`, `finalizeCardProcessing`, `NotificationMode`, `setMultipleSelectionMode`, `prepareReleaseChannel`, `CommonIsoCardSelector`, `MultichannelCardSelector`, `DetectionMode.SINGLESHOT`, `CardReaderEvent.Type.UNAVAILABLE`, **`ConfigurableCardReader` et ses méthodes `activateProtocol` / `deactivateProtocol` / `getCurrentProtocol`**, **`CardSelector.filterByCardProtocol(String)`**, et de manière générale **toute valeur littérale `String` utilisée comme nom de protocole** (à remplacer par les enums `RfTechnology` / `CardType`) ;
-  - **Calypso Card API** : `TransactionManager.processCommands(ChannelControl)`, exceptions `UnexpectedCommandStatusException` / `ReaderIOException` / `CardIOException` ;
-  - ainsi que tout élément déjà marqué `@Deprecated` dans les versions 1.x ou 2.x de ces deux APIs.
-
-  Un simple `grep` ou une recherche IDE suffit pour produire l'inventaire ;
-- **Recenser** les points d'usage du patron Observer (`CardReaderObserverSpi`, `CardReaderObservationExceptionHandlerSpi`) qui devront être fusionnés en une implémentation unique de `CardReaderEventHandler` ;
-- **Inventorier** les chaînes de protocoles utilisées comme arguments d'`activateProtocol(...)` et de `filterByCardProtocol(...)` afin de préparer leur mapping vers les valeurs typées `RfTechnology` / `CardType` ;
-- **Anticiper** le besoin éventuel de support ECP : si le déploiement cible inclut des terminaux iPhone, prévoir l'utilisation de `CardDetectionSettings.setEcpFrame(…)` au moment de l'appel à `startCardDetection(…)` ;
-- **Identifier** les références longues à des `SmartCard` (et à `CalypsoCard`) conservées par le code applicatif au-delà de `endCardProcessing()` : ces références deviendront systématiquement `isActive() == false` dans la 3.0.0 et devront être ré-acquises via une nouvelle sélection.
-
-Ces préparations rendront l'application du futur guide de migration nettement plus rapide.
-
----
-
-## 10. Suite et validation par le TC Terminal
-
-### 10.1 Périmètre soumis à validation
+### 9.1 Périmètre soumis à validation
 
 Le présent document soumet à la validation du **TC Terminal de la CNA** les éléments suivants :
 
@@ -652,9 +548,9 @@ Le présent document soumet à la validation du **TC Terminal de la CNA** les é
    - l'**exposition du `CardType` détecté sur `CardSelectionResult`** (§7.5).
 3. **Le contenu détaillé** des diagrammes UML `3.0.0-SNAPSHOT` des trois APIs existantes (`Reader`, `Card`, `Calypso Card`) et `1.0.0-SNAPSHOT` du nouveau dépôt UML `calypsonet-terminal-definitions-uml-api`, qui matérialisent ces choix — **accessibles directement** via les liens fournis dans la section [Diagrammes UML de référence](#diagrammes-uml-de-référence) en tête de document, sous deux formes : version finale et version avec diff 2.x → 3.0.0.
 4. **L'introduction** de la nouvelle API socle (dépôt UML créé, module Java `keypop-definitions-jvm-api` à créer).
-5. **La trajectoire** d'alignement Java décrite au §8 et le principe de la procédure de migration intégrateur décrite au §9.
+5. **Le principe** d'une procédure de migration dédiée fournie ultérieurement aux intégrateurs (cf. §8).
 
-### 10.2 Points d'attention pour la revue
+### 9.2 Points d'attention pour la revue
 
 Quelques points pour lesquels une attention particulière du TC est sollicitée :
 
@@ -663,15 +559,14 @@ Quelques points pour lesquels une attention particulière du TC est sollicitée 
 - la **sémantique du `csnMin`** comme seuil sur le CSN pour les bornes de durée (§3.3) — ce mécanisme doit pouvoir être exploité par tous les profils de déploiement Calypso ciblés ;
 - le **contrat de cycle de vie des `SmartCard`** mémorisées par le `CardReader` (§2.3.2), qui est documenté en Javadoc côté implémentation mais n'apparaît pas dans le diagramme UML ; le TC est invité à confirmer que cette description en prose suffit, ou à demander une formalisation supplémentaire.
 
-### 10.3 Étapes suivantes
+### 9.3 Étapes suivantes
 
 Une fois la version 3.0.0 validée par le TC Terminal :
 
 1. **Finalisation des diagrammes UML** : retrait des éléments barrés (`<s>`) et des éléments en gris (`<color:grey>`) qui ne sont pas retenus, génération des SVG définitifs, passage des dépôts de `3.0.0-SNAPSHOT` à `3.0.0` (et de `1.0.0-SNAPSHOT` à `1.0.0` pour le dépôt UML `calypsonet-terminal-definitions-uml-api`, déjà créé).
-2. **Création du nouveau module Java** `keypop-definitions-jvm-api` correspondant à la Terminal Definitions API.
-3. **Alignement des modules Java Keypop** selon la check-list du §8, dans l'ordre recommandé (`definitions` → `card` → `reader` → `calypso-card`).
-4. **Rédaction et publication du guide technique de migration** à destination de l'intégrateur (§9).
-5. **Communication** de la disponibilité de la 3.0.0 aux intégrateurs et aux groupes de travail CNA concernés.
+2. **Création du nouveau module Java** `keypop-definitions-jvm-api` correspondant à la Terminal Definitions API, et **alignement des modules Java Keypop** existants (`keypop-reader-java-api`, `keypop-card-java-api`, `keypop-calypso-card-java-api`) sur la 3.0.0.
+3. **Rédaction et publication du guide technique de migration** à destination de l'intégrateur (cf. §8).
+4. **Communication** de la disponibilité de la 3.0.0 aux intégrateurs et aux groupes de travail CNA concernés.
 
 ---
 
