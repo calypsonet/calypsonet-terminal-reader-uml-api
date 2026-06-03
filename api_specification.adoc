@@ -1,0 +1,1459 @@
+= Terminal Reader API -- Technical Specification
+Calypso Networks Association <https://calypsonet.org>
+v3.0.0-SNAPSHOT, {docdate}
+:doctype: book
+:toc: left
+:toclevels: 4
+:sectnums:
+:sectnumlevels: 4
+:sectanchors:
+:sectlinks:
+:icons: font
+:rouge-style: github
+:source-highlighter: rouge
+:imagesdir: assets
+:docinfo: shared
+:docinfodir: assets
+:experimental:
+:xrefstyle: short
+:figure-caption: Figure
+:table-caption: Table
+:example-caption: Example
+:appendix-caption: Appendix
+:organization: Calypso Networks Association
+:short-name: CNA
+:spec-name: Terminal Reader API
+:spec-id: CNA-TR-API
+:spec-version: 3.0.0-SNAPSHOT
+
+ifdef::backend-html5[]
+++++
+<style>
+table { font-size: 0.92em; }
+table th { background-color: #f2f3f4; }
+.literalblock pre, .listingblock pre { font-size: 0.85em; }
+</style>
+++++
+endif::[]
+
+[abstract]
+== Abstract
+
+This document is the official technical specification of the **{spec-name}** standardised
+by the **{organization}** ({short-name}).
+It defines, in a language-agnostic way, the interfaces, classes, enumerations, exceptions, structural
+relationships and behavioural requirements that any conforming implementation of the {spec-name} MUST satisfy.
+
+The {spec-name} is part of the broader CNA *Terminal API* family and acts as the contract through which
+terminal applications discover card readers, observe card events, select cards and exchange data with them.
+
+[discrete]
+== Document Status
+
+[cols="1h,3", grid=rows, frame=ends]
+|===
+| Specification ID    | {spec-id}
+| Version             | {spec-version}
+| Status              | Working Draft
+| Editor              | {organization}
+| Reference model     | link:api_class_diagram.puml[`api_class_diagram.puml`] / link:api_class_diagram.svg[`api_class_diagram.svg`]
+| Reference license   | MIT License
+|===
+
+[discrete]
+== Revision History
+
+[cols="1,2,2,5", options="header"]
+|===
+| Version | Date | Editor | Description
+| 1.0.0          | _TBC_ | CNA  | Initial release of the Terminal Reader API.
+| 2.0.0          | _TBC_ | CNA  | Introduction of the `ReaderApiFactory` and of the `CardSelector` hierarchy.
+| 2.1.0          | _TBC_ | CNA  | Introduction of `ChannelControl`, `InvalidCardResponseException` and `CardTransactionManager`.
+| {spec-version} | _TBD_ | CNA  | _Work in progress -- see <<sec_changes>>._
+|===
+
+// =============================================================================
+== Introduction
+
+=== Purpose
+
+The {spec-name} defines a standardised set of contracts allowing terminal applications to interact with card
+readers and the cards presented to them, independently of:
+
+* the underlying reader hardware (contact, contactless, virtual, etc.),
+* the card technology family (ISO/IEC 7816-4, ISO/IEC 14443, proprietary),
+* the implementation technology of the application (programming language, runtime).
+
+Conforming implementations of this specification MUST allow extension modules (e.g. card-specific APIs such as the
+Calypso Card API) to plug in transparently through the Service Provider Interface (SPI) mechanism defined in
+<<sec_pkg_reader_selection_spi>>.
+
+=== Scope
+
+This specification covers:
+
+* the discovery and basic interrogation of card readers,
+* the observation of reader events related to card presence and selection,
+* the configuration of card detection (where applicable),
+* the description and orchestration of card selection scenarios,
+* the abstraction of the physical and logical communication channels established with cards,
+* the contract surface required by card extension modules to interoperate with reader implementations.
+
+The following topics are *out of scope*:
+
+* the wire-level protocols used between reader and card (e.g. APDU framing, ISO/IEC 14443 anti-collision),
+* the cryptographic operations performed by or on behalf of the card,
+* the lifecycle and packaging of reader drivers,
+* the user interface presented by the terminal application.
+
+=== Conformance
+
+A software product conforms to this specification if and only if:
+
+. it implements every interface and class defined in <<sec_specification>> with the operations and semantics
+  prescribed in this document,
+. it raises exceptions exclusively of the types defined in <<sec_exceptions>> for the situations described,
+. it preserves the structural and behavioural relationships described in <<sec_architecture>>.
+
+Throughout this specification, the key words **MUST**, **MUST NOT**, **SHALL**, **SHALL NOT**, **SHOULD**,
+**SHOULD NOT**, **RECOMMENDED**, **MAY** and **OPTIONAL** are to be interpreted as described in **RFC 2119** and
+**RFC 8174** when, and only when, they appear in all capitals.
+
+=== Document Conventions
+
+==== Naming
+
+Type names follow `UpperCamelCase`; operation, parameter and enumeration-member names follow `lowerCamelCase`
+except for enumeration values which use `UPPER_SNAKE_CASE`. Names defined by this specification are reproduced
+exactly as they appear in the reference UML class diagram (<<sec_class_diagram>>).
+
+==== Language-agnostic types
+
+The following symbolic type names are used in operation signatures and are mapped, in each binding, to the closest
+equivalent native type. Implementations MUST preserve the semantic intent rather than the syntactic form.
+
+[cols="1,3,3", options="header"]
+|===
+| Symbolic type   | Description                                                     | Typical bindings
+| `string`        | Sequence of characters, UTF-8 encoded by default.                | `String` (Java), `string` (C#), `str` (Rust/Python).
+| `boolean`       | Two-state truth value.                                           | `boolean`, `bool`.
+| `integer`       | Signed 32-bit integer.                                           | `int`, `Int32`.
+| `byte array`    | Ordered sequence of octets.                                      | `byte[]`, `[u8]`, `bytes`.
+| `set<T>`        | Unordered collection of unique `T` values.                       | `Set<T>`, `HashSet<T>`.
+| `list<T>`       | Ordered collection of `T` values, may contain duplicates.        | `List<T>`, `Vec<T>`.
+| `map<K, V>`     | Associative array binding keys of type `K` to values of type `V`.| `Map<K,V>`, `Dictionary<K,V>`.
+| `void`          | Indicates that an operation returns no value.                    | `void`, `Unit`, `None`.
+|===
+
+==== Operation tables
+
+Each operation defined in this document is described by a table of the form:
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | The operation's language-agnostic signature.
+| Since       | The version of the specification that introduced the operation.
+| Description | A normative description of the operation's behaviour.
+| Parameters  | A description of each input parameter.
+| Returns     | A description of the returned value, if any.
+| Throws      | A list of exceptional conditions, each mapped to a specific exception type.
+|===
+
+==== Element status markers
+
+[cols="1,5", options="header"]
+|===
+| Marker            | Meaning
+| _(no marker)_     | Stable element belonging to the specification baseline.
+| `[new]`           | Element added in {spec-version}.
+| `[deprecated]`    | Element retained for backward compatibility but scheduled for removal.
+| `[draft]`         | Element under active discussion; signature or semantics MAY still change.
+|===
+
+=== References
+
+[cols="1,1,4", options="header"]
+|===
+| Reference | Identifier | Title
+
+| [[ref_rfc2119]] [RFC 2119]
+| RFC 2119
+| _Key words for use in RFCs to Indicate Requirement Levels_, S. Bradner, March 1997.
+
+| [[ref_rfc8174]] [RFC 8174]
+| RFC 8174
+| _Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words_, B. Leiba, May 2017.
+
+| [[ref_iso7816]] [ISO/IEC 7816-4]
+| ISO/IEC 7816-4
+| _Identification cards -- Integrated circuit cards -- Part 4: Organization, security and commands for interchange_.
+
+| [[ref_iso14443]] [ISO/IEC 14443]
+| ISO/IEC 14443
+| _Identification cards -- Contactless integrated circuit cards -- Proximity cards_.
+
+| [[ref_cna_card]] [CNA-CARD]
+| CNA-CARD-API
+| _Calypsonet Terminal Card API Specification_, {organization}.
+
+| [[ref_cna_def]]  [CNA-DEF]
+| CNA-DEF-API
+| _Calypsonet Terminal Definitions API Specification_, {organization}.
+
+| [[ref_keypop]]   [KEYPOP]
+| KEYPOP
+| Keypop open-source project, hosted by the Eclipse Foundation -- https://keypop.org.
+|===
+
+// =============================================================================
+== Terms, Definitions and Abbreviations
+
+=== Terms and Definitions
+
+[cols="1,4", options="header"]
+|===
+| Term              | Definition
+
+| Card              | Any physical or virtual smart card that can be presented to a reader for selection and dialogue.
+| Card Reader       | Hardware or software component capable of detecting cards and exchanging data with them.
+| Card Selection    | Sequence of operations used to identify, filter and prepare a card for application-level dialogue.
+| Logical Channel   | Software-level communication path established with a card after a successful selection.
+| Physical Channel  | Hardware-level communication path between the reader and the card.
+| Observable Reader | Reader implementation able to notify observers asynchronously of card-related events.
+| Power-on Data     | Data returned by the reader at the moment a card is detected (ATR, virtual ATR, anti-collision data).
+| Card Application  | Application Dedicated File (DF) selected on a card, identified by its AID, as defined in ISO/IEC 7816-4.
+| AID               | Application Identifier as defined in ISO/IEC 7816-4 (5 to 16 bytes).
+| APDU              | Application Protocol Data Unit, the message format used between the terminal and the card.
+| SPI               | Service Provider Interface -- a set of interfaces designed to be implemented by an extension module.
+|===
+
+=== Abbreviations
+
+[cols="1,4", options="header"]
+|===
+| Abbreviation | Expansion
+
+| AID  | Application IDentifier
+| APDU | Application Protocol Data Unit
+| ATR  | Answer To Reset
+| CNA  | Calypso Networks Association
+| DF   | Dedicated File
+| FCI  | File Control Information
+| FCP  | File Control Parameters
+| FMD  | File Management Data
+| ISO  | International Organization for Standardization
+| RFC  | Request For Comments
+| SPI  | Service Provider Interface
+| UML  | Unified Modelling Language
+|===
+
+// =============================================================================
+[[sec_architecture]]
+== Architectural Overview
+
+=== Functional positioning
+
+The {spec-name} sits between the terminal application and the reader drivers, exposing a stable contract on each side:
+
+[plantuml, target=architecture-overview, format=svg]
+....
+@startuml
+skinparam shadowing false
+skinparam roundCorner 8
+skinparam ArrowColor #2C3E50
+
+component "Terminal Application" as App
+component "Card Extensions\n(e.g. Calypso Card API)" as Ext
+component "Terminal Reader API\n(this specification)" as TR
+component "Reader Driver\nImplementation(s)" as Drv
+component "Card Reader\nHardware" as HW
+
+App --> TR : uses
+Ext  --> TR : extends (SPI)
+TR   --> Drv : delegated to
+Drv  --> HW : controls
+@enduml
+....
+
+=== Logical packages
+
+The specification is organised in the following logical packages. Each package groups elements that share a common
+responsibility and a common stability lifecycle.
+
+[cols="1,1,4", options="header"]
+|===
+| Package                       | Role     | Summary
+
+| `reader`                      | Public API
+| Reader discovery, identification, configuration and observation.
+
+| `reader.spi`                  | SPI
+| Interfaces implemented by application code to consume reader events.
+
+| `reader.selection`            | Public API
+| Definition, orchestration and parsing of card selection scenarios.
+
+| `reader.selection.spi`        | SPI
+| Interfaces implemented by card extension modules to enrich the selection process.
+
+| `reader.transaction.spi`      | SPI
+| Common contract shared by all card transaction managers exposed by card extensions.
+|===
+
+[[sec_class_diagram]]
+=== Reference class diagram
+
+The normative class diagram of this specification is provided as a PlantUML source file alongside this document:
+
+* link:api_class_diagram.puml[`api_class_diagram.puml`] -- canonical UML model,
+* link:api_class_diagram.svg[`api_class_diagram.svg`]   -- rendered representation,
+* link:api_class_diagram_diff.puml[`api_class_diagram_diff.puml`] -- delta against the previous version.
+
+image::../api_class_diagram.svg[Terminal Reader API class diagram, align=center]
+
+// =============================================================================
+[[sec_specification]]
+== API Specification
+
+// -----------------------------------------------------------------------------
+=== Package `reader`
+
+The `reader` package defines the entry points of the API and the abstractions used to manipulate readers and the
+events they produce.
+
+[[type_ReaderApiProperties]]
+==== `ReaderApiProperties`
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Kind     | Final class
+| Package  | `reader`
+| Since    | 1.0.0
+| Purpose  | Exposes the immutable properties of the {spec-name}.
+|===
+
+===== Constants
+
+[cols="1,1,1,4", options="header"]
+|===
+| Name    | Type     | Since  | Description
+
+| `VERSION`
+| `string`
+| 1.0.0
+| String representation of the version of the API implemented by the conforming binding (e.g. `"3.0"`).
+  The value MUST be a dotted decimal of the form `MAJOR.MINOR`.
+|===
+
+[NOTE]
+====
+The `ReaderApiProperties` type SHALL NOT be instantiated. Implementations MUST prevent external construction.
+====
+
+[[type_ReaderApiFactory]]
+==== `ReaderApiFactory`
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Kind     | Interface
+| Package  | `reader`
+| Since    | 2.0.0
+| Purpose  | Factory used by the application to obtain instances of the public types provided by the API.
+|===
+
+The `ReaderApiFactory` is the *only* normative entry point through which the application is allowed to instantiate
+the public types of the API. Implementations MUST expose exactly one instance of this factory and MUST guarantee
+that every invocation returns a fresh, fully initialised object.
+
+===== Operations
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `createCardSelectionManager() -> CardSelectionManager`
+| Since       | 2.0.0
+| Description | Returns a new, freshly initialised <<type_CardSelectionManager,`CardSelectionManager`>>.
+| Returns     | A non-`null` <<type_CardSelectionManager,`CardSelectionManager`>>.
+| Throws      | None.
+|===
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `createBasicCardSelector() -> BasicCardSelector`
+| Since       | 2.0.0
+| Description | Returns a new, freshly initialised <<type_BasicCardSelector,`BasicCardSelector`>>.
+| Returns     | A non-`null` <<type_BasicCardSelector,`BasicCardSelector`>>.
+| Throws      | None.
+|===
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `createIsoCardSelector() -> IsoCardSelector`
+| Since       | 2.0.0
+| Description | Returns a new, freshly initialised <<type_IsoCardSelector,`IsoCardSelector`>>.
+| Returns     | A non-`null` <<type_IsoCardSelector,`IsoCardSelector`>>.
+| Throws      | None.
+|===
+
+[[type_CardReader]]
+==== `CardReader`
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Kind     | Interface
+| Package  | `reader`
+| Since    | 1.0.0
+| Purpose  | Represents a card reader capable of driving the underlying hardware to manage card detection.
+|===
+
+===== Operations
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `getName() -> string`
+| Since       | 1.0.0
+| Description | Returns the name of the reader.
+| Returns     | A non-empty `string` identifying the reader. The value MUST be stable for the lifetime of the reader instance.
+| Throws      | None.
+|===
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `isContactless() -> boolean`
+| Since       | 1.0.0
+| Description | Indicates whether the card communication mode is contactless.
+| Returns     | `true` if the communication mode is contactless, `false` otherwise.
+| Throws      | None.
+|===
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `isCardPresent() -> boolean`
+| Since       | 1.0.0
+| Description | Indicates whether a card is currently present in the reader.
+| Returns     | `true` if a card is inserted in the reader, `false` otherwise.
+| Throws      | `ReaderCommunicationException` -- if the communication with the reader has failed.
+|===
+
+[[type_ConfigurableCardReader]]
+==== `ConfigurableCardReader`
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Kind         | Interface
+| Package      | `reader`
+| Since        | 1.0.0
+| Extends      | <<type_CardReader,`CardReader`>>
+| Purpose      | A `CardReader` exposing operations to manage the card communication protocols.
+|===
+
+The association between *physical protocol name* (as known by the reader) and *logical protocol name* (as defined
+by the application) is intended to allow applications to refer to non-ISO cards by a stable, implementation-agnostic
+identifier when constructing a `CardSelector`.
+
+===== Operations
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature
+| `activateProtocol(physicalProtocolName: string, logicalProtocolName: string) -> void`
+| Since       | 1.0.0
+| Description
+| Activates the reader communication protocol by associating the provided physical communication protocol name
+  with the logical communication protocol name defined by the application.
+
+  The operation:
+
+  - activates the detection of cards using the provided physical communication protocol;
+  - internally associates the two strings provided as arguments.
+
+| Parameters
+| `physicalProtocolName` -- name of the physical communication protocol as known by the reader. Refer to the
+  reader documentation for the list of supported communication protocols. +
+  `logicalProtocolName` -- name of the logical protocol associated with the cards detected using the physical
+  protocol. This name MAY be used by the application to perform filtering at the time of selection.
+| Throws
+| `IllegalArgumentException` -- if either provided protocol name is `null` or empty. +
+  `ReaderProtocolNotSupportedException` -- if the physical communication protocol is not supported.
+|===
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `deactivateProtocol(physicalProtocolName: string) -> void`
+| Since       | 1.0.0
+| Description | Deactivates the reader communication protocol. The reader MUST stop detecting cards using this protocol.
+| Parameters  | `physicalProtocolName` -- name of the physical communication protocol as known by the reader.
+| Throws
+| `IllegalArgumentException` -- if the provided protocol name is `null` or empty. +
+  `ReaderProtocolNotSupportedException` -- if the physical communication protocol is not supported.
+|===
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `getCurrentProtocol() -> string`
+| Since       | 1.2.0
+| Description | Returns the name of the physical protocol currently used by the reader.
+| Returns     | The active physical protocol name, or `null` if no selection has been made yet or no protocol has been activated.
+| Throws      | None.
+|===
+
+[[type_ObservableCardReader]]
+==== `ObservableCardReader`
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Kind         | Interface
+| Package      | `reader`
+| Since        | 1.0.0
+| Extends      | <<type_CardReader,`CardReader`>>
+| Purpose      | A `CardReader` capable of observing the insertion and removal of cards.
+|===
+
+===== Operations
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature
+| `setReaderObservationExceptionHandler(exceptionHandler: CardReaderObservationExceptionHandlerSpi) -> void`
+| Since       | 1.0.0
+| Description
+| Registers the exception handler that will receive notifications of fatal errors raised during the observation.
+  Calling this operation is *mandatory* before the reader can be observed.
+| Parameters  | `exceptionHandler` -- the handler implemented by the application.
+| Throws      | `IllegalArgumentException` -- if the provided handler is `null`.
+|===
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `addObserver(observer: CardReaderObserverSpi) -> void`
+| Since       | 1.0.0
+| Description
+| Registers an observer to be notified whenever a reader event is produced. The observer MUST implement
+  <<type_CardReaderObserverSpi,`CardReaderObserverSpi`>>.
+| Parameters  | `observer` -- the observer to register. MUST be non-`null`.
+| Throws      | `IllegalArgumentException` -- if the provided observer is `null`.
+|===
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `removeObserver(observer: CardReaderObserverSpi) -> void`
+| Since       | 1.0.0
+| Description | Unregisters a previously registered observer. The observer MUST stop receiving events as soon as the operation returns.
+| Parameters  | `observer` -- the observer to remove. MUST be non-`null`.
+| Throws      | `IllegalArgumentException` -- if the provided observer is `null`.
+|===
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `clearObservers() -> void`
+| Since       | 1.0.0
+| Description | Unregisters every observer currently attached to the reader.
+| Throws      | None.
+|===
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `countObservers() -> integer`
+| Since       | 1.0.0
+| Description | Returns the number of observers currently registered with the reader.
+| Returns     | A non-negative `integer`.
+| Throws      | None.
+|===
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `startCardDetection(detectionMode: DetectionMode) -> void`
+| Since       | 1.0.0
+| Description
+| Activates card detection. Once activated, the application MAY be notified of the arrival of a card through the
+  registered observers. The <<type_DetectionMode,`DetectionMode`>> indicates the action to be followed after
+  processing the card.
+| Parameters  | `detectionMode` -- the desired card detection mode.
+| Throws      | `IllegalArgumentException` -- if the provided detection mode is `null`.
+|===
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `stopCardDetection() -> void`
+| Since       | 1.0.0
+| Description | Stops card detection. After this operation has returned, observers SHALL NOT receive card events until detection is restarted.
+| Throws      | None.
+|===
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `finalizeCardProcessing() -> void`
+| Since       | 1.0.0
+| Description
+| Notifies the observation process that the processing of the current card has been completed in order to ensure
+  that the card monitoring cycle runs properly.
+
+  This operation has no effect if the physical communication channel has already been closed.
+  It is *mandatory* to call this operation when the physical communication channel with the card could not be
+  closed properly. The channel closing is nominally managed during the last transmission with the card; however,
+  there are cases where exchanges with the card are interrupted (e.g. by an exception), in which case it is
+  necessary to explicitly close the channel using this operation.
+
+  In practice, it is RECOMMENDED to invoke this operation systematically (e.g. inside a `finally` block) at the
+  end of a card processing whatever the outcome.
+| Throws      | None.
+|===
+
+[[type_DetectionMode]]
+===== Enumeration `DetectionMode`
+
+Nested inside <<type_ObservableCardReader,`ObservableCardReader`>>. Card detection management options to be applied
+after processing a card.
+
+[cols="1,1,4", options="header"]
+|===
+| Value         | Since | Description
+
+| `REPEATING`   | 1.0.0 | Continue waiting for the insertion of a next card.
+| `SINGLESHOT`  | 1.0.0 | Stop and wait for a restart signal.
+|===
+
+[[type_NotificationMode]]
+===== Enumeration `NotificationMode`
+
+Nested inside <<type_ObservableCardReader,`ObservableCardReader`>>. Options applied when a card is detected, used
+to decide which cards trigger observer notifications.
+
+[cols="1,1,4", options="header"]
+|===
+| Value           | Since | Description
+
+| `ALWAYS`        | 1.0.0 | All cards presented to the reader are notified to the observers, regardless of the result of the selection.
+| `MATCHED_ONLY`  | 1.0.0 | Only cards that have been successfully selected will be notified to the observers. The others MUST be ignored.
+|===
+
+[[type_CardReaderEvent]]
+==== `CardReaderEvent`
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Kind     | Interface
+| Package  | `reader`
+| Since    | 1.0.0
+| Purpose  | Data container describing a change of state observed by a `CardReader`.
+|===
+
+A `CardReaderEvent` carries the origin of the event (the reader name), the event type and, when available, the
+card selection response.
+
+===== Operations
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `getReaderName() -> string`
+| Since       | 1.0.0
+| Description | Returns the name of the reader that generated the event.
+| Returns     | A non-empty `string`.
+| Throws      | None.
+|===
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `getType() -> Type`
+| Since       | 1.0.0
+| Description | Returns the type of the event.
+| Returns     | A non-`null` <<type_CardReaderEventType,`Type`>> value.
+| Throws      | None.
+|===
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `getScheduledCardSelectionsResponse() -> ScheduledCardSelectionsResponse`
+| Since       | 1.0.0
+| Description
+| Returns the card selection response when it is available and `null` in all other cases.
+  The response MAY be available when the event type is `CARD_INSERTED` and MUST be present when the event type
+  is `CARD_MATCHED`.
+
+  The returned value MUST be passed to
+  <<op_parseScheduledCardSelectionsResponse,`CardSelectionManager.parseScheduledCardSelectionsResponse`>> to be
+  interpreted.
+| Returns     | The scheduled card selections response, or `null` if the event does not carry one.
+| Throws      | None.
+|===
+
+[[type_CardReaderEventType]]
+===== Enumeration `Type`
+
+Nested inside <<type_CardReaderEvent,`CardReaderEvent`>>. Possible card reader events.
+
+[cols="1,1,4", options="header"]
+|===
+| Value           | Since | Description
+
+| `CARD_INSERTED` | 1.0.0 | A card has been inserted, with or without a specific selection.
+| `CARD_MATCHED`  | 1.0.0 | A card has been inserted that matches the selection criteria.
+| `CARD_REMOVED`  | 1.0.0 | The card has been removed from the reader.
+| `UNAVAILABLE`   | 1.0.0 | The reader has become unavailable.
+|===
+
+[[type_ChannelControl]]
+==== `ChannelControl`
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Kind     | Enumeration
+| Package  | `reader`
+| Since    | 2.1.0
+| Purpose  | Policy for managing the physical channel after a card request has been executed.
+|===
+
+[cols="1,1,4", options="header"]
+|===
+| Value          | Since | Description
+
+| `KEEP_OPEN`    | 2.1.0 | Leaves the physical channel open.
+| `CLOSE_AFTER`  | 2.1.0
+| Terminates communication with the card. The physical channel closes instantly, or a card removal sequence is
+  initiated depending on the observation mode.
+|===
+
+// -----------------------------------------------------------------------------
+=== Package `reader.spi`
+
+The `reader.spi` package gathers the contracts that are implemented by the *application* (as opposed to the reader
+implementation) when readers are observed.
+
+[[type_CardReaderObserverSpi]]
+==== `CardReaderObserverSpi`
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Kind     | Interface (SPI)
+| Package  | `reader.spi`
+| Since    | 1.0.0
+| Purpose  | Implemented by the application to receive <<type_CardReaderEvent,`CardReaderEvent`>> instances from an `ObservableCardReader`.
+|===
+
+===== Operations
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `onReaderEvent(readerEvent: CardReaderEvent) -> void`
+| Since       | 1.0.0
+| Description
+| Invoked when a reader event occurs. The dispatch SHOULD be performed *sequentially* and *synchronously* unless
+  the implementation explicitly documents a different policy.
+| Parameters  | `readerEvent` -- the non-`null` event payload.
+| Throws      | None. Implementations MUST ensure that exceptions thrown by the observer are routed to the configured exception handler.
+|===
+
+[[type_CardReaderObservationExceptionHandlerSpi]]
+==== `CardReaderObservationExceptionHandlerSpi`
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Kind     | Interface (SPI)
+| Package  | `reader.spi`
+| Since    | 1.0.0
+| Purpose  | Reader observation error handler -- implemented by the application to be notified of errors occurring during the monitoring of a reader.
+|===
+
+===== Operations
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature
+| `onReaderObservationError(contextInfo: string, readerName: string, e: throwable) -> void`
+| Since       | 1.0.0
+| Description
+| Invoked when an error occurs on the observed reader. After the operation returns, the observation process MUST
+  be considered stopped.
+| Parameters
+| `contextInfo` -- contextual information describing the operation that failed. +
+  `readerName`  -- name of the reader on which the error occurred. +
+  `e`           -- the original exception that triggered the notification.
+| Throws       | None.
+|===
+
+// -----------------------------------------------------------------------------
+=== Package `reader.selection`
+
+The `reader.selection` package describes the orchestration of card selection scenarios. It introduces the central
+<<type_CardSelectionManager,`CardSelectionManager`>>, the family of selectors and the structures used to expose
+selection results.
+
+[[type_CardSelector]]
+==== `CardSelector<T extends CardSelector<T>>`
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Kind     | Interface
+| Package  | `reader.selection`
+| Since    | 2.0.0
+| Purpose  | Base contract for all card selectors. Defines filters used to restrict the selection process to a subset of cards.
+|===
+
+All filters defined by this interface are *optional* and MAY be combined. If no filter is specified, any card that
+responds when inserted in the reader is considered selected. Conversely, if one or more filters are defined, a
+card SHALL NOT be selected if at least one of them rejects it.
+
+===== Operations
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `filterByCardProtocol(logicalProtocolName: string) -> T`
+| Since       | 2.0.0
+| Description
+| Restricts the selection process to cards communicating with the reader according to a specific protocol
+  (e.g. ISO/IEC 14443-A, ISO/IEC 14443-B, proprietary or other standardised technology).
+  The protocol is identified by its *logical name*.
+
+  *Prerequisite:* the reader MUST be a <<type_ConfigurableCardReader,`ConfigurableCardReader`>> and the targeted
+  protocol MUST have been activated through
+  <<type_ConfigurableCardReader,`ConfigurableCardReader.activateProtocol`>>.
+| Parameters  | `logicalProtocolName` -- logical name of the protocol to use as filter.
+| Returns     | The current instance, to allow fluent composition.
+| Throws      | `IllegalArgumentException` -- if the provided logical protocol name is `null` or empty.
+|===
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `filterByPowerOnData(powerOnDataRegex: string) -> T`
+| Since       | 2.0.0
+| Description | Restricts the selection process to cards whose power-on data, as provided by the reader, matches a specific regular expression.
+| Parameters  | `powerOnDataRegex` -- the regular expression to evaluate against the power-on data.
+| Returns     | The current instance, to allow fluent composition.
+| Throws      | `IllegalArgumentException` -- if the provided regular expression is `null`, empty or invalid.
+|===
+
+[[type_BasicCardSelector]]
+==== `BasicCardSelector`
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Kind     | Interface
+| Package  | `reader.selection`
+| Since    | 2.0.0
+| Extends  | `CardSelector<BasicCardSelector>`
+| Purpose  | Basic, technology-agnostic card selector. An instance is obtained via <<type_ReaderApiFactory,`ReaderApiFactory.createBasicCardSelector`>>.
+|===
+
+`BasicCardSelector` does not add any operation to <<type_CardSelector,`CardSelector`>>. It exists to express the
+absence of ISO/IEC 7816-4-specific filters at the type level.
+
+[[type_CommonIsoCardSelector]]
+==== `CommonIsoCardSelector<T extends CommonIsoCardSelector<T>>`
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Kind     | Interface
+| Package  | `reader.selection`
+| Since    | 2.0.0
+| Extends  | `CardSelector<T>`
+| Purpose  | Common filters used to restrict the selection process to ISO/IEC 7816-4 cards.
+|===
+
+===== Operations
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `filterByDfName(aid: byte array) -> T`
+| Since       | 2.0.0
+| Description
+| Selects a card application DF by its name. The DF is selected only if its name starts with the provided AID,
+  as defined by ISO/IEC 7816-4 § 4.2.
+  The provided AID MUST be used as a parameter of the *Select Application* ISO card command.
+| Parameters  | `aid` -- the AID, encoded as a 5 to 16 byte array.
+| Returns     | The current instance.
+| Throws      | `IllegalArgumentException` -- if the provided array is `null` or out of range.
+|===
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `filterByDfName(aid: string) -> T`
+| Since       | 2.0.0
+| Description | Selects a card application DF by its name. The AID is provided as a hexadecimal string. Semantics are otherwise identical to the byte-array overload.
+| Parameters  | `aid` -- AID encoded as a hexadecimal `string` of 5 to 16 bytes.
+| Returns     | The current instance.
+| Throws      | `IllegalArgumentException` -- if the provided string is `null`, invalid or out of range.
+|===
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `setFileOccurrence(fileOccurrence: FileOccurrence) -> T`
+| Since       | 2.0.0
+| Description | Sets the file occurrence mode (see ISO/IEC 7816-4). The default value is `FIRST`.
+| Parameters  | `fileOccurrence` -- the navigation option to apply.
+| Returns     | The current instance.
+| Throws      | `IllegalArgumentException` -- if `fileOccurrence` is `null`.
+|===
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `setFileControlInformation(fileControlInformation: FileControlInformation) -> T`
+| Since       | 2.0.0
+| Description | Sets the file control mode (see ISO/IEC 7816-4). The default value is `FCI`.
+| Parameters  | `fileControlInformation` -- the file control mode to apply.
+| Returns     | The current instance.
+| Throws      | `IllegalArgumentException` -- if `fileControlInformation` is `null`.
+|===
+
+[[type_FileOccurrence]]
+===== Enumeration `FileOccurrence`
+
+Nested inside `CommonIsoCardSelector`. Navigation options through the applications contained on the card according
+to ISO/IEC 7816-4.
+
+[cols="1,1,4", options="header"]
+|===
+| Value     | Since | Description
+| `FIRST`   | 2.0.0 | First occurrence.
+| `LAST`    | 2.0.0 | Last occurrence.
+| `NEXT`    | 2.0.0 | Next occurrence.
+| `PREVIOUS`| 2.0.0 | Previous occurrence.
+|===
+
+[[type_FileControlInformation]]
+===== Enumeration `FileControlInformation`
+
+Nested inside `CommonIsoCardSelector`. Types of templates returned in response to the *Select Application* command,
+according to ISO/IEC 7816-4.
+
+[cols="1,1,4", options="header"]
+|===
+| Value          | Since | Description
+| `FCI`          | 2.0.0 | File Control Information.
+| `FCP`          | 2.0.0 | File Control Parameters.
+| `FMD`          | 2.0.0 | File Management Data.
+| `NO_RESPONSE`  | 2.0.0 | No response expected.
+|===
+
+[[type_IsoCardSelector]]
+==== `IsoCardSelector`
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Kind     | Interface
+| Package  | `reader.selection`
+| Since    | 2.0.0
+| Extends  | `CommonIsoCardSelector<IsoCardSelector>`
+| Purpose  | ISO/IEC 7816-4 card selector. An instance is obtained via <<type_ReaderApiFactory,`ReaderApiFactory.createIsoCardSelector`>>.
+|===
+
+`IsoCardSelector` does not add any operation to <<type_CommonIsoCardSelector,`CommonIsoCardSelector`>>.
+
+[[type_CardSelectionManager]]
+==== `CardSelectionManager`
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Kind     | Interface
+| Package  | `reader.selection`
+| Since    | 1.0.0
+| Purpose  | Service responsible for preparing and executing card selection scenarios. An instance is obtained via <<type_ReaderApiFactory,`ReaderApiFactory.createCardSelectionManager`>>.
+|===
+
+A *card selection scenario* is composed of one or more *selection cases*, each backed by a
+<<type_CardSelectionExtension,`CardSelectionExtension`>>. A selection case targets a specific card and MAY define
+additional commands to be executed after the successful selection. The behaviour of the scenario is governed by
+the rules below:
+
+* If a selection case fails, the manager MUST proceed with the next selection case until none remains.
+* If a selection case succeeds:
+** by default, the manager MUST stop at the first successful selection;
+** if the *multiple selection mode* is enabled (see <<op_setMultipleSelectionMode,`setMultipleSelectionMode`>>),
+   the manager MUST process every remaining selection case.
+* The logical channel established with the card MAY be left open (default) or closed after the selection by calling
+  <<op_prepareReleaseChannel,`prepareReleaseChannel`>>.
+
+The manager provides three flavours of execution: explicit (synchronous) selection, scheduled (event-driven)
+selection, and the ability to *export/import* a selection scenario or its result for distributed architectures.
+
+===== Operations
+
+[[op_setMultipleSelectionMode]]
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `setMultipleSelectionMode() -> void`
+| Since       | 1.0.0
+| Description | Enables the multiple selection mode, instructing the manager to process *every* selection case even after a successful one. Disabled by default.
+| Throws      | None.
+|===
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature
+| `prepareSelection(cardSelector: CardSelector<?>, cardSelectionExtension: CardSelectionExtension) -> integer`
+| Since       | 2.0.0
+| Description
+| Appends a selection case to the scenario. The returned index gives the position of the selection in the
+  scenario (`0` for the first case, `1` for the second, etc.) and SHALL be used to retrieve the corresponding
+  result in the <<type_CardSelectionResult,`CardSelectionResult`>>.
+| Parameters
+| `cardSelector` -- the selector containing the filters to be used. +
+  `cardSelectionExtension` -- the extension used to parse the selection response.
+| Returns      | A non-negative `integer` -- the index of the appended selection case.
+| Throws       | `IllegalArgumentException` -- if either argument is `null`.
+|===
+
+[[op_prepareReleaseChannel]]
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `prepareReleaseChannel() -> void`
+| Since       | 1.0.0
+| Description
+| Requests the closing of the physical channel at the end of the execution of the selection scenario. This allows
+  several selection scenarios to be chained on the same card by restarting the card connection sequence.
+| Throws      | None.
+|===
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `exportCardSelectionScenario() -> string`
+| Since       | 1.1.0
+| Description | Exports the content of the current prepared selection scenario as a `string`. The result MAY be imported into the same or another `CardSelectionManager` via `importCardSelectionScenario`.
+| Returns     | A non-`null` `string`.
+| Throws      | None.
+|===
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `importCardSelectionScenario(cardSelectionScenario: string) -> integer`
+| Since       | 1.1.0
+| Description | Imports a previously exported scenario. The input MUST have been produced by `exportCardSelectionScenario`.
+| Parameters  | `cardSelectionScenario` -- the previously exported scenario.
+| Returns     | The index of the last imported selection in the scenario.
+| Throws      | `IllegalArgumentException` -- if the string is `null` or malformed.
+|===
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `processCardSelectionScenario(reader: CardReader) -> CardSelectionResult`
+| Since       | 1.0.0
+| Description | Explicitly executes the previously prepared selection scenario against the provided reader and returns the result.
+| Parameters  | `reader` -- the reader through which the card is reached.
+| Returns     | A non-`null` <<type_CardSelectionResult,`CardSelectionResult`>>.
+| Throws
+| `IllegalArgumentException` -- if `reader` is `null`. +
+  `ReaderCommunicationException` -- if communication with the reader has failed. +
+  `CardCommunicationException` -- if communication with the card has failed, or if the status word check is
+  enabled in the card request and the card returned an unexpected code. +
+  `InvalidCardResponseException` -- if the card returned invalid data during the selection process.
+|===
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature
+| `scheduleCardSelectionScenario(observableCardReader: ObservableCardReader, notificationMode: ObservableCardReader.NotificationMode) -> void`
+| Since       | 1.0.0
+| Description
+| Schedules the execution of the prepared selection scenario as soon as a card is presented to the supplied
+  observable reader. Events are pushed to observers according to the requested notification mode. The result of the
+  execution MUST be parsed via <<op_parseScheduledCardSelectionsResponse,`parseScheduledCardSelectionsResponse`>>.
+| Parameters
+| `observableCardReader` -- the reader through which the card is reached. +
+  `notificationMode` -- the desired notification mode (`ALWAYS` or `MATCHED_ONLY`).
+| Throws       | `IllegalArgumentException` -- if any parameter is `null`.
+|===
+
+[[op_parseScheduledCardSelectionsResponse]]
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature
+| `parseScheduledCardSelectionsResponse(scheduledCardSelectionsResponse: ScheduledCardSelectionsResponse) -> CardSelectionResult`
+| Since       | 1.0.0
+| Description | Analyses the responses provided by a <<type_CardReaderEvent,`CardReaderEvent`>> following the insertion of a card and the execution of the scheduled selection scenario.
+| Parameters  | `scheduledCardSelectionsResponse` -- the scenario execution response carried by the event.
+| Returns     | A non-`null` <<type_CardSelectionResult,`CardSelectionResult`>>.
+| Throws
+| `IllegalArgumentException` -- if the provided response is `null`. +
+  `InvalidCardResponseException` -- if the data returned by the card could not be interpreted.
+|===
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `exportProcessedCardSelectionScenario() -> string`
+| Since       | 1.3.0
+| Description
+| Exports the content of the previously processed selection scenario as a `string`. The result MAY be imported
+  through `importProcessedCardSelectionScenario`.
+
+  *Prerequisite:* the selection scenario MUST have been processed previously via `processCardSelectionScenario`
+  or `parseScheduledCardSelectionsResponse`.
+
+  *Caution:* if the local environment does not have all the card extensions involved in the scenario, the
+  `CardSelectionResult` produced locally will not contain any active selection. In that case, the processed
+  scenario MUST be exported so that it can be re-imported and interpreted on a manager which has the relevant
+  card extensions.
+| Returns     | A non-`null` `string`.
+| Throws      | `IllegalStateException` -- if the scenario has not yet been processed or has failed.
+|===
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `importProcessedCardSelectionScenario(processedCardSelectionScenario: string) -> CardSelectionResult`
+| Since       | 1.3.0
+| Description
+| Imports a previously exported *processed* selection scenario and returns the corresponding result.
+
+  *Prerequisites:* the input MUST have been produced by `exportProcessedCardSelectionScenario`; the local
+  environment MUST possess every card extension involved; the current manager MUST first have been configured
+  with the same selection scenario as the manager that produced the export.
+| Parameters  | `processedCardSelectionScenario` -- the previously exported processed scenario.
+| Returns     | A non-`null` <<type_CardSelectionResult,`CardSelectionResult`>>.
+| Throws
+| `IllegalArgumentException` -- if the string is `null`, malformed or contains more selection cases than the
+  current scenario. +
+  `InvalidCardResponseException` -- if the data returned by the card could not be interpreted.
+|===
+
+[[type_CardSelectionResult]]
+==== `CardSelectionResult`
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Kind     | Interface
+| Package  | `reader.selection`
+| Since    | 1.0.0
+| Purpose  | Result of a selection process.
+|===
+
+Each selection case prepared with the manager is associated with the index returned by `prepareSelection`. The same
+index is used to retrieve the corresponding result here. At most one case will correspond to the *active* selected
+card; the operations below allow the application to exploit these results according to its needs.
+
+===== Operations
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `getSmartCards() -> map<integer, SmartCard>`
+| Since       | 1.0.0
+| Description | Returns all <<type_SmartCard,`SmartCard`>> instances corresponding to successful selection cases, indexed by the value returned by `prepareSelection`.
+| Returns     | A non-`null`, possibly empty map.
+| Throws      | None.
+|===
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `getActiveSmartCard() -> SmartCard`
+| Since       | 1.0.0
+| Description | Returns the active matching card, i.e. the card that has been selected.
+| Returns     | The active <<type_SmartCard,`SmartCard`>>, or `null` if there is no active card.
+| Throws      | None.
+|===
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `getActiveSelectionIndex() -> integer`
+| Since       | 1.0.0
+| Description | Returns the index of the active selection, if any.
+| Returns     | A non-negative `integer` if an active selection exists, `-1` otherwise.
+| Throws      | None.
+|===
+
+[[type_ScheduledCardSelectionsResponse]]
+==== `ScheduledCardSelectionsResponse`
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Kind     | Interface (marker)
+| Package  | `reader.selection`
+| Since    | 1.0.0
+| Purpose  | Carrier for the response of the execution of a scheduled selection scenario, provided by a <<type_CardReaderEvent,`CardReaderEvent`>>.
+|===
+
+This interface declares no operation. It conveys the card responses to one or more of the scenario's selection
+cases (selection step itself plus any subsequent commands). Its content MUST be interpreted through
+<<op_parseScheduledCardSelectionsResponse,`CardSelectionManager.parseScheduledCardSelectionsResponse`>>.
+
+// -----------------------------------------------------------------------------
+[[sec_pkg_reader_selection_spi]]
+=== Package `reader.selection.spi`
+
+The `reader.selection.spi` package gathers the contracts that *card extensions* implement to plug into the selection
+machinery defined in <<sec_specification,Section 4>>.
+
+[[type_CardSelectionExtension]]
+==== `CardSelectionExtension`
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Kind     | Interface (SPI, marker)
+| Package  | `reader.selection.spi`
+| Since    | 2.0.0
+| Purpose  | Provided by card extensions to enrich a selection case with additional commands and to interpret the response in order to build the corresponding <<type_SmartCard,`SmartCard`>>.
+|===
+
+This interface declares no operation at the API level; the contract between the selection manager and the
+extension is defined by the card extension specification consuming this SPI.
+
+[[type_SmartCard]]
+==== `SmartCard`
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Kind     | Interface (SPI)
+| Package  | `reader.selection.spi`
+| Since    | 1.0.0
+| Purpose  | Basic smart card whose communication has been established after a successful selection. The instance is ready to receive APDUs.
+|===
+
+Card extensions MUST implement (and MAY extend) this interface to expose the data they have collected during the
+selection.
+
+===== Operations
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `getPowerOnData() -> string`
+| Since       | 1.0.0
+| Description
+| Returns the card's power-on data, as collected by the reader at the moment the card was inserted.
+
+  - For a contact reader, this is the Answer To Reset (ATR) defined by ISO/IEC 7816.
+  - For a contactless reader, the reader decides what this data is. Some contactless readers provide a virtual
+    ATR (partially standardised by the PC/SC standard), while other devices may have their own definition,
+    including for example elements from the anti-collision stage of ISO/IEC 14443 (ATQA, ATQB, ATS, SAK, etc.)
+    or any proprietary definitions.
+
+  Because this data varies from one reader to another, it is exposed here as a `string` that MAY be either a
+  hexadecimal string or any other relevant representation.
+| Returns     | The power-on data, or `null` if no power-on data is available.
+| Throws      | None.
+|===
+
+[[type_IsoSmartCard]]
+==== `IsoSmartCard`
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Kind     | Interface (SPI)
+| Package  | `reader.selection.spi`
+| Since    | 2.0.0
+| Extends  | <<type_SmartCard,`SmartCard`>>
+| Purpose  | ISO/IEC 7816-4 smart card whose communication has been established after a successful selection.
+|===
+
+In addition to the inherited power-on data, an `IsoSmartCard` exposes the response to the *Select Application*
+command. Both the power-on data and the *Select Application* response are OPTIONAL but they MUST NOT both be
+absent at the same time.
+
+===== Operations
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `getSelectApplicationResponse() -> byte array`
+| Since       | 1.0.0
+| Description | Returns the data received from the card in response to the *Select Application* command, including the status word.
+| Returns     | The response bytes, or `null` if no *Select Application* command has been performed.
+| Throws      | None.
+|===
+
+// -----------------------------------------------------------------------------
+=== Package `reader.transaction.spi`
+
+The `reader.transaction.spi` package defines the common contract shared by all card transaction managers exposed
+by card extensions.
+
+[[type_CardTransactionManager]]
+==== `CardTransactionManager<T extends CardTransactionManager<T>>`
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Kind     | Interface (SPI)
+| Package  | `reader.transaction.spi`
+| Since    | 2.1.0
+| Purpose  | Contains operations common to all card transactions.
+|===
+
+To exchange data with a card, the application MUST first prepare the commands to transmit and then process them.
+The preparation step allows commands to be grouped to minimise network exchanges, which is especially valuable in
+distributed architectures. The <<type_SmartCard,`SmartCard`>> registered with the manager MUST be updated after
+each data exchange with the card.
+
+===== Operations
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Signature   | `processCommands(channelControl: ChannelControl) -> T`
+| Since       | 2.1.0
+| Description
+| Processes all previously prepared commands and closes the physical channel if requested.
+
+  All APDUs corresponding to the prepared commands MUST be sent to the card, their responses retrieved and used
+  to update the <<type_SmartCard,`SmartCard`>> associated with the transaction.
+  For write commands, the `SmartCard` MUST be updated only when the command is successful. The process MUST be
+  interrupted at the first failed command.
+| Parameters  | `channelControl` -- policy for managing the physical channel after the commands have been executed.
+| Returns     | The current instance, to allow fluent composition.
+| Throws
+| `ReaderCommunicationException` -- if a communication error with the reader occurs. +
+  `CardCommunicationException` -- if a communication error with the card occurs. +
+  `InvalidCardResponseException` -- if a command returns an unexpected status.
+|===
+
+// =============================================================================
+[[sec_exceptions]]
+== Exceptions
+
+All exception types defined by this specification are unchecked (runtime) and MAY be propagated to the application.
+Each exception MUST expose, at minimum, the constructors listed below.
+
+[[type_CardCommunicationException]]
+=== `CardCommunicationException`
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Kind     | Runtime exception
+| Package  | `reader`
+| Since    | 1.0.0
+| Purpose  | Indicates that the communication with the card has failed.
+|===
+
+===== Constructors
+
+* `CardCommunicationException(message: string)` -- _since 1.0.0_.
+* `CardCommunicationException(message: string, cause: throwable)` -- _since 1.0.0_.
+
+[[type_InvalidCardResponseException]]
+=== `InvalidCardResponseException`
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Kind     | Runtime exception
+| Package  | `reader`
+| Since    | 2.1.0
+| Purpose  | Indicates that a response received from the card during command processing was invalid.
+|===
+
+===== Constructors
+
+* `InvalidCardResponseException(message: string)` -- _since 2.1.0_.
+* `InvalidCardResponseException(message: string, cause: throwable)` -- _since 2.1.0_.
+
+NOTE: A separate `InvalidCardResponseException` MAY be defined in the `reader.selection` package for backward
+compatibility with selection-time errors. New code SHOULD use the type defined in the `reader` package.
+
+[[type_ReaderCommunicationException]]
+=== `ReaderCommunicationException`
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Kind     | Runtime exception
+| Package  | `reader`
+| Since    | 1.0.0
+| Purpose  | Indicates that the communication with the reader has failed. The most likely cause is a physical disconnection of the reader, but other technical problems MAY also be at the origin of the failure.
+|===
+
+===== Constructors
+
+* `ReaderCommunicationException(message: string)` -- _since 1.0.0_.
+* `ReaderCommunicationException(message: string, cause: throwable)` -- _since 1.0.0_.
+
+[[type_ReaderProtocolNotSupportedException]]
+=== `ReaderProtocolNotSupportedException`
+
+[cols="1h,4", grid=rows, frame=ends]
+|===
+| Kind     | Runtime exception
+| Package  | `reader`
+| Since    | 1.0.0
+| Purpose  | Indicates that the requested card protocol is not supported by the reader.
+|===
+
+===== Constructors
+
+* `ReaderProtocolNotSupportedException(physicalProtocolName: string)` -- _since 1.0.0_.
+  The default message MUST follow the pattern `"The protocol '<physicalProtocolName>' is not supported."`.
+
+// =============================================================================
+[[sec_behaviours]]
+== Behavioural Requirements
+
+This section consolidates the cross-cutting behavioural requirements that conforming implementations MUST satisfy.
+
+=== Reader lifecycle
+
+. A `CardReader` instance MUST expose a stable name for its entire lifetime.
+. A reader instance MUST signal communication failures by raising `ReaderCommunicationException` rather than
+  returning a default value.
+. A reader instance MUST refuse to be observed until a `CardReaderObservationExceptionHandlerSpi` has been
+  registered.
+
+=== Observation lifecycle
+
+. Observer notifications MUST be delivered *sequentially* per reader; concurrent invocations of `onReaderEvent`
+  on the same reader MUST NOT occur.
+. After `stopCardDetection`, observers SHALL NOT receive new events until `startCardDetection` has been called
+  again.
+. Any uncaught exception raised inside an observer MUST be relayed to the observation exception handler.
+
+=== Selection scenario lifecycle
+
+. A scenario is considered "prepared" once at least one selection case has been appended via `prepareSelection`.
+. A scenario MAY be executed multiple times, but each execution operates on the scenario as it stood at the time
+  of the call.
+. `exportProcessedCardSelectionScenario` MUST raise `IllegalStateException` if no scenario has been processed yet.
+
+=== Channel control
+
+. The default channel policy after a successful selection is `KEEP_OPEN`.
+. After `prepareReleaseChannel` has been invoked, the next execution of the scenario MUST close the physical
+  channel at the end of the selection.
+. `finalizeCardProcessing` MUST be idempotent.
+
+// =============================================================================
+[appendix]
+[[sec_changes]]
+== Change Log -- 3.0.0-SNAPSHOT (Working Draft)
+
+This appendix tracks, on a best-effort basis, the deltas introduced by the {spec-version} working draft compared
+to the previous published release. The list below MUST be kept in sync with
+link:api_class_diagram_diff.puml[`api_class_diagram_diff.puml`].
+
+* _Pending: list of additions, deprecations and removals as agreed by the editorial group._
+
+// =============================================================================
+[appendix]
+[[sec_traceability]]
+== Traceability Matrix (Reference Java Binding)
+
+The table below maps each abstract element defined in this specification to the corresponding identifier in the
+reference Java binding hosted at https://github.com/eclipse-keypop/keypop-reader-java-api[`eclipse-keypop/keypop-reader-java-api`].
+
+[cols="1,1,2,2", options="header"]
+|===
+| Section            | Element                                  | Java type / member                                                     | Notes
+
+| <<type_ReaderApiFactory>>                            | `ReaderApiFactory`                       | `org.eclipse.keypop.reader.ReaderApiFactory`                           | --
+| <<type_ReaderApiProperties>>                         | `ReaderApiProperties.VERSION`            | `org.eclipse.keypop.reader.ReaderApiProperties.VERSION`                | Reference value: `"2.1"` in the 2.1.x binding.
+| <<type_CardReader>>                                  | `CardReader`                             | `org.eclipse.keypop.reader.CardReader`                                 | --
+| <<type_ConfigurableCardReader>>                      | `ConfigurableCardReader`                 | `org.eclipse.keypop.reader.ConfigurableCardReader`                     | --
+| <<type_ObservableCardReader>>                        | `ObservableCardReader`                   | `org.eclipse.keypop.reader.ObservableCardReader`                       | Includes nested `DetectionMode`, `NotificationMode`.
+| <<type_CardReaderEvent>>                             | `CardReaderEvent`                        | `org.eclipse.keypop.reader.CardReaderEvent`                            | Includes nested `Type`.
+| <<type_ChannelControl>>                              | `ChannelControl`                         | `org.eclipse.keypop.reader.ChannelControl`                             | --
+| <<type_CardReaderObserverSpi>>                       | `CardReaderObserverSpi`                  | `org.eclipse.keypop.reader.spi.CardReaderObserverSpi`                  | --
+| <<type_CardReaderObservationExceptionHandlerSpi>>    | `CardReaderObservationExceptionHandlerSpi` | `org.eclipse.keypop.reader.spi.CardReaderObservationExceptionHandlerSpi` | --
+| <<type_CardSelector>>                                | `CardSelector<T>`                        | `org.eclipse.keypop.reader.selection.CardSelector`                     | --
+| <<type_BasicCardSelector>>                           | `BasicCardSelector`                      | `org.eclipse.keypop.reader.selection.BasicCardSelector`                | --
+| <<type_CommonIsoCardSelector>>                       | `CommonIsoCardSelector<T>`               | `org.eclipse.keypop.reader.selection.CommonIsoCardSelector`            | --
+| <<type_IsoCardSelector>>                             | `IsoCardSelector`                        | `org.eclipse.keypop.reader.selection.IsoCardSelector`                  | --
+| <<type_CardSelectionManager>>                        | `CardSelectionManager`                   | `org.eclipse.keypop.reader.selection.CardSelectionManager`             | --
+| <<type_CardSelectionResult>>                         | `CardSelectionResult`                    | `org.eclipse.keypop.reader.selection.CardSelectionResult`              | --
+| <<type_ScheduledCardSelectionsResponse>>             | `ScheduledCardSelectionsResponse`        | `org.eclipse.keypop.reader.selection.ScheduledCardSelectionsResponse`  | Marker interface.
+| <<type_CardSelectionExtension>>                      | `CardSelectionExtension`                 | `org.eclipse.keypop.reader.selection.spi.CardSelectionExtension`       | Marker SPI.
+| <<type_SmartCard>>                                   | `SmartCard`                              | `org.eclipse.keypop.reader.selection.spi.SmartCard`                    | --
+| <<type_IsoSmartCard>>                                | `IsoSmartCard`                           | `org.eclipse.keypop.reader.selection.spi.IsoSmartCard`                 | --
+| <<type_CardTransactionManager>>                      | `CardTransactionManager<T>`              | `org.eclipse.keypop.reader.transaction.spi.CardTransactionManager`     | --
+| <<type_CardCommunicationException>>                  | `CardCommunicationException`             | `org.eclipse.keypop.reader.CardCommunicationException`                 | --
+| <<type_InvalidCardResponseException>>                | `InvalidCardResponseException`           | `org.eclipse.keypop.reader.InvalidCardResponseException`               | --
+| <<type_ReaderCommunicationException>>                | `ReaderCommunicationException`           | `org.eclipse.keypop.reader.ReaderCommunicationException`               | --
+| <<type_ReaderProtocolNotSupportedException>>         | `ReaderProtocolNotSupportedException`    | `org.eclipse.keypop.reader.ReaderProtocolNotSupportedException`        | --
+|===
+
+// =============================================================================
+[appendix]
+== Copyright and License
+
+Copyright (c) {organization}, https://calypsonet.org.
+
+This specification is distributed under the terms of the *MIT License*. A copy of the license is available in the
+link:LICENSE[`LICENSE`] file alongside this document and at https://opensource.org/licenses/MIT.
+
+The reference Java binding of this API is itself distributed under the MIT License and is part of the Eclipse
+Keypop project hosted by the Eclipse Foundation.
