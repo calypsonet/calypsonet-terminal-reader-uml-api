@@ -53,7 +53,7 @@ terminal applications discover card readers, observe card events, select cards a
 [discrete]
 == Document Status
 
-[cols="1h,3", grid=rows, frame=ends]
+[cols="1h,3", grid=rows, frame=all]
 |===
 | Specification ID    | {spec-id}
 | Version             | {spec-version}
@@ -152,7 +152,7 @@ equivalent native type. Implementations MUST preserve the semantic intent rather
 
 Each operation defined in this document is described by a table of the form:
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | The operation's language-agnostic signature.
 | Since       | The version of the specification that introduced the operation.
@@ -327,7 +327,7 @@ events they produce.
 [[type_ReaderApiProperties]]
 ==== ReaderApiProperties
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Final class
 | Package  | `reader`
@@ -356,7 +356,7 @@ The `ReaderApiProperties` type SHALL NOT be instantiated. Implementations MUST p
 [[type_ReaderApiFactory]]
 ==== ReaderApiFactory
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface
 | Package  | `reader`
@@ -370,7 +370,7 @@ that every invocation returns a fresh, fully initialised object.
 
 ===== Operations
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `createCardSelectionManager() -> CardSelectionManager`
 | Since       | 2.0.0
@@ -379,7 +379,7 @@ that every invocation returns a fresh, fully initialised object.
 | Throws      | None.
 |===
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `createBasicCardSelector() -> BasicCardSelector`
 | Since       | 2.0.0
@@ -388,7 +388,7 @@ that every invocation returns a fresh, fully initialised object.
 | Throws      | None.
 |===
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `createIsoCardSelector() -> IsoCardSelector`
 | Since       | 2.0.0
@@ -400,7 +400,7 @@ that every invocation returns a fresh, fully initialised object.
 [[type_CardReader]]
 ==== CardReader
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface
 | Package  | `reader`
@@ -410,7 +410,7 @@ that every invocation returns a fresh, fully initialised object.
 
 ===== Operations
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `getName() -> string`
 | Since       | 1.0.0
@@ -419,7 +419,7 @@ that every invocation returns a fresh, fully initialised object.
 | Throws      | None.
 |===
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `isContactless() -> boolean`
 | Since       | 1.0.0
@@ -428,7 +428,7 @@ that every invocation returns a fresh, fully initialised object.
 | Throws      | None.
 |===
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `isCardPresent() -> boolean`
 | Since       | 1.0.0
@@ -440,7 +440,7 @@ that every invocation returns a fresh, fully initialised object.
 [[type_ConfigurableCardReader]]
 ==== ConfigurableCardReader
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Kind         | Interface
 | Package      | `reader`
@@ -455,7 +455,7 @@ identifier when constructing a `CardSelector`.
 
 ===== Operations
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature
 | `activateProtocol(physicalProtocolName: string, logicalProtocolName: string) -> void`
@@ -479,7 +479,7 @@ identifier when constructing a `CardSelector`.
   `ReaderProtocolNotSupportedException` -- if the physical communication protocol is not supported.
 |===
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `deactivateProtocol(physicalProtocolName: string) -> void`
 | Since       | 1.0.0
@@ -490,7 +490,7 @@ identifier when constructing a `CardSelector`.
   `ReaderProtocolNotSupportedException` -- if the physical communication protocol is not supported.
 |===
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `getCurrentProtocol() -> string`
 | Since       | 1.2.0
@@ -502,7 +502,7 @@ identifier when constructing a `CardSelector`.
 [[type_ObservableCardReader]]
 ==== ObservableCardReader
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Kind         | Interface
 | Package      | `reader`
@@ -513,7 +513,7 @@ identifier when constructing a `CardSelector`.
 
 ===== Operations
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature
 | `setReaderObservationExceptionHandler(exceptionHandler: CardReaderObservationExceptionHandlerSpi) -> void`
@@ -525,7 +525,7 @@ identifier when constructing a `CardSelector`.
 | Throws      | `IllegalArgumentException` -- if the provided handler is `null`.
 |===
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `addObserver(observer: CardReaderObserverSpi) -> void`
 | Since       | 1.0.0
@@ -536,7 +536,7 @@ identifier when constructing a `CardSelector`.
 | Throws      | `IllegalArgumentException` -- if the provided observer is `null`.
 |===
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `removeObserver(observer: CardReaderObserverSpi) -> void`
 | Since       | 1.0.0
@@ -545,7 +545,7 @@ identifier when constructing a `CardSelector`.
 | Throws      | `IllegalArgumentException` -- if the provided observer is `null`.
 |===
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `clearObservers() -> void`
 | Since       | 1.0.0
@@ -553,7 +553,7 @@ identifier when constructing a `CardSelector`.
 | Throws      | None.
 |===
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `countObservers() -> integer`
 | Since       | 1.0.0
@@ -562,7 +562,7 @@ identifier when constructing a `CardSelector`.
 | Throws      | None.
 |===
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `startCardDetection(detectionMode: DetectionMode) -> void`
 | Since       | 1.0.0
@@ -574,7 +574,7 @@ identifier when constructing a `CardSelector`.
 | Throws      | `IllegalArgumentException` -- if the provided detection mode is `null`.
 |===
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `stopCardDetection() -> void`
 | Since       | 1.0.0
@@ -582,7 +582,7 @@ identifier when constructing a `CardSelector`.
 | Throws      | None.
 |===
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `finalizeCardProcessing() -> void`
 | Since       | 1.0.0
@@ -632,7 +632,7 @@ to decide which cards trigger observer notifications.
 [[type_CardReaderEvent]]
 ==== CardReaderEvent
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface
 | Package  | `reader`
@@ -645,7 +645,7 @@ card selection response.
 
 ===== Operations
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `getReaderName() -> string`
 | Since       | 1.0.0
@@ -654,7 +654,7 @@ card selection response.
 | Throws      | None.
 |===
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `getType() -> Type`
 | Since       | 1.0.0
@@ -663,7 +663,7 @@ card selection response.
 | Throws      | None.
 |===
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `getScheduledCardSelectionsResponse() -> ScheduledCardSelectionsResponse`
 | Since       | 1.0.0
@@ -697,7 +697,7 @@ Nested inside <<type_CardReaderEvent,`CardReaderEvent`>>. Possible card reader e
 [[type_ChannelControl]]
 ==== ChannelControl
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Enumeration
 | Package  | `reader`
@@ -724,7 +724,7 @@ implementation) when readers are observed.
 [[type_CardReaderObserverSpi]]
 ==== CardReaderObserverSpi
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface (SPI)
 | Package  | `reader.spi`
@@ -734,7 +734,7 @@ implementation) when readers are observed.
 
 ===== Operations
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `onReaderEvent(readerEvent: CardReaderEvent) -> void`
 | Since       | 1.0.0
@@ -748,7 +748,7 @@ implementation) when readers are observed.
 [[type_CardReaderObservationExceptionHandlerSpi]]
 ==== CardReaderObservationExceptionHandlerSpi
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface (SPI)
 | Package  | `reader.spi`
@@ -758,7 +758,7 @@ implementation) when readers are observed.
 
 ===== Operations
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature
 | `onReaderObservationError(contextInfo: string, readerName: string, e: throwable) -> void`
@@ -783,7 +783,7 @@ selection results.
 [[type_CardSelector]]
 ==== CardSelector&lt;T extends CardSelector&lt;T&gt;&gt;
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface
 | Package  | `reader.selection`
@@ -797,7 +797,7 @@ card SHALL NOT be selected if at least one of them rejects it.
 
 ===== Operations
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `filterByCardProtocol(logicalProtocolName: string) -> T`
 | Since       | 2.0.0
@@ -814,7 +814,7 @@ card SHALL NOT be selected if at least one of them rejects it.
 | Throws      | `IllegalArgumentException` -- if the provided logical protocol name is `null` or empty.
 |===
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `filterByPowerOnData(powerOnDataRegex: string) -> T`
 | Since       | 2.0.0
@@ -827,7 +827,7 @@ card SHALL NOT be selected if at least one of them rejects it.
 [[type_BasicCardSelector]]
 ==== BasicCardSelector
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface
 | Package  | `reader.selection`
@@ -842,7 +842,7 @@ absence of ISO/IEC 7816-4-specific filters at the type level.
 [[type_CommonIsoCardSelector]]
 ==== CommonIsoCardSelector&lt;T extends CommonIsoCardSelector&lt;T&gt;&gt;
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface
 | Package  | `reader.selection`
@@ -853,7 +853,7 @@ absence of ISO/IEC 7816-4-specific filters at the type level.
 
 ===== Operations
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `filterByDfName(aid: byte array) -> T`
 | Since       | 2.0.0
@@ -866,7 +866,7 @@ absence of ISO/IEC 7816-4-specific filters at the type level.
 | Throws      | `IllegalArgumentException` -- if the provided array is `null` or out of range.
 |===
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `filterByDfName(aid: string) -> T`
 | Since       | 2.0.0
@@ -876,7 +876,7 @@ absence of ISO/IEC 7816-4-specific filters at the type level.
 | Throws      | `IllegalArgumentException` -- if the provided string is `null`, invalid or out of range.
 |===
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `setFileOccurrence(fileOccurrence: FileOccurrence) -> T`
 | Since       | 2.0.0
@@ -886,7 +886,7 @@ absence of ISO/IEC 7816-4-specific filters at the type level.
 | Throws      | `IllegalArgumentException` -- if `fileOccurrence` is `null`.
 |===
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `setFileControlInformation(fileControlInformation: FileControlInformation) -> T`
 | Since       | 2.0.0
@@ -929,7 +929,7 @@ according to ISO/IEC 7816-4.
 [[type_IsoCardSelector]]
 ==== IsoCardSelector
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface
 | Package  | `reader.selection`
@@ -943,7 +943,7 @@ according to ISO/IEC 7816-4.
 [[type_CardSelectionManager]]
 ==== CardSelectionManager
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface
 | Package  | `reader.selection`
@@ -970,7 +970,7 @@ selection, and the ability to *export/import* a selection scenario or its result
 ===== Operations
 
 [[op_setMultipleSelectionMode]]
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `setMultipleSelectionMode() -> void`
 | Since       | 1.0.0
@@ -978,7 +978,7 @@ selection, and the ability to *export/import* a selection scenario or its result
 | Throws      | None.
 |===
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature
 | `prepareSelection(cardSelector: CardSelector<?>, cardSelectionExtension: CardSelectionExtension) -> integer`
@@ -995,7 +995,7 @@ selection, and the ability to *export/import* a selection scenario or its result
 |===
 
 [[op_prepareReleaseChannel]]
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `prepareReleaseChannel() -> void`
 | Since       | 1.0.0
@@ -1005,7 +1005,7 @@ selection, and the ability to *export/import* a selection scenario or its result
 | Throws      | None.
 |===
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `exportCardSelectionScenario() -> string`
 | Since       | 1.1.0
@@ -1014,7 +1014,7 @@ selection, and the ability to *export/import* a selection scenario or its result
 | Throws      | None.
 |===
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `importCardSelectionScenario(cardSelectionScenario: string) -> integer`
 | Since       | 1.1.0
@@ -1024,7 +1024,7 @@ selection, and the ability to *export/import* a selection scenario or its result
 | Throws      | `IllegalArgumentException` -- if the string is `null` or malformed.
 |===
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `processCardSelectionScenario(reader: CardReader) -> CardSelectionResult`
 | Since       | 1.0.0
@@ -1039,7 +1039,7 @@ selection, and the ability to *export/import* a selection scenario or its result
   `InvalidCardResponseException` -- if the card returned invalid data during the selection process.
 |===
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature
 | `scheduleCardSelectionScenario(observableCardReader: ObservableCardReader, notificationMode: ObservableCardReader.NotificationMode) -> void`
@@ -1055,7 +1055,7 @@ selection, and the ability to *export/import* a selection scenario or its result
 |===
 
 [[op_parseScheduledCardSelectionsResponse]]
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature
 | `parseScheduledCardSelectionsResponse(scheduledCardSelectionsResponse: ScheduledCardSelectionsResponse) -> CardSelectionResult`
@@ -1068,7 +1068,7 @@ selection, and the ability to *export/import* a selection scenario or its result
   `InvalidCardResponseException` -- if the data returned by the card could not be interpreted.
 |===
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `exportProcessedCardSelectionScenario() -> string`
 | Since       | 1.3.0
@@ -1087,7 +1087,7 @@ selection, and the ability to *export/import* a selection scenario or its result
 | Throws      | `IllegalStateException` -- if the scenario has not yet been processed or has failed.
 |===
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `importProcessedCardSelectionScenario(processedCardSelectionScenario: string) -> CardSelectionResult`
 | Since       | 1.3.0
@@ -1108,7 +1108,7 @@ selection, and the ability to *export/import* a selection scenario or its result
 [[type_CardSelectionResult]]
 ==== CardSelectionResult
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface
 | Package  | `reader.selection`
@@ -1122,7 +1122,7 @@ card; the operations below allow the application to exploit these results accord
 
 ===== Operations
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `getSmartCards() -> map<integer, SmartCard>`
 | Since       | 1.0.0
@@ -1131,7 +1131,7 @@ card; the operations below allow the application to exploit these results accord
 | Throws      | None.
 |===
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `getActiveSmartCard() -> SmartCard`
 | Since       | 1.0.0
@@ -1140,7 +1140,7 @@ card; the operations below allow the application to exploit these results accord
 | Throws      | None.
 |===
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `getActiveSelectionIndex() -> integer`
 | Since       | 1.0.0
@@ -1152,7 +1152,7 @@ card; the operations below allow the application to exploit these results accord
 [[type_ScheduledCardSelectionsResponse]]
 ==== ScheduledCardSelectionsResponse
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface (marker)
 | Package  | `reader.selection`
@@ -1174,7 +1174,7 @@ machinery defined in <<sec_specification,Section 4>>.
 [[type_CardSelectionExtension]]
 ==== CardSelectionExtension
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface (SPI, marker)
 | Package  | `reader.selection.spi`
@@ -1188,7 +1188,7 @@ extension is defined by the card extension specification consuming this SPI.
 [[type_SmartCard]]
 ==== SmartCard
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface (SPI)
 | Package  | `reader.selection.spi`
@@ -1201,7 +1201,7 @@ selection.
 
 ===== Operations
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `getPowerOnData() -> string`
 | Since       | 1.0.0
@@ -1223,7 +1223,7 @@ selection.
 [[type_IsoSmartCard]]
 ==== IsoSmartCard
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface (SPI)
 | Package  | `reader.selection.spi`
@@ -1238,7 +1238,7 @@ absent at the same time.
 
 ===== Operations
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `getSelectApplicationResponse() -> byte array`
 | Since       | 1.0.0
@@ -1256,7 +1256,7 @@ by card extensions.
 [[type_CardTransactionManager]]
 ==== CardTransactionManager&lt;T extends CardTransactionManager&lt;T&gt;&gt;
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface (SPI)
 | Package  | `reader.transaction.spi`
@@ -1271,7 +1271,7 @@ each data exchange with the card.
 
 ===== Operations
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `processCommands(channelControl: ChannelControl) -> T`
 | Since       | 2.1.0
@@ -1300,7 +1300,7 @@ Each exception MUST expose, at minimum, the constructors listed below.
 [[type_CardCommunicationException]]
 === CardCommunicationException
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Runtime exception
 | Package  | `reader`
@@ -1316,7 +1316,7 @@ Each exception MUST expose, at minimum, the constructors listed below.
 [[type_InvalidCardResponseException]]
 === InvalidCardResponseException
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Runtime exception
 | Package  | `reader`
@@ -1335,7 +1335,7 @@ compatibility with selection-time errors. New code SHOULD use the type defined i
 [[type_ReaderCommunicationException]]
 === ReaderCommunicationException
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Runtime exception
 | Package  | `reader`
@@ -1351,7 +1351,7 @@ compatibility with selection-time errors. New code SHOULD use the type defined i
 [[type_ReaderProtocolNotSupportedException]]
 === ReaderProtocolNotSupportedException
 
-[cols="1h,4", grid=rows, frame=ends]
+[cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Runtime exception
 | Package  | `reader`
