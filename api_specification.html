@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.26">
 <meta name="author" content="Calypso Networks Association">
-<title>Terminal Reader API&#8201;&#8212;&#8201;Technical Specification</title>
+<title>Terminal Reader API&#8201;&#8212;&#8201;Specification</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -435,10 +435,50 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 @media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
 <style>
-body, .content, p, li, td, th, dt, dd, .admonitionblock, .sectionbody {
-  font-family: 'Montserrat', sans-serif;
+body, #content, p, li, td, th, dt, dd, .admonitionblock td.content,
+h1, h2, h3, h4, h5, h6, #toctitle, .title {
+    font-family: 'Montserrat', sans-serif !important;
+}
+h1, h2, h3, h4, h5, h6, a.link {
+    color: #039efd !important;
+}
+a {
+    color: #039efd;
+}
+code {
+    color: #ba3925;
+    background: none !important;
+}
+table.tableblock td code {
+    word-break: break-word;
+}
+table th {
+    background-color: #f2f3f4 !important;
+}
+pre, code, .listingblock pre, .literalblock pre, .inlineblock code {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.9em;
+}
+@media screen and (min-width: 768px) {
+    /* 1. On élargit la boîte de la TOC (ex: passage à 25em ou 350px) */
+    #toc.toc2 {
+        width: 25em !important;
+    }
+
+    /* 2. On décale le contenu principal vers la droite pour lui laisser de la place */
+    body.toc2 {
+        padding-left: 26em !important; /* width de la TOC + 1em de marge de sécurité */
+    }
+
+    /* 3. On s'assure que les éléments fixes s'alignent correctement */
+    #header, #content, #footnotes, #footer {
+        max-width: 100% !important;
+    }
 }
 </style>
 <style>
@@ -556,12 +596,12 @@ body, .content, p, li, td, th, dt, dd, .admonitionblock, .sectionbody {
 </head>
 <body class="book toc2 toc-left">
 <div id="header">
-<h1>Terminal Reader API&#8201;&#8212;&#8201;Technical Specification</h1>
+<h1>Terminal Reader API&#8201;&#8212;&#8201;Specification</h1>
 <div class="details">
 <span id="author" class="author">Calypso Networks Association</span><br>
 <span id="email" class="email"><a href="https://calypsonet.org" class="bare">https://calypsonet.org</a></span><br>
 <span id="revnumber">version 3.0.0-SNAPSHOT,</span>
-<span id="revdate">2026-06-03</span>
+<span id="revdate">2026-06-04</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -598,105 +638,105 @@ body, .content, p, li, td, th, dt, dd, .admonitionblock, .sectionbody {
 </li>
 <li><a href="#sec_specification">5. API Specification</a>
 <ul class="sectlevel2">
-<li><a href="#_package_reader">5.1. Package <code>reader</code></a>
+<li><a href="#_package_reader">5.1. Package reader</a>
 <ul class="sectlevel3">
-<li><a href="#type_ReaderApiProperties">5.1.1. <code>ReaderApiProperties</code></a>
+<li><a href="#type_ReaderApiProperties">5.1.1. ReaderApiProperties</a>
 <ul class="sectlevel4">
 <li><a href="#_constants">5.1.1.1. Constants</a></li>
 </ul>
 </li>
-<li><a href="#type_ReaderApiFactory">5.1.2. <code>ReaderApiFactory</code></a>
+<li><a href="#type_ReaderApiFactory">5.1.2. ReaderApiFactory</a>
 <ul class="sectlevel4">
 <li><a href="#_operations">5.1.2.1. Operations</a></li>
 </ul>
 </li>
-<li><a href="#type_CardReader">5.1.3. <code>CardReader</code></a>
+<li><a href="#type_CardReader">5.1.3. CardReader</a>
 <ul class="sectlevel4">
 <li><a href="#_operations_2">5.1.3.1. Operations</a></li>
 </ul>
 </li>
-<li><a href="#type_ConfigurableCardReader">5.1.4. <code>ConfigurableCardReader</code></a>
+<li><a href="#type_ConfigurableCardReader">5.1.4. ConfigurableCardReader</a>
 <ul class="sectlevel4">
 <li><a href="#_operations_3">5.1.4.1. Operations</a></li>
 </ul>
 </li>
-<li><a href="#type_ObservableCardReader">5.1.5. <code>ObservableCardReader</code></a>
+<li><a href="#type_ObservableCardReader">5.1.5. ObservableCardReader</a>
 <ul class="sectlevel4">
 <li><a href="#_operations_4">5.1.5.1. Operations</a></li>
-<li><a href="#type_DetectionMode">5.1.5.2. Enumeration <code>DetectionMode</code></a></li>
-<li><a href="#type_NotificationMode">5.1.5.3. Enumeration <code>NotificationMode</code></a></li>
+<li><a href="#type_DetectionMode">5.1.5.2. Enumeration DetectionMode</a></li>
+<li><a href="#type_NotificationMode">5.1.5.3. Enumeration NotificationMode</a></li>
 </ul>
 </li>
-<li><a href="#type_CardReaderEvent">5.1.6. <code>CardReaderEvent</code></a>
+<li><a href="#type_CardReaderEvent">5.1.6. CardReaderEvent</a>
 <ul class="sectlevel4">
 <li><a href="#_operations_5">5.1.6.1. Operations</a></li>
-<li><a href="#type_CardReaderEventType">5.1.6.2. Enumeration <code>Type</code></a></li>
+<li><a href="#type_CardReaderEventType">5.1.6.2. Enumeration Type</a></li>
 </ul>
 </li>
-<li><a href="#type_ChannelControl">5.1.7. <code>ChannelControl</code></a></li>
+<li><a href="#type_ChannelControl">5.1.7. ChannelControl</a></li>
 </ul>
 </li>
-<li><a href="#_package_reader_spi">5.2. Package <code>reader.spi</code></a>
+<li><a href="#_package_reader_spi">5.2. Package reader.spi</a>
 <ul class="sectlevel3">
-<li><a href="#type_CardReaderObserverSpi">5.2.1. <code>CardReaderObserverSpi</code></a>
+<li><a href="#type_CardReaderObserverSpi">5.2.1. CardReaderObserverSpi</a>
 <ul class="sectlevel4">
 <li><a href="#_operations_6">5.2.1.1. Operations</a></li>
 </ul>
 </li>
-<li><a href="#type_CardReaderObservationExceptionHandlerSpi">5.2.2. <code>CardReaderObservationExceptionHandlerSpi</code></a>
+<li><a href="#type_CardReaderObservationExceptionHandlerSpi">5.2.2. CardReaderObservationExceptionHandlerSpi</a>
 <ul class="sectlevel4">
 <li><a href="#_operations_7">5.2.2.1. Operations</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#_package_reader_selection">5.3. Package <code>reader.selection</code></a>
+<li><a href="#_package_reader_selection">5.3. Package reader.selection</a>
 <ul class="sectlevel3">
-<li><a href="#type_CardSelector">5.3.1. <code>CardSelector&lt;T extends CardSelector&lt;T&gt;&gt;</code></a>
+<li><a href="#type_CardSelector">5.3.1. CardSelector&lt;T extends CardSelector&lt;T&gt;&gt;</a>
 <ul class="sectlevel4">
 <li><a href="#_operations_8">5.3.1.1. Operations</a></li>
 </ul>
 </li>
-<li><a href="#type_BasicCardSelector">5.3.2. <code>BasicCardSelector</code></a></li>
-<li><a href="#type_CommonIsoCardSelector">5.3.3. <code>CommonIsoCardSelector&lt;T extends CommonIsoCardSelector&lt;T&gt;&gt;</code></a>
+<li><a href="#type_BasicCardSelector">5.3.2. BasicCardSelector</a></li>
+<li><a href="#type_CommonIsoCardSelector">5.3.3. CommonIsoCardSelector&lt;T extends CommonIsoCardSelector&lt;T&gt;&gt;</a>
 <ul class="sectlevel4">
 <li><a href="#_operations_9">5.3.3.1. Operations</a></li>
-<li><a href="#type_FileOccurrence">5.3.3.2. Enumeration <code>FileOccurrence</code></a></li>
-<li><a href="#type_FileControlInformation">5.3.3.3. Enumeration <code>FileControlInformation</code></a></li>
+<li><a href="#type_FileOccurrence">5.3.3.2. Enumeration FileOccurrence</a></li>
+<li><a href="#type_FileControlInformation">5.3.3.3. Enumeration FileControlInformation</a></li>
 </ul>
 </li>
-<li><a href="#type_IsoCardSelector">5.3.4. <code>IsoCardSelector</code></a></li>
-<li><a href="#type_CardSelectionManager">5.3.5. <code>CardSelectionManager</code></a>
+<li><a href="#type_IsoCardSelector">5.3.4. IsoCardSelector</a></li>
+<li><a href="#type_CardSelectionManager">5.3.5. CardSelectionManager</a>
 <ul class="sectlevel4">
 <li><a href="#_operations_10">5.3.5.1. Operations</a></li>
 </ul>
 </li>
-<li><a href="#type_CardSelectionResult">5.3.6. <code>CardSelectionResult</code></a>
+<li><a href="#type_CardSelectionResult">5.3.6. CardSelectionResult</a>
 <ul class="sectlevel4">
 <li><a href="#_operations_11">5.3.6.1. Operations</a></li>
 </ul>
 </li>
-<li><a href="#type_ScheduledCardSelectionsResponse">5.3.7. <code>ScheduledCardSelectionsResponse</code></a></li>
+<li><a href="#type_ScheduledCardSelectionsResponse">5.3.7. ScheduledCardSelectionsResponse</a></li>
 </ul>
 </li>
-<li><a href="#sec_pkg_reader_selection_spi">5.4. Package <code>reader.selection.spi</code></a>
+<li><a href="#sec_pkg_reader_selection_spi">5.4. Package reader.selection.spi</a>
 <ul class="sectlevel3">
-<li><a href="#type_CardSelectionExtension">5.4.1. <code>CardSelectionExtension</code></a></li>
-<li><a href="#type_SmartCard">5.4.2. <code>SmartCard</code></a>
+<li><a href="#type_CardSelectionExtension">5.4.1. CardSelectionExtension</a></li>
+<li><a href="#type_SmartCard">5.4.2. SmartCard</a>
 <ul class="sectlevel4">
 <li><a href="#_operations_12">5.4.2.1. Operations</a></li>
 </ul>
 </li>
-<li><a href="#type_IsoSmartCard">5.4.3. <code>IsoSmartCard</code></a>
+<li><a href="#type_IsoSmartCard">5.4.3. IsoSmartCard</a>
 <ul class="sectlevel4">
 <li><a href="#_operations_13">5.4.3.1. Operations</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#_package_reader_transaction_spi">5.5. Package <code>reader.transaction.spi</code></a>
+<li><a href="#_package_reader_transaction_spi">5.5. Package reader.transaction.spi</a>
 <ul class="sectlevel3">
-<li><a href="#type_CardTransactionManager">5.5.1. <code>CardTransactionManager&lt;T extends CardTransactionManager&lt;T&gt;&gt;</code></a>
+<li><a href="#type_CardTransactionManager">5.5.1. CardTransactionManager&lt;T extends CardTransactionManager&lt;T&gt;&gt;</a>
 <ul class="sectlevel4">
 <li><a href="#_operations_14">5.5.1.1. Operations</a></li>
 </ul>
@@ -707,22 +747,22 @@ body, .content, p, li, td, th, dt, dd, .admonitionblock, .sectionbody {
 </li>
 <li><a href="#sec_exceptions">6. Exceptions</a>
 <ul class="sectlevel2">
-<li><a href="#type_CardCommunicationException">6.1. <code>CardCommunicationException</code></a>
+<li><a href="#type_CardCommunicationException">6.1. CardCommunicationException</a>
 <ul class="sectlevel4">
 <li><a href="#_constructors">6.1.1. Constructors</a></li>
 </ul>
 </li>
-<li><a href="#type_InvalidCardResponseException">6.2. <code>InvalidCardResponseException</code></a>
+<li><a href="#type_InvalidCardResponseException">6.2. InvalidCardResponseException</a>
 <ul class="sectlevel4">
 <li><a href="#_constructors_2">6.2.1. Constructors</a></li>
 </ul>
 </li>
-<li><a href="#type_ReaderCommunicationException">6.3. <code>ReaderCommunicationException</code></a>
+<li><a href="#type_ReaderCommunicationException">6.3. ReaderCommunicationException</a>
 <ul class="sectlevel4">
 <li><a href="#_constructors_3">6.3.1. Constructors</a></li>
 </ul>
 </li>
-<li><a href="#type_ReaderProtocolNotSupportedException">6.4. <code>ReaderProtocolNotSupportedException</code></a>
+<li><a href="#type_ReaderProtocolNotSupportedException">6.4. ReaderProtocolNotSupportedException</a>
 <ul class="sectlevel4">
 <li><a href="#_constructors_4">6.4.1. Constructors</a></li>
 </ul>
@@ -767,7 +807,7 @@ relationships and behavioural requirements that any conforming implementation of
 terminal applications discover card readers, observe card events, select cards and exchange data with them.</p>
 </div>
 <h2 id="_document_status" class="discrete">Document Status</h2>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 25%;">
 <col style="width: 75%;">
@@ -1022,7 +1062,7 @@ equivalent native type. Implementations MUST preserve the semantic intent rather
 <div class="paragraph">
 <p>Each operation defined in this document is described by a table of the form:</p>
 </div>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -1286,7 +1326,7 @@ equivalent native type. Implementations MUST preserve the semantic intent rather
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="assets/architecture-overview.svg" alt="architecture overview" width="385" height="439">
+<img src="C:/Users/Andrei/IdeaProjects/Keypop/CNA%20Terminal%20API/calypsonet-terminal-reader-uml-api/assets/architecture-overview.svg" alt="architecture overview" width="385" height="439">
 </div>
 </div>
 </div>
@@ -1358,7 +1398,7 @@ responsibility and a common stability lifecycle.</p>
 </div>
 <div class="imageblock text-center">
 <div class="content">
-<img src="api_class_diagram.svg" alt="Terminal Reader API class diagram">
+<img src="C:/Users/Andrei/IdeaProjects/Keypop/CNA%20Terminal%20API/calypsonet-terminal-reader-uml-api/api_class_diagram.svg" alt="Terminal Reader API class diagram">
 </div>
 </div>
 </div>
@@ -1368,14 +1408,14 @@ responsibility and a common stability lifecycle.</p>
 <h2 id="sec_specification"><a class="anchor" href="#sec_specification"></a><a class="link" href="#sec_specification">5. API Specification</a></h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_package_reader"><a class="anchor" href="#_package_reader"></a><a class="link" href="#_package_reader">5.1. Package <code>reader</code></a></h3>
+<h3 id="_package_reader"><a class="anchor" href="#_package_reader"></a><a class="link" href="#_package_reader">5.1. Package reader</a></h3>
 <div class="paragraph">
 <p>The <code>reader</code> package defines the entry points of the API and the abstractions used to manipulate readers and the
 events they produce.</p>
 </div>
 <div class="sect3">
-<h4 id="type_ReaderApiProperties"><a class="anchor" href="#type_ReaderApiProperties"></a><a class="link" href="#type_ReaderApiProperties">5.1.1. <code>ReaderApiProperties</code></a></h4>
-<table class="tableblock frame-ends grid-rows stretch">
+<h4 id="type_ReaderApiProperties"><a class="anchor" href="#type_ReaderApiProperties"></a><a class="link" href="#type_ReaderApiProperties">5.1.1. ReaderApiProperties</a></h4>
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -1443,8 +1483,8 @@ events they produce.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="type_ReaderApiFactory"><a class="anchor" href="#type_ReaderApiFactory"></a><a class="link" href="#type_ReaderApiFactory">5.1.2. <code>ReaderApiFactory</code></a></h4>
-<table class="tableblock frame-ends grid-rows stretch">
+<h4 id="type_ReaderApiFactory"><a class="anchor" href="#type_ReaderApiFactory"></a><a class="link" href="#type_ReaderApiFactory">5.1.2. ReaderApiFactory</a></h4>
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -1475,7 +1515,7 @@ that every invocation returns a fresh, fully initialised object.</p>
 </div>
 <div class="sect4">
 <h5 id="_operations"><a class="anchor" href="#_operations"></a><a class="link" href="#_operations">5.1.2.1. Operations</a></h5>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -1503,7 +1543,7 @@ that every invocation returns a fresh, fully initialised object.</p>
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -1531,7 +1571,7 @@ that every invocation returns a fresh, fully initialised object.</p>
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -1562,8 +1602,8 @@ that every invocation returns a fresh, fully initialised object.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="type_CardReader"><a class="anchor" href="#type_CardReader"></a><a class="link" href="#type_CardReader">5.1.3. <code>CardReader</code></a></h4>
-<table class="tableblock frame-ends grid-rows stretch">
+<h4 id="type_CardReader"><a class="anchor" href="#type_CardReader"></a><a class="link" href="#type_CardReader">5.1.3. CardReader</a></h4>
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -1589,7 +1629,7 @@ that every invocation returns a fresh, fully initialised object.</p>
 </table>
 <div class="sect4">
 <h5 id="_operations_2"><a class="anchor" href="#_operations_2"></a><a class="link" href="#_operations_2">5.1.3.1. Operations</a></h5>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -1617,7 +1657,7 @@ that every invocation returns a fresh, fully initialised object.</p>
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -1645,7 +1685,7 @@ that every invocation returns a fresh, fully initialised object.</p>
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -1676,8 +1716,8 @@ that every invocation returns a fresh, fully initialised object.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="type_ConfigurableCardReader"><a class="anchor" href="#type_ConfigurableCardReader"></a><a class="link" href="#type_ConfigurableCardReader">5.1.4. <code>ConfigurableCardReader</code></a></h4>
-<table class="tableblock frame-ends grid-rows stretch">
+<h4 id="type_ConfigurableCardReader"><a class="anchor" href="#type_ConfigurableCardReader"></a><a class="link" href="#type_ConfigurableCardReader">5.1.4. ConfigurableCardReader</a></h4>
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -1712,7 +1752,7 @@ identifier when constructing a <code>CardSelector</code>.</p>
 </div>
 <div class="sect4">
 <h5 id="_operations_3"><a class="anchor" href="#_operations_3"></a><a class="link" href="#_operations_3">5.1.4.1. Operations</a></h5>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -1748,7 +1788,7 @@ identifier when constructing a <code>CardSelector</code>.</p>
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -1777,7 +1817,7 @@ identifier when constructing a <code>CardSelector</code>.</p>
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -1808,8 +1848,8 @@ identifier when constructing a <code>CardSelector</code>.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="type_ObservableCardReader"><a class="anchor" href="#type_ObservableCardReader"></a><a class="link" href="#type_ObservableCardReader">5.1.5. <code>ObservableCardReader</code></a></h4>
-<table class="tableblock frame-ends grid-rows stretch">
+<h4 id="type_ObservableCardReader"><a class="anchor" href="#type_ObservableCardReader"></a><a class="link" href="#type_ObservableCardReader">5.1.5. ObservableCardReader</a></h4>
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -1839,7 +1879,7 @@ identifier when constructing a <code>CardSelector</code>.</p>
 </table>
 <div class="sect4">
 <h5 id="_operations_4"><a class="anchor" href="#_operations_4"></a><a class="link" href="#_operations_4">5.1.5.1. Operations</a></h5>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -1868,7 +1908,7 @@ identifier when constructing a <code>CardSelector</code>.</p>
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -1897,7 +1937,7 @@ identifier when constructing a <code>CardSelector</code>.</p>
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -1925,7 +1965,7 @@ identifier when constructing a <code>CardSelector</code>.</p>
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -1949,7 +1989,7 @@ identifier when constructing a <code>CardSelector</code>.</p>
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -1977,7 +2017,7 @@ identifier when constructing a <code>CardSelector</code>.</p>
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -2007,7 +2047,7 @@ identifier when constructing a <code>CardSelector</code>.</p>
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -2031,7 +2071,7 @@ identifier when constructing a <code>CardSelector</code>.</p>
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -2065,7 +2105,7 @@ identifier when constructing a <code>CardSelector</code>.</p>
 </table>
 </div>
 <div class="sect4">
-<h5 id="type_DetectionMode"><a class="anchor" href="#type_DetectionMode"></a><a class="link" href="#type_DetectionMode">5.1.5.2. Enumeration <code>DetectionMode</code></a></h5>
+<h5 id="type_DetectionMode"><a class="anchor" href="#type_DetectionMode"></a><a class="link" href="#type_DetectionMode">5.1.5.2. Enumeration DetectionMode</a></h5>
 <div class="paragraph">
 <p>Nested inside <a href="#type_ObservableCardReader"><code>ObservableCardReader</code></a>. Card detection management options to be applied
 after processing a card.</p>
@@ -2098,7 +2138,7 @@ after processing a card.</p>
 </table>
 </div>
 <div class="sect4">
-<h5 id="type_NotificationMode"><a class="anchor" href="#type_NotificationMode"></a><a class="link" href="#type_NotificationMode">5.1.5.3. Enumeration <code>NotificationMode</code></a></h5>
+<h5 id="type_NotificationMode"><a class="anchor" href="#type_NotificationMode"></a><a class="link" href="#type_NotificationMode">5.1.5.3. Enumeration NotificationMode</a></h5>
 <div class="paragraph">
 <p>Nested inside <a href="#type_ObservableCardReader"><code>ObservableCardReader</code></a>. Options applied when a card is detected, used
 to decide which cards trigger observer notifications.</p>
@@ -2132,8 +2172,8 @@ to decide which cards trigger observer notifications.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="type_CardReaderEvent"><a class="anchor" href="#type_CardReaderEvent"></a><a class="link" href="#type_CardReaderEvent">5.1.6. <code>CardReaderEvent</code></a></h4>
-<table class="tableblock frame-ends grid-rows stretch">
+<h4 id="type_CardReaderEvent"><a class="anchor" href="#type_CardReaderEvent"></a><a class="link" href="#type_CardReaderEvent">5.1.6. CardReaderEvent</a></h4>
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -2163,7 +2203,7 @@ card selection response.</p>
 </div>
 <div class="sect4">
 <h5 id="_operations_5"><a class="anchor" href="#_operations_5"></a><a class="link" href="#_operations_5">5.1.6.1. Operations</a></h5>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -2191,7 +2231,7 @@ card selection response.</p>
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -2219,7 +2259,7 @@ card selection response.</p>
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -2254,7 +2294,7 @@ card selection response.</p>
 </table>
 </div>
 <div class="sect4">
-<h5 id="type_CardReaderEventType"><a class="anchor" href="#type_CardReaderEventType"></a><a class="link" href="#type_CardReaderEventType">5.1.6.2. Enumeration <code>Type</code></a></h5>
+<h5 id="type_CardReaderEventType"><a class="anchor" href="#type_CardReaderEventType"></a><a class="link" href="#type_CardReaderEventType">5.1.6.2. Enumeration Type</a></h5>
 <div class="paragraph">
 <p>Nested inside <a href="#type_CardReaderEvent"><code>CardReaderEvent</code></a>. Possible card reader events.</p>
 </div>
@@ -2297,8 +2337,8 @@ card selection response.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="type_ChannelControl"><a class="anchor" href="#type_ChannelControl"></a><a class="link" href="#type_ChannelControl">5.1.7. <code>ChannelControl</code></a></h4>
-<table class="tableblock frame-ends grid-rows stretch">
+<h4 id="type_ChannelControl"><a class="anchor" href="#type_ChannelControl"></a><a class="link" href="#type_ChannelControl">5.1.7. ChannelControl</a></h4>
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -2352,14 +2392,14 @@ card selection response.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_package_reader_spi"><a class="anchor" href="#_package_reader_spi"></a><a class="link" href="#_package_reader_spi">5.2. Package <code>reader.spi</code></a></h3>
+<h3 id="_package_reader_spi"><a class="anchor" href="#_package_reader_spi"></a><a class="link" href="#_package_reader_spi">5.2. Package reader.spi</a></h3>
 <div class="paragraph">
 <p>The <code>reader.spi</code> package gathers the contracts that are implemented by the <strong>application</strong> (as opposed to the reader
 implementation) when readers are observed.</p>
 </div>
 <div class="sect3">
-<h4 id="type_CardReaderObserverSpi"><a class="anchor" href="#type_CardReaderObserverSpi"></a><a class="link" href="#type_CardReaderObserverSpi">5.2.1. <code>CardReaderObserverSpi</code></a></h4>
-<table class="tableblock frame-ends grid-rows stretch">
+<h4 id="type_CardReaderObserverSpi"><a class="anchor" href="#type_CardReaderObserverSpi"></a><a class="link" href="#type_CardReaderObserverSpi">5.2.1. CardReaderObserverSpi</a></h4>
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -2385,7 +2425,7 @@ implementation) when readers are observed.</p>
 </table>
 <div class="sect4">
 <h5 id="_operations_6"><a class="anchor" href="#_operations_6"></a><a class="link" href="#_operations_6">5.2.1.1. Operations</a></h5>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -2417,8 +2457,8 @@ implementation) when readers are observed.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="type_CardReaderObservationExceptionHandlerSpi"><a class="anchor" href="#type_CardReaderObservationExceptionHandlerSpi"></a><a class="link" href="#type_CardReaderObservationExceptionHandlerSpi">5.2.2. <code>CardReaderObservationExceptionHandlerSpi</code></a></h4>
-<table class="tableblock frame-ends grid-rows stretch">
+<h4 id="type_CardReaderObservationExceptionHandlerSpi"><a class="anchor" href="#type_CardReaderObservationExceptionHandlerSpi"></a><a class="link" href="#type_CardReaderObservationExceptionHandlerSpi">5.2.2. CardReaderObservationExceptionHandlerSpi</a></h4>
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -2444,7 +2484,7 @@ implementation) when readers are observed.</p>
 </table>
 <div class="sect4">
 <h5 id="_operations_7"><a class="anchor" href="#_operations_7"></a><a class="link" href="#_operations_7">5.2.2.1. Operations</a></h5>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -2479,15 +2519,15 @@ implementation) when readers are observed.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_package_reader_selection"><a class="anchor" href="#_package_reader_selection"></a><a class="link" href="#_package_reader_selection">5.3. Package <code>reader.selection</code></a></h3>
+<h3 id="_package_reader_selection"><a class="anchor" href="#_package_reader_selection"></a><a class="link" href="#_package_reader_selection">5.3. Package reader.selection</a></h3>
 <div class="paragraph">
 <p>The <code>reader.selection</code> package describes the orchestration of card selection scenarios. It introduces the central
 <a href="#type_CardSelectionManager"><code>CardSelectionManager</code></a>, the family of selectors and the structures used to expose
 selection results.</p>
 </div>
 <div class="sect3">
-<h4 id="type_CardSelector"><a class="anchor" href="#type_CardSelector"></a><a class="link" href="#type_CardSelector">5.3.1. <code>CardSelector&lt;T extends CardSelector&lt;T&gt;&gt;</code></a></h4>
-<table class="tableblock frame-ends grid-rows stretch">
+<h4 id="type_CardSelector"><a class="anchor" href="#type_CardSelector"></a><a class="link" href="#type_CardSelector">5.3.1. CardSelector&lt;T extends CardSelector&lt;T&gt;&gt;</a></h4>
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -2518,7 +2558,7 @@ card SHALL NOT be selected if at least one of them rejects it.</p>
 </div>
 <div class="sect4">
 <h5 id="_operations_8"><a class="anchor" href="#_operations_8"></a><a class="link" href="#_operations_8">5.3.1.1. Operations</a></h5>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -2555,7 +2595,7 @@ card SHALL NOT be selected if at least one of them rejects it.</p>
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -2590,8 +2630,8 @@ card SHALL NOT be selected if at least one of them rejects it.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="type_BasicCardSelector"><a class="anchor" href="#type_BasicCardSelector"></a><a class="link" href="#type_BasicCardSelector">5.3.2. <code>BasicCardSelector</code></a></h4>
-<table class="tableblock frame-ends grid-rows stretch">
+<h4 id="type_BasicCardSelector"><a class="anchor" href="#type_BasicCardSelector"></a><a class="link" href="#type_BasicCardSelector">5.3.2. BasicCardSelector</a></h4>
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -2625,8 +2665,8 @@ absence of ISO/IEC 7816-4-specific filters at the type level.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="type_CommonIsoCardSelector"><a class="anchor" href="#type_CommonIsoCardSelector"></a><a class="link" href="#type_CommonIsoCardSelector">5.3.3. <code>CommonIsoCardSelector&lt;T extends CommonIsoCardSelector&lt;T&gt;&gt;</code></a></h4>
-<table class="tableblock frame-ends grid-rows stretch">
+<h4 id="type_CommonIsoCardSelector"><a class="anchor" href="#type_CommonIsoCardSelector"></a><a class="link" href="#type_CommonIsoCardSelector">5.3.3. CommonIsoCardSelector&lt;T extends CommonIsoCardSelector&lt;T&gt;&gt;</a></h4>
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -2656,7 +2696,7 @@ absence of ISO/IEC 7816-4-specific filters at the type level.</p>
 </table>
 <div class="sect4">
 <h5 id="_operations_9"><a class="anchor" href="#_operations_9"></a><a class="link" href="#_operations_9">5.3.3.1. Operations</a></h5>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -2690,7 +2730,7 @@ absence of ISO/IEC 7816-4-specific filters at the type level.</p>
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -2722,7 +2762,7 @@ absence of ISO/IEC 7816-4-specific filters at the type level.</p>
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -2754,7 +2794,7 @@ absence of ISO/IEC 7816-4-specific filters at the type level.</p>
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -2788,7 +2828,7 @@ absence of ISO/IEC 7816-4-specific filters at the type level.</p>
 </table>
 </div>
 <div class="sect4">
-<h5 id="type_FileOccurrence"><a class="anchor" href="#type_FileOccurrence"></a><a class="link" href="#type_FileOccurrence">5.3.3.2. Enumeration <code>FileOccurrence</code></a></h5>
+<h5 id="type_FileOccurrence"><a class="anchor" href="#type_FileOccurrence"></a><a class="link" href="#type_FileOccurrence">5.3.3.2. Enumeration FileOccurrence</a></h5>
 <div class="paragraph">
 <p>Nested inside <code>CommonIsoCardSelector</code>. Navigation options through the applications contained on the card according
 to ISO/IEC 7816-4.</p>
@@ -2831,7 +2871,7 @@ to ISO/IEC 7816-4.</p>
 </table>
 </div>
 <div class="sect4">
-<h5 id="type_FileControlInformation"><a class="anchor" href="#type_FileControlInformation"></a><a class="link" href="#type_FileControlInformation">5.3.3.3. Enumeration <code>FileControlInformation</code></a></h5>
+<h5 id="type_FileControlInformation"><a class="anchor" href="#type_FileControlInformation"></a><a class="link" href="#type_FileControlInformation">5.3.3.3. Enumeration FileControlInformation</a></h5>
 <div class="paragraph">
 <p>Nested inside <code>CommonIsoCardSelector</code>. Types of templates returned in response to the <strong>Select Application</strong> command,
 according to ISO/IEC 7816-4.</p>
@@ -2875,8 +2915,8 @@ according to ISO/IEC 7816-4.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="type_IsoCardSelector"><a class="anchor" href="#type_IsoCardSelector"></a><a class="link" href="#type_IsoCardSelector">5.3.4. <code>IsoCardSelector</code></a></h4>
-<table class="tableblock frame-ends grid-rows stretch">
+<h4 id="type_IsoCardSelector"><a class="anchor" href="#type_IsoCardSelector"></a><a class="link" href="#type_IsoCardSelector">5.3.4. IsoCardSelector</a></h4>
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -2909,8 +2949,8 @@ according to ISO/IEC 7816-4.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="type_CardSelectionManager"><a class="anchor" href="#type_CardSelectionManager"></a><a class="link" href="#type_CardSelectionManager">5.3.5. <code>CardSelectionManager</code></a></h4>
-<table class="tableblock frame-ends grid-rows stretch">
+<h4 id="type_CardSelectionManager"><a class="anchor" href="#type_CardSelectionManager"></a><a class="link" href="#type_CardSelectionManager">5.3.5. CardSelectionManager</a></h4>
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -2971,7 +3011,7 @@ selection, and the ability to <strong>export/import</strong> a selection scenari
 </div>
 <div class="sect4">
 <h5 id="_operations_10"><a class="anchor" href="#_operations_10"></a><a class="link" href="#_operations_10">5.3.5.1. Operations</a></h5>
-<table id="op_setMultipleSelectionMode" class="tableblock frame-ends grid-rows stretch">
+<table id="op_setMultipleSelectionMode" class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -2995,7 +3035,7 @@ selection, and the ability to <strong>export/import</strong> a selection scenari
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -3030,7 +3070,7 @@ selection, and the ability to <strong>export/import</strong> a selection scenari
 </tr>
 </tbody>
 </table>
-<table id="op_prepareReleaseChannel" class="tableblock frame-ends grid-rows stretch">
+<table id="op_prepareReleaseChannel" class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -3055,7 +3095,7 @@ selection, and the ability to <strong>export/import</strong> a selection scenari
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -3083,7 +3123,7 @@ selection, and the ability to <strong>export/import</strong> a selection scenari
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -3115,7 +3155,7 @@ selection, and the ability to <strong>export/import</strong> a selection scenari
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -3151,7 +3191,7 @@ selection, and the ability to <strong>export/import</strong> a selection scenari
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -3182,7 +3222,7 @@ selection, and the ability to <strong>export/import</strong> a selection scenari
 </tr>
 </tbody>
 </table>
-<table id="op_parseScheduledCardSelectionsResponse" class="tableblock frame-ends grid-rows stretch">
+<table id="op_parseScheduledCardSelectionsResponse" class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -3215,7 +3255,7 @@ selection, and the ability to <strong>export/import</strong> a selection scenari
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -3250,7 +3290,7 @@ selection, and the ability to <strong>export/import</strong> a selection scenari
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -3290,8 +3330,8 @@ selection, and the ability to <strong>export/import</strong> a selection scenari
 </div>
 </div>
 <div class="sect3">
-<h4 id="type_CardSelectionResult"><a class="anchor" href="#type_CardSelectionResult"></a><a class="link" href="#type_CardSelectionResult">5.3.6. <code>CardSelectionResult</code></a></h4>
-<table class="tableblock frame-ends grid-rows stretch">
+<h4 id="type_CardSelectionResult"><a class="anchor" href="#type_CardSelectionResult"></a><a class="link" href="#type_CardSelectionResult">5.3.6. CardSelectionResult</a></h4>
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -3322,7 +3362,7 @@ card; the operations below allow the application to exploit these results accord
 </div>
 <div class="sect4">
 <h5 id="_operations_11"><a class="anchor" href="#_operations_11"></a><a class="link" href="#_operations_11">5.3.6.1. Operations</a></h5>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -3350,7 +3390,7 @@ card; the operations below allow the application to exploit these results accord
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -3378,7 +3418,7 @@ card; the operations below allow the application to exploit these results accord
 </tr>
 </tbody>
 </table>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -3409,8 +3449,8 @@ card; the operations below allow the application to exploit these results accord
 </div>
 </div>
 <div class="sect3">
-<h4 id="type_ScheduledCardSelectionsResponse"><a class="anchor" href="#type_ScheduledCardSelectionsResponse"></a><a class="link" href="#type_ScheduledCardSelectionsResponse">5.3.7. <code>ScheduledCardSelectionsResponse</code></a></h4>
-<table class="tableblock frame-ends grid-rows stretch">
+<h4 id="type_ScheduledCardSelectionsResponse"><a class="anchor" href="#type_ScheduledCardSelectionsResponse"></a><a class="link" href="#type_ScheduledCardSelectionsResponse">5.3.7. ScheduledCardSelectionsResponse</a></h4>
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -3442,14 +3482,14 @@ cases (selection step itself plus any subsequent commands). Its content MUST be 
 </div>
 </div>
 <div class="sect2">
-<h3 id="sec_pkg_reader_selection_spi"><a class="anchor" href="#sec_pkg_reader_selection_spi"></a><a class="link" href="#sec_pkg_reader_selection_spi">5.4. Package <code>reader.selection.spi</code></a></h3>
+<h3 id="sec_pkg_reader_selection_spi"><a class="anchor" href="#sec_pkg_reader_selection_spi"></a><a class="link" href="#sec_pkg_reader_selection_spi">5.4. Package reader.selection.spi</a></h3>
 <div class="paragraph">
 <p>The <code>reader.selection.spi</code> package gathers the contracts that <strong>card extensions</strong> implement to plug into the selection
 machinery defined in <a href="#sec_specification">Section 4</a>.</p>
 </div>
 <div class="sect3">
-<h4 id="type_CardSelectionExtension"><a class="anchor" href="#type_CardSelectionExtension"></a><a class="link" href="#type_CardSelectionExtension">5.4.1. <code>CardSelectionExtension</code></a></h4>
-<table class="tableblock frame-ends grid-rows stretch">
+<h4 id="type_CardSelectionExtension"><a class="anchor" href="#type_CardSelectionExtension"></a><a class="link" href="#type_CardSelectionExtension">5.4.1. CardSelectionExtension</a></h4>
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -3479,8 +3519,8 @@ extension is defined by the card extension specification consuming this SPI.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="type_SmartCard"><a class="anchor" href="#type_SmartCard"></a><a class="link" href="#type_SmartCard">5.4.2. <code>SmartCard</code></a></h4>
-<table class="tableblock frame-ends grid-rows stretch">
+<h4 id="type_SmartCard"><a class="anchor" href="#type_SmartCard"></a><a class="link" href="#type_SmartCard">5.4.2. SmartCard</a></h4>
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -3510,7 +3550,7 @@ selection.</p>
 </div>
 <div class="sect4">
 <h5 id="_operations_12"><a class="anchor" href="#_operations_12"></a><a class="link" href="#_operations_12">5.4.2.1. Operations</a></h5>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -3548,8 +3588,8 @@ selection.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="type_IsoSmartCard"><a class="anchor" href="#type_IsoSmartCard"></a><a class="link" href="#type_IsoSmartCard">5.4.3. <code>IsoSmartCard</code></a></h4>
-<table class="tableblock frame-ends grid-rows stretch">
+<h4 id="type_IsoSmartCard"><a class="anchor" href="#type_IsoSmartCard"></a><a class="link" href="#type_IsoSmartCard">5.4.3. IsoSmartCard</a></h4>
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -3584,7 +3624,7 @@ absent at the same time.</p>
 </div>
 <div class="sect4">
 <h5 id="_operations_13"><a class="anchor" href="#_operations_13"></a><a class="link" href="#_operations_13">5.4.3.1. Operations</a></h5>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -3616,14 +3656,14 @@ absent at the same time.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_package_reader_transaction_spi"><a class="anchor" href="#_package_reader_transaction_spi"></a><a class="link" href="#_package_reader_transaction_spi">5.5. Package <code>reader.transaction.spi</code></a></h3>
+<h3 id="_package_reader_transaction_spi"><a class="anchor" href="#_package_reader_transaction_spi"></a><a class="link" href="#_package_reader_transaction_spi">5.5. Package reader.transaction.spi</a></h3>
 <div class="paragraph">
 <p>The <code>reader.transaction.spi</code> package defines the common contract shared by all card transaction managers exposed
 by card extensions.</p>
 </div>
 <div class="sect3">
-<h4 id="type_CardTransactionManager"><a class="anchor" href="#type_CardTransactionManager"></a><a class="link" href="#type_CardTransactionManager">5.5.1. <code>CardTransactionManager&lt;T extends CardTransactionManager&lt;T&gt;&gt;</code></a></h4>
-<table class="tableblock frame-ends grid-rows stretch">
+<h4 id="type_CardTransactionManager"><a class="anchor" href="#type_CardTransactionManager"></a><a class="link" href="#type_CardTransactionManager">5.5.1. CardTransactionManager&lt;T extends CardTransactionManager&lt;T&gt;&gt;</a></h4>
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -3655,7 +3695,7 @@ each data exchange with the card.</p>
 </div>
 <div class="sect4">
 <h5 id="_operations_14"><a class="anchor" href="#_operations_14"></a><a class="link" href="#_operations_14">5.5.1.1. Operations</a></h5>
-<table class="tableblock frame-ends grid-rows stretch">
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -3706,8 +3746,8 @@ each data exchange with the card.</p>
 Each exception MUST expose, at minimum, the constructors listed below.</p>
 </div>
 <div class="sect2">
-<h3 id="type_CardCommunicationException"><a class="anchor" href="#type_CardCommunicationException"></a><a class="link" href="#type_CardCommunicationException">6.1. <code>CardCommunicationException</code></a></h3>
-<table class="tableblock frame-ends grid-rows stretch">
+<h3 id="type_CardCommunicationException"><a class="anchor" href="#type_CardCommunicationException"></a><a class="link" href="#type_CardCommunicationException">6.1. CardCommunicationException</a></h3>
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -3746,8 +3786,8 @@ Each exception MUST expose, at minimum, the constructors listed below.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="type_InvalidCardResponseException"><a class="anchor" href="#type_InvalidCardResponseException"></a><a class="link" href="#type_InvalidCardResponseException">6.2. <code>InvalidCardResponseException</code></a></h3>
-<table class="tableblock frame-ends grid-rows stretch">
+<h3 id="type_InvalidCardResponseException"><a class="anchor" href="#type_InvalidCardResponseException"></a><a class="link" href="#type_InvalidCardResponseException">6.2. InvalidCardResponseException</a></h3>
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -3799,8 +3839,8 @@ compatibility with selection-time errors. New code SHOULD use the type defined i
 </div>
 </div>
 <div class="sect2">
-<h3 id="type_ReaderCommunicationException"><a class="anchor" href="#type_ReaderCommunicationException"></a><a class="link" href="#type_ReaderCommunicationException">6.3. <code>ReaderCommunicationException</code></a></h3>
-<table class="tableblock frame-ends grid-rows stretch">
+<h3 id="type_ReaderCommunicationException"><a class="anchor" href="#type_ReaderCommunicationException"></a><a class="link" href="#type_ReaderCommunicationException">6.3. ReaderCommunicationException</a></h3>
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -3839,8 +3879,8 @@ compatibility with selection-time errors. New code SHOULD use the type defined i
 </div>
 </div>
 <div class="sect2">
-<h3 id="type_ReaderProtocolNotSupportedException"><a class="anchor" href="#type_ReaderProtocolNotSupportedException"></a><a class="link" href="#type_ReaderProtocolNotSupportedException">6.4. <code>ReaderProtocolNotSupportedException</code></a></h3>
-<table class="tableblock frame-ends grid-rows stretch">
+<h3 id="type_ReaderProtocolNotSupportedException"><a class="anchor" href="#type_ReaderProtocolNotSupportedException"></a><a class="link" href="#type_ReaderProtocolNotSupportedException">6.4. ReaderProtocolNotSupportedException</a></h3>
+<table class="tableblock frame-all grid-rows stretch">
 <colgroup>
 <col style="width: 20%;">
 <col style="width: 80%;">
@@ -4164,9 +4204,10 @@ Keypop project hosted by the Eclipse Foundation.</p>
 <div id="footer">
 <div id="footer-text">
 Version 3.0.0-SNAPSHOT<br>
-Last updated 2026-06-03 16:45:50 +0200
+Last updated 2026-06-04 17:21:16 +0200
 </div>
 </div>
+
 <script>
 ;(function () { /*! Asciidoctor Tabs | Copyright (c) 2018-present Dan Allen | MIT License */
   'use strict'
