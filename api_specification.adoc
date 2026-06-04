@@ -50,13 +50,6 @@ relationships and behavioural requirements that any conforming implementation of
 The {spec-name} is part of the broader CNA *Terminal API* family and acts as the contract through which
 terminal applications discover card readers, observe card events, select cards and exchange data with them.
 
-[source,java]
-----
-public static void main(String[] args) {
-    Integer toto = 1;
-}
-----
-
 [discrete]
 == Document Status
 
