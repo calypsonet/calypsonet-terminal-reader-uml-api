@@ -1,0 +1,102 @@
+extends: default
+
+# 1. Configuration de la page et des marges globales
+page:
+  margin: [1.0in, 0.67in, 0.67in, 0.67in]
+
+# 1. Déclaration du catalogue (inchangé, compact avec l'ancre)
+font:
+  catalog:
+    Montserrat: &montserrat
+      regular: Montserrat-Regular.ttf
+      bold: Montserrat-Bold.ttf
+      italic: Montserrat-Italic.ttf
+      bold_italic: Montserrat-BoldItalic.ttf
+    JetBrains Mono: &jetbrains
+      regular: JetBrainsMono-Regular.ttf
+      bold: JetBrainsMono-Bold.ttf
+    "M+ 1mn": *jetbrains
+    fallback: *montserrat
+
+# 2. Règle unique globale : Tout le document hérite de Montserrat
+base:
+  font_family: Montserrat
+  font_size: 10.5
+  font_color: #333333
+
+# S'applique au code en ligne (ex: `mon_parametre`)
+code:
+  font_family: JetBrains Mono
+  font_size: 8.5
+  font_color: #333333
+
+# S'applique aux blocs de code (ex: [source,json]) gérés par Rouge
+listing:
+  font_family: JetBrains Mono
+  font_size: 8
+  font_color: #333333
+  caption:
+    font_family: Montserrat
+
+heading:
+  font_color: #111111
+  font_style: normal
+
+link:
+  font_color: #039efd
+
+admonition:
+  icon:
+    note:
+      font_color: #039efd
+    important:
+      font_color: #039efd
+
+# 4. Configuration de l'en-tête (Header)
+header:
+  height: 0.6in
+  border_color: #039efd
+  border_width: 0.5
+  padding: [16, 0, 4, 0]
+  font_family: Montserrat
+  font_size: 9
+  start_at: body
+  recto:
+    left:
+      content: image:logo.svg[pdfwidth=1.0in]
+      valign: center
+    right:
+      content: '{spec-name} -- {spec-version}'
+      valign: center
+  verso:
+    left:
+      content: image:logo.svg[pdfwidth=1.0in]
+      valign: center
+    right:
+      content: '{spec-name} -- {spec-version}'
+      valign: center
+
+# 5. Configuration du pied de page (Footer)
+footer:
+  height: 0.4in
+  border_color: #039efd
+  border_width: 0.5
+  padding: [4, 0, 4, 0]
+  font_family: Montserrat
+  font_size: 8
+  font_color: #6b7280
+  start_at: body
+  recto:
+    left:
+      content: '{revdate}'
+      valign: center
+    right:
+      content: '{page-number} / {page-count}'
+      valign: center
+  verso:
+    left:
+      content: '{revdate}'
+      valign: center
+    right:
+      content: '{page-number} / {page-count}'
+      valign: center

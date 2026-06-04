@@ -1,6 +1,16 @@
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
 <style>
-body, .content, p, li, td, th, dt, dd, .admonitionblock, .sectionbody {
-  font-family: 'Montserrat', sans-serif;
+/* Règle unique pour TOUT le texte (général et titres) en Montserrat */
+body, #content, p, li, td, th, dt, dd, .admonitionblock td.content,
+h1, h2, h3, h4, h5, h6, #toctitle, .title {
+    font-family: 'Montserrat', sans-serif !important;
+}
+/* Blocs de code en JetBrains Mono */
+pre, code, .listingblock pre, .literalblock pre, .inlineblock code {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.9em;
 }
 </style>

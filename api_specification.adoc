@@ -11,9 +11,12 @@ v3.0.0-SNAPSHOT, {docdate}
 :icons: font
 :rouge-style: github
 :source-highlighter: rouge
-:imagesdir: assets
+:imagesdir: {docdir}/assets
+:docinfodir: {docdir}/assets
 :docinfo: shared
-:docinfodir: assets
+:pdf-themesdir: {docdir}/assets
+:pdf-theme: calypso
+:pdf-fontsdir: {docdir}/assets/fonts
 :experimental:
 :xrefstyle: short
 :figure-caption: Figure
@@ -46,6 +49,13 @@ relationships and behavioural requirements that any conforming implementation of
 
 The {spec-name} is part of the broader CNA *Terminal API* family and acts as the contract through which
 terminal applications discover card readers, observe card events, select cards and exchange data with them.
+
+[source,java]
+----
+public static void main(String[] args) {
+    Integer toto = 1;
+}
+----
 
 [discrete]
 == Document Status
