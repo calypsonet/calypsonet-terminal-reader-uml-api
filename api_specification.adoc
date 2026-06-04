@@ -1,4 +1,4 @@
-= Terminal Reader API -- Technical Specification
+= Terminal Reader API -- Specification
 Calypso Networks Association <https://calypsonet.org>
 v3.0.0-SNAPSHOT, {docdate}
 :doctype: book
@@ -319,13 +319,13 @@ image::../api_class_diagram.svg[Terminal Reader API class diagram, align=center]
 == API Specification
 
 // -----------------------------------------------------------------------------
-=== Package `reader`
+=== Package reader
 
 The `reader` package defines the entry points of the API and the abstractions used to manipulate readers and the
 events they produce.
 
 [[type_ReaderApiProperties]]
-==== `ReaderApiProperties`
+==== ReaderApiProperties
 
 [cols="1h,4", grid=rows, frame=ends]
 |===
@@ -354,7 +354,7 @@ The `ReaderApiProperties` type SHALL NOT be instantiated. Implementations MUST p
 ====
 
 [[type_ReaderApiFactory]]
-==== `ReaderApiFactory`
+==== ReaderApiFactory
 
 [cols="1h,4", grid=rows, frame=ends]
 |===
@@ -398,7 +398,7 @@ that every invocation returns a fresh, fully initialised object.
 |===
 
 [[type_CardReader]]
-==== `CardReader`
+==== CardReader
 
 [cols="1h,4", grid=rows, frame=ends]
 |===
@@ -438,7 +438,7 @@ that every invocation returns a fresh, fully initialised object.
 |===
 
 [[type_ConfigurableCardReader]]
-==== `ConfigurableCardReader`
+==== ConfigurableCardReader
 
 [cols="1h,4", grid=rows, frame=ends]
 |===
@@ -500,7 +500,7 @@ identifier when constructing a `CardSelector`.
 |===
 
 [[type_ObservableCardReader]]
-==== `ObservableCardReader`
+==== ObservableCardReader
 
 [cols="1h,4", grid=rows, frame=ends]
 |===
@@ -602,7 +602,7 @@ identifier when constructing a `CardSelector`.
 |===
 
 [[type_DetectionMode]]
-===== Enumeration `DetectionMode`
+===== Enumeration DetectionMode
 
 Nested inside <<type_ObservableCardReader,`ObservableCardReader`>>. Card detection management options to be applied
 after processing a card.
@@ -616,7 +616,7 @@ after processing a card.
 |===
 
 [[type_NotificationMode]]
-===== Enumeration `NotificationMode`
+===== Enumeration NotificationMode
 
 Nested inside <<type_ObservableCardReader,`ObservableCardReader`>>. Options applied when a card is detected, used
 to decide which cards trigger observer notifications.
@@ -630,7 +630,7 @@ to decide which cards trigger observer notifications.
 |===
 
 [[type_CardReaderEvent]]
-==== `CardReaderEvent`
+==== CardReaderEvent
 
 [cols="1h,4", grid=rows, frame=ends]
 |===
@@ -680,7 +680,7 @@ card selection response.
 |===
 
 [[type_CardReaderEventType]]
-===== Enumeration `Type`
+===== Enumeration Type
 
 Nested inside <<type_CardReaderEvent,`CardReaderEvent`>>. Possible card reader events.
 
@@ -695,7 +695,7 @@ Nested inside <<type_CardReaderEvent,`CardReaderEvent`>>. Possible card reader e
 |===
 
 [[type_ChannelControl]]
-==== `ChannelControl`
+==== ChannelControl
 
 [cols="1h,4", grid=rows, frame=ends]
 |===
@@ -716,13 +716,13 @@ Nested inside <<type_CardReaderEvent,`CardReaderEvent`>>. Possible card reader e
 |===
 
 // -----------------------------------------------------------------------------
-=== Package `reader.spi`
+=== Package reader.spi
 
 The `reader.spi` package gathers the contracts that are implemented by the *application* (as opposed to the reader
 implementation) when readers are observed.
 
 [[type_CardReaderObserverSpi]]
-==== `CardReaderObserverSpi`
+==== CardReaderObserverSpi
 
 [cols="1h,4", grid=rows, frame=ends]
 |===
@@ -746,7 +746,7 @@ implementation) when readers are observed.
 |===
 
 [[type_CardReaderObservationExceptionHandlerSpi]]
-==== `CardReaderObservationExceptionHandlerSpi`
+==== CardReaderObservationExceptionHandlerSpi
 
 [cols="1h,4", grid=rows, frame=ends]
 |===
@@ -774,14 +774,14 @@ implementation) when readers are observed.
 |===
 
 // -----------------------------------------------------------------------------
-=== Package `reader.selection`
+=== Package reader.selection
 
 The `reader.selection` package describes the orchestration of card selection scenarios. It introduces the central
 <<type_CardSelectionManager,`CardSelectionManager`>>, the family of selectors and the structures used to expose
 selection results.
 
 [[type_CardSelector]]
-==== `CardSelector<T extends CardSelector<T>>`
+==== CardSelector&lt;T extends CardSelector&lt;T&gt;&gt;
 
 [cols="1h,4", grid=rows, frame=ends]
 |===
@@ -825,7 +825,7 @@ card SHALL NOT be selected if at least one of them rejects it.
 |===
 
 [[type_BasicCardSelector]]
-==== `BasicCardSelector`
+==== BasicCardSelector
 
 [cols="1h,4", grid=rows, frame=ends]
 |===
@@ -840,7 +840,7 @@ card SHALL NOT be selected if at least one of them rejects it.
 absence of ISO/IEC 7816-4-specific filters at the type level.
 
 [[type_CommonIsoCardSelector]]
-==== `CommonIsoCardSelector<T extends CommonIsoCardSelector<T>>`
+==== CommonIsoCardSelector&lt;T extends CommonIsoCardSelector&lt;T&gt;&gt;
 
 [cols="1h,4", grid=rows, frame=ends]
 |===
@@ -897,7 +897,7 @@ absence of ISO/IEC 7816-4-specific filters at the type level.
 |===
 
 [[type_FileOccurrence]]
-===== Enumeration `FileOccurrence`
+===== Enumeration FileOccurrence
 
 Nested inside `CommonIsoCardSelector`. Navigation options through the applications contained on the card according
 to ISO/IEC 7816-4.
@@ -912,7 +912,7 @@ to ISO/IEC 7816-4.
 |===
 
 [[type_FileControlInformation]]
-===== Enumeration `FileControlInformation`
+===== Enumeration FileControlInformation
 
 Nested inside `CommonIsoCardSelector`. Types of templates returned in response to the *Select Application* command,
 according to ISO/IEC 7816-4.
@@ -927,7 +927,7 @@ according to ISO/IEC 7816-4.
 |===
 
 [[type_IsoCardSelector]]
-==== `IsoCardSelector`
+==== IsoCardSelector
 
 [cols="1h,4", grid=rows, frame=ends]
 |===
@@ -941,7 +941,7 @@ according to ISO/IEC 7816-4.
 `IsoCardSelector` does not add any operation to <<type_CommonIsoCardSelector,`CommonIsoCardSelector`>>.
 
 [[type_CardSelectionManager]]
-==== `CardSelectionManager`
+==== CardSelectionManager
 
 [cols="1h,4", grid=rows, frame=ends]
 |===
@@ -1106,7 +1106,7 @@ selection, and the ability to *export/import* a selection scenario or its result
 |===
 
 [[type_CardSelectionResult]]
-==== `CardSelectionResult`
+==== CardSelectionResult
 
 [cols="1h,4", grid=rows, frame=ends]
 |===
@@ -1150,7 +1150,7 @@ card; the operations below allow the application to exploit these results accord
 |===
 
 [[type_ScheduledCardSelectionsResponse]]
-==== `ScheduledCardSelectionsResponse`
+==== ScheduledCardSelectionsResponse
 
 [cols="1h,4", grid=rows, frame=ends]
 |===
@@ -1166,13 +1166,13 @@ cases (selection step itself plus any subsequent commands). Its content MUST be 
 
 // -----------------------------------------------------------------------------
 [[sec_pkg_reader_selection_spi]]
-=== Package `reader.selection.spi`
+=== Package reader.selection.spi
 
 The `reader.selection.spi` package gathers the contracts that *card extensions* implement to plug into the selection
 machinery defined in <<sec_specification,Section 4>>.
 
 [[type_CardSelectionExtension]]
-==== `CardSelectionExtension`
+==== CardSelectionExtension
 
 [cols="1h,4", grid=rows, frame=ends]
 |===
@@ -1186,7 +1186,7 @@ This interface declares no operation at the API level; the contract between the 
 extension is defined by the card extension specification consuming this SPI.
 
 [[type_SmartCard]]
-==== `SmartCard`
+==== SmartCard
 
 [cols="1h,4", grid=rows, frame=ends]
 |===
@@ -1221,7 +1221,7 @@ selection.
 |===
 
 [[type_IsoSmartCard]]
-==== `IsoSmartCard`
+==== IsoSmartCard
 
 [cols="1h,4", grid=rows, frame=ends]
 |===
@@ -1248,13 +1248,13 @@ absent at the same time.
 |===
 
 // -----------------------------------------------------------------------------
-=== Package `reader.transaction.spi`
+=== Package reader.transaction.spi
 
 The `reader.transaction.spi` package defines the common contract shared by all card transaction managers exposed
 by card extensions.
 
 [[type_CardTransactionManager]]
-==== `CardTransactionManager<T extends CardTransactionManager<T>>`
+==== CardTransactionManager&lt;T extends CardTransactionManager&lt;T&gt;&gt;
 
 [cols="1h,4", grid=rows, frame=ends]
 |===
@@ -1298,7 +1298,7 @@ All exception types defined by this specification are unchecked (runtime) and MA
 Each exception MUST expose, at minimum, the constructors listed below.
 
 [[type_CardCommunicationException]]
-=== `CardCommunicationException`
+=== CardCommunicationException
 
 [cols="1h,4", grid=rows, frame=ends]
 |===
@@ -1314,7 +1314,7 @@ Each exception MUST expose, at minimum, the constructors listed below.
 * `CardCommunicationException(message: string, cause: throwable)` -- _since 1.0.0_.
 
 [[type_InvalidCardResponseException]]
-=== `InvalidCardResponseException`
+=== InvalidCardResponseException
 
 [cols="1h,4", grid=rows, frame=ends]
 |===
@@ -1333,7 +1333,7 @@ NOTE: A separate `InvalidCardResponseException` MAY be defined in the `reader.se
 compatibility with selection-time errors. New code SHOULD use the type defined in the `reader` package.
 
 [[type_ReaderCommunicationException]]
-=== `ReaderCommunicationException`
+=== ReaderCommunicationException
 
 [cols="1h,4", grid=rows, frame=ends]
 |===
@@ -1349,7 +1349,7 @@ compatibility with selection-time errors. New code SHOULD use the type defined i
 * `ReaderCommunicationException(message: string, cause: throwable)` -- _since 1.0.0_.
 
 [[type_ReaderProtocolNotSupportedException]]
-=== `ReaderProtocolNotSupportedException`
+=== ReaderProtocolNotSupportedException
 
 [cols="1h,4", grid=rows, frame=ends]
 |===
