@@ -8,10 +8,10 @@ v3.0.0-SNAPSHOT, {docdate}
 :sectnumlevels: 4
 :sectanchors:
 :sectlinks:
+:data-uri:
 :icons: font
 :rouge-style: github
 :source-highlighter: rouge
-:imagesdir: {docdir}/assets
 :docinfodir: {docdir}/assets
 :docinfo: shared
 :pdf-themesdir: {docdir}/assets
@@ -254,7 +254,7 @@ Each operation defined in this document is described by a table of the form:
 
 The {spec-name} sits between the terminal application and the reader drivers, exposing a stable contract on each side:
 
-[plantuml, target=architecture-overview, format=svg]
+[plantuml, target=gen/architecture-overview, format=svg]
 ....
 @startuml
 skinparam shadowing false
@@ -308,7 +308,10 @@ The normative class diagram of this specification is provided as a PlantUML sour
 * link:api_class_diagram.svg[`api_class_diagram.svg`]   -- rendered representation,
 * link:api_class_diagram_diff.puml[`api_class_diagram_diff.puml`] -- delta against the previous version.
 
-image::../api_class_diagram.svg[Terminal Reader API class diagram, align=center]
+[plantuml, target="gen/api_class_diagram", format="svg"]
+----
+include::api_class_diagram.puml[Terminal Reader API class diagram, align=center]
+----
 
 // =============================================================================
 [[sec_specification]]
