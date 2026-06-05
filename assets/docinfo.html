@@ -10,6 +10,25 @@ h1, h2, h3, h4, h5, h6, #toctitle, .title {
 h1, h2, h3, h4, h5, h6, a.link {
     color: #039efd !important;
 }
+#header h1, #header .details {
+    display: block;
+    text-align: center;
+}
+#header h1::before {
+    content: "";
+    display: block;
+    height: 3em;
+    background-image: url("https://raw.githubusercontent.com/calypsonet/calypsonet-terminal-reader-uml-api/refs/heads/main/assets/logo.svg");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-bottom: 1em;
+    /* 2. Centre le bloc lui-même et conserve votre marge en bas */
+    /*margin: 0 auto 1em auto;*/
+}
+#header .details {
+    padding-bottom: 4em !important;
+}
 a {
     color: #039efd;
 }

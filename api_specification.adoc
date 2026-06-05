@@ -60,7 +60,7 @@ terminal applications discover card readers, observe card events, select cards a
 | Status              | Working Draft
 | Editor              | {organization}
 | Reference model     | link:api_class_diagram.puml[`api_class_diagram.puml`] / link:api_class_diagram.svg[`api_class_diagram.svg`]
-| Reference license   | MIT License
+| Reference license   | Eclipse Public License -- v 2.0 (EPL-2.0)
 |===
 
 [discrete]
@@ -202,10 +202,6 @@ Each operation defined in this document is described by a table of the form:
 | [[ref_cna_def]]  [CNA-DEF]
 | CNA-DEF-API
 | _Calypsonet Terminal Definitions API Specification_, {organization}.
-
-| [[ref_keypop]]   [KEYPOP]
-| KEYPOP
-| Keypop open-source project, hosted by the Eclipse Foundation -- https://keypop.org.
 |===
 
 // =============================================================================
@@ -1413,50 +1409,10 @@ link:api_class_diagram_diff.puml[`api_class_diagram_diff.puml`].
 
 // =============================================================================
 [appendix]
-[[sec_traceability]]
-== Traceability Matrix (Reference Java Binding)
-
-The table below maps each abstract element defined in this specification to the corresponding identifier in the
-reference Java binding hosted at https://github.com/eclipse-keypop/keypop-reader-java-api[`eclipse-keypop/keypop-reader-java-api`].
-
-[cols="1,1,2,2", options="header"]
-|===
-| Section            | Element                                  | Java type / member                                                     | Notes
-
-| <<type_ReaderApiFactory>>                            | `ReaderApiFactory`                       | `org.eclipse.keypop.reader.ReaderApiFactory`                           | --
-| <<type_ReaderApiProperties>>                         | `ReaderApiProperties.VERSION`            | `org.eclipse.keypop.reader.ReaderApiProperties.VERSION`                | Reference value: `"2.1"` in the 2.1.x binding.
-| <<type_CardReader>>                                  | `CardReader`                             | `org.eclipse.keypop.reader.CardReader`                                 | --
-| <<type_ConfigurableCardReader>>                      | `ConfigurableCardReader`                 | `org.eclipse.keypop.reader.ConfigurableCardReader`                     | --
-| <<type_ObservableCardReader>>                        | `ObservableCardReader`                   | `org.eclipse.keypop.reader.ObservableCardReader`                       | Includes nested `DetectionMode`, `NotificationMode`.
-| <<type_CardReaderEvent>>                             | `CardReaderEvent`                        | `org.eclipse.keypop.reader.CardReaderEvent`                            | Includes nested `Type`.
-| <<type_ChannelControl>>                              | `ChannelControl`                         | `org.eclipse.keypop.reader.ChannelControl`                             | --
-| <<type_CardReaderObserverSpi>>                       | `CardReaderObserverSpi`                  | `org.eclipse.keypop.reader.spi.CardReaderObserverSpi`                  | --
-| <<type_CardReaderObservationExceptionHandlerSpi>>    | `CardReaderObservationExceptionHandlerSpi` | `org.eclipse.keypop.reader.spi.CardReaderObservationExceptionHandlerSpi` | --
-| <<type_CardSelector>>                                | `CardSelector<T>`                        | `org.eclipse.keypop.reader.selection.CardSelector`                     | --
-| <<type_BasicCardSelector>>                           | `BasicCardSelector`                      | `org.eclipse.keypop.reader.selection.BasicCardSelector`                | --
-| <<type_CommonIsoCardSelector>>                       | `CommonIsoCardSelector<T>`               | `org.eclipse.keypop.reader.selection.CommonIsoCardSelector`            | --
-| <<type_IsoCardSelector>>                             | `IsoCardSelector`                        | `org.eclipse.keypop.reader.selection.IsoCardSelector`                  | --
-| <<type_CardSelectionManager>>                        | `CardSelectionManager`                   | `org.eclipse.keypop.reader.selection.CardSelectionManager`             | --
-| <<type_CardSelectionResult>>                         | `CardSelectionResult`                    | `org.eclipse.keypop.reader.selection.CardSelectionResult`              | --
-| <<type_ScheduledCardSelectionsResponse>>             | `ScheduledCardSelectionsResponse`        | `org.eclipse.keypop.reader.selection.ScheduledCardSelectionsResponse`  | Marker interface.
-| <<type_CardSelectionExtension>>                      | `CardSelectionExtension`                 | `org.eclipse.keypop.reader.selection.spi.CardSelectionExtension`       | Marker SPI.
-| <<type_SmartCard>>                                   | `SmartCard`                              | `org.eclipse.keypop.reader.selection.spi.SmartCard`                    | --
-| <<type_IsoSmartCard>>                                | `IsoSmartCard`                           | `org.eclipse.keypop.reader.selection.spi.IsoSmartCard`                 | --
-| <<type_CardTransactionManager>>                      | `CardTransactionManager<T>`              | `org.eclipse.keypop.reader.transaction.spi.CardTransactionManager`     | --
-| <<type_CardCommunicationException>>                  | `CardCommunicationException`             | `org.eclipse.keypop.reader.CardCommunicationException`                 | --
-| <<type_InvalidCardResponseException>>                | `InvalidCardResponseException`           | `org.eclipse.keypop.reader.InvalidCardResponseException`               | --
-| <<type_ReaderCommunicationException>>                | `ReaderCommunicationException`           | `org.eclipse.keypop.reader.ReaderCommunicationException`               | --
-| <<type_ReaderProtocolNotSupportedException>>         | `ReaderProtocolNotSupportedException`    | `org.eclipse.keypop.reader.ReaderProtocolNotSupportedException`        | --
-|===
-
-// =============================================================================
-[appendix]
 == Copyright and License
 
 Copyright (c) {organization}, https://calypsonet.org.
 
-This specification is distributed under the terms of the *MIT License*. A copy of the license is available in the
-link:LICENSE[`LICENSE`] file alongside this document and at https://opensource.org/licenses/MIT.
-
-The reference Java binding of this API is itself distributed under the MIT License and is part of the Eclipse
-Keypop project hosted by the Eclipse Foundation.
+This specification is distributed under the terms of the *Eclipse Public License -- v 2.0* (EPL-2.0). A copy of the
+license is available in the link:LICENSE[`LICENSE`] file alongside this document and at
+https://www.eclipse.org/legal/epl-2.0/.

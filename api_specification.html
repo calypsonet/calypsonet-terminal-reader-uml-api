@@ -447,6 +447,25 @@ h1, h2, h3, h4, h5, h6, #toctitle, .title {
 h1, h2, h3, h4, h5, h6, a.link {
     color: #039efd !important;
 }
+#header h1, #header .details {
+    display: block;
+    text-align: center;
+}
+#header h1::before {
+    content: "";
+    display: block;
+    height: 3em;
+    background-image: url("https://raw.githubusercontent.com/calypsonet/calypsonet-terminal-reader-uml-api/refs/heads/main/assets/logo.svg");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-bottom: 1em;
+    /* 2. Centre le bloc lui-même et conserve votre marge en bas */
+    /*margin: 0 auto 1em auto;*/
+}
+#header .details {
+    padding-bottom: 4em !important;
+}
 a {
     color: #039efd;
 }
@@ -465,17 +484,12 @@ pre, code, .listingblock pre, .literalblock pre, .inlineblock code {
     font-size: 0.9em;
 }
 @media screen and (min-width: 768px) {
-    /* 1. On élargit la boîte de la TOC (ex: passage à 25em ou 350px) */
     #toc.toc2 {
         width: 25em !important;
     }
-
-    /* 2. On décale le contenu principal vers la droite pour lui laisser de la place */
     body.toc2 {
-        padding-left: 26em !important; /* width de la TOC + 1em de marge de sécurité */
+        padding-left: 26em !important; /* width of the TOC + 1em safety margin */
     }
-
-    /* 3. On s'assure que les éléments fixes s'alignent correctement */
     #header, #content, #footnotes, #footer {
         max-width: 100% !important;
     }
@@ -601,7 +615,7 @@ pre, code, .listingblock pre, .literalblock pre, .inlineblock code {
 <span id="author" class="author">Calypso Networks Association</span><br>
 <span id="email" class="email"><a href="https://calypsonet.org" class="bare">https://calypsonet.org</a></span><br>
 <span id="revnumber">version 3.0.0-SNAPSHOT,</span>
-<span id="revdate">2026-06-04</span>
+<span id="revdate">2026-06-05</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -778,8 +792,7 @@ pre, code, .listingblock pre, .literalblock pre, .inlineblock code {
 </ul>
 </li>
 <li><a href="#sec_changes">Appendix A: Change Log&#8201;&#8212;&#8201;3.0.0-SNAPSHOT (Working Draft)</a></li>
-<li><a href="#sec_traceability">Appendix B: Traceability Matrix (Reference Java Binding)</a></li>
-<li><a href="#_copyright_and_license">Appendix C: Copyright and License</a></li>
+<li><a href="#_copyright_and_license">Appendix B: Copyright and License</a></li>
 </ul>
 </div>
 </div>
@@ -835,7 +848,7 @@ terminal applications discover card readers, observe card events, select cards a
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Reference license</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock">MIT License</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Eclipse Public License&#8201;&#8212;&#8201;v 2.0 (EPL-2.0)</p></td>
 </tr>
 </tbody>
 </table>
@@ -1174,11 +1187,6 @@ equivalent native type. Implementations MUST preserve the semantic intent rather
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a id="ref_cna_def"></a>  [CNA-DEF]</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">CNA-DEF-API</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><em>Calypsonet Terminal Definitions API Specification</em>, Calypso Networks Association.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a id="ref_keypop"></a>   [KEYPOP]</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">KEYPOP</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Keypop open-source project, hosted by the Eclipse Foundation&#8201;&#8212;&#8201;<a href="https://keypop.org" class="bare">https://keypop.org</a>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -4014,189 +4022,15 @@ to the previous published release. The list below MUST be kept in sync with
 </div>
 </div>
 <div class="sect1">
-<h2 id="sec_traceability"><a class="anchor" href="#sec_traceability"></a><a class="link" href="#sec_traceability">Appendix B: Traceability Matrix (Reference Java Binding)</a></h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>The table below maps each abstract element defined in this specification to the corresponding identifier in the
-reference Java binding hosted at <a href="https://github.com/eclipse-keypop/keypop-reader-java-api"><code>eclipse-keypop/keypop-reader-java-api</code></a>.</p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 16.6666%;">
-<col style="width: 16.6666%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3335%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Section</th>
-<th class="tableblock halign-left valign-top">Element</th>
-<th class="tableblock halign-left valign-top">Java type / member</th>
-<th class="tableblock halign-left valign-top">Notes</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#type_ReaderApiFactory">Section 5.1.2</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ReaderApiFactory</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.eclipse.keypop.reader.ReaderApiFactory</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#type_ReaderApiProperties">Section 5.1.1</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ReaderApiProperties.VERSION</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.eclipse.keypop.reader.ReaderApiProperties.VERSION</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Reference value: <code>"2.1"</code> in the 2.1.x binding.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#type_CardReader">Section 5.1.3</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CardReader</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.eclipse.keypop.reader.CardReader</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#type_ConfigurableCardReader">Section 5.1.4</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ConfigurableCardReader</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.eclipse.keypop.reader.ConfigurableCardReader</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#type_ObservableCardReader">Section 5.1.5</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ObservableCardReader</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.eclipse.keypop.reader.ObservableCardReader</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Includes nested <code>DetectionMode</code>, <code>NotificationMode</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#type_CardReaderEvent">Section 5.1.6</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CardReaderEvent</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.eclipse.keypop.reader.CardReaderEvent</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Includes nested <code>Type</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#type_ChannelControl">Section 5.1.7</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ChannelControl</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.eclipse.keypop.reader.ChannelControl</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#type_CardReaderObserverSpi">Section 5.2.1</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CardReaderObserverSpi</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.eclipse.keypop.reader.spi.CardReaderObserverSpi</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#type_CardReaderObservationExceptionHandlerSpi">Section 5.2.2</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CardReaderObservationExceptionHandlerSpi</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.eclipse.keypop.reader.spi.CardReaderObservationExceptionHandlerSpi</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#type_CardSelector">Section 5.3.1</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CardSelector&lt;T&gt;</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.eclipse.keypop.reader.selection.CardSelector</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#type_BasicCardSelector">Section 5.3.2</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>BasicCardSelector</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.eclipse.keypop.reader.selection.BasicCardSelector</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#type_CommonIsoCardSelector">Section 5.3.3</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CommonIsoCardSelector&lt;T&gt;</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.eclipse.keypop.reader.selection.CommonIsoCardSelector</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#type_IsoCardSelector">Section 5.3.4</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>IsoCardSelector</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.eclipse.keypop.reader.selection.IsoCardSelector</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#type_CardSelectionManager">Section 5.3.5</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CardSelectionManager</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.eclipse.keypop.reader.selection.CardSelectionManager</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#type_CardSelectionResult">Section 5.3.6</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CardSelectionResult</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.eclipse.keypop.reader.selection.CardSelectionResult</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#type_ScheduledCardSelectionsResponse">Section 5.3.7</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ScheduledCardSelectionsResponse</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.eclipse.keypop.reader.selection.ScheduledCardSelectionsResponse</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Marker interface.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#type_CardSelectionExtension">Section 5.4.1</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CardSelectionExtension</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.eclipse.keypop.reader.selection.spi.CardSelectionExtension</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Marker SPI.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#type_SmartCard">Section 5.4.2</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>SmartCard</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.eclipse.keypop.reader.selection.spi.SmartCard</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#type_IsoSmartCard">Section 5.4.3</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>IsoSmartCard</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.eclipse.keypop.reader.selection.spi.IsoSmartCard</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#type_CardTransactionManager">Section 5.5.1</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CardTransactionManager&lt;T&gt;</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.eclipse.keypop.reader.transaction.spi.CardTransactionManager</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#type_CardCommunicationException">Section 6.1</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CardCommunicationException</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.eclipse.keypop.reader.CardCommunicationException</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#type_InvalidCardResponseException">Section 6.2</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>InvalidCardResponseException</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.eclipse.keypop.reader.InvalidCardResponseException</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#type_ReaderCommunicationException">Section 6.3</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ReaderCommunicationException</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.eclipse.keypop.reader.ReaderCommunicationException</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#type_ReaderProtocolNotSupportedException">Section 6.4</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ReaderProtocolNotSupportedException</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.eclipse.keypop.reader.ReaderProtocolNotSupportedException</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_copyright_and_license"><a class="anchor" href="#_copyright_and_license"></a><a class="link" href="#_copyright_and_license">Appendix C: Copyright and License</a></h2>
+<h2 id="_copyright_and_license"><a class="anchor" href="#_copyright_and_license"></a><a class="link" href="#_copyright_and_license">Appendix B: Copyright and License</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Copyright (c) Calypso Networks Association, <a href="https://calypsonet.org" class="bare">https://calypsonet.org</a>.</p>
 </div>
 <div class="paragraph">
-<p>This specification is distributed under the terms of the <strong>MIT License</strong>. A copy of the license is available in the
-<a href="LICENSE"><code>LICENSE</code></a> file alongside this document and at <a href="https://opensource.org/licenses/MIT" class="bare">https://opensource.org/licenses/MIT</a>.</p>
-</div>
-<div class="paragraph">
-<p>The reference Java binding of this API is itself distributed under the MIT License and is part of the Eclipse
-Keypop project hosted by the Eclipse Foundation.</p>
+<p>This specification is distributed under the terms of the <strong>Eclipse Public License&#8201;&#8212;&#8201;v 2.0</strong> (EPL-2.0). A copy of the
+license is available in the <a href="LICENSE"><code>LICENSE</code></a> file alongside this document and at
+<a href="https://www.eclipse.org/legal/epl-2.0/" class="bare">https://www.eclipse.org/legal/epl-2.0/</a>.</p>
 </div>
 </div>
 </div>
@@ -4204,7 +4038,7 @@ Keypop project hosted by the Eclipse Foundation.</p>
 <div id="footer">
 <div id="footer-text">
 Version 3.0.0-SNAPSHOT<br>
-Last updated 2026-06-04 17:21:16 +0200
+Last updated 2026-06-05 10:08:42 +0200
 </div>
 </div>
 

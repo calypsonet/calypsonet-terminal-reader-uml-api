@@ -21,6 +21,20 @@ base:
   font-size: 10.5
   font-color: #333333
 
+title_page:
+  align: center
+  logo:
+    align: center
+    image: image:logo.svg[pdfwidth=4.0in]
+    top: 20%
+  title:
+    align: center
+    font-color: #039efd
+  authors:
+    align: center
+  revision:
+    align: center
+
 heading:
   font-color: #039efd
   font-style: normal
