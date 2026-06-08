@@ -14,6 +14,7 @@ v3.0.0-SNAPSHOT, {docdate}
 :source-highlighter: rouge
 :docinfodir: {docdir}/assets
 :docinfo: shared
+:imagesoutdir: {docdir}/gen
 :pdf-themesdir: {docdir}/assets
 :pdf-theme: calypso
 :pdf-fontsdir: {docdir}/assets/fonts
@@ -254,7 +255,7 @@ Each operation defined in this document is described by a table of the form:
 
 The {spec-name} sits between the terminal application and the reader drivers, exposing a stable contract on each side:
 
-[plantuml, target=gen/architecture-overview, format=svg]
+[plantuml, target=architecture-overview, format=svg]
 ....
 @startuml
 skinparam shadowing false
@@ -308,7 +309,7 @@ The normative class diagram of this specification is provided as a PlantUML sour
 * link:api_class_diagram.svg[`api_class_diagram.svg`]   -- rendered representation,
 * link:api_class_diagram_diff.puml[`api_class_diagram_diff.puml`] -- delta against the previous version.
 
-[plantuml, target="gen/api_class_diagram", format="svg"]
+[plantuml, target="api_class_diagram", format="svg"]
 ----
 include::api_class_diagram.puml[Terminal Reader API class diagram, align=center]
 ----
