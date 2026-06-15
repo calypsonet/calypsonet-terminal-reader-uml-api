@@ -255,32 +255,28 @@ package "selection" as selectionApi {
 ' TRANSACTION
 package "transaction" as transactionApi {
     package "spi" as transactionSpi {
-        +interface "CardTransactionManager" as CardTransactionManager<T extends CardTransactionManager<T>> <<red>> {
+        +interface "CardTransactionManager" as CardTransactionManager <<red>> {
             +<color:red><s>T processCommands (ChannelControl channelControl)
-            +<color:blue>T processCommands ()
+            +<color:blue>void processCommands ()
         }
-        +interface "<color:blue>MultichannelCardTransactionManager" as MultichannelCardTransactionManager<T extends MultichannelCardTransactionManager<T>> <<red>> extends CardTransactionManager {
-            +<color:blue>T processCommandsAndCloseChannel ()
-            +<color:blue>T closeChannel ()
+        +interface "<color:blue>IsoCardTransactionManager" as IsoCardTransactionManager <<red>> extends CardTransactionManager {
+            +<color:blue>MultichannelCardTransactionManager asMultichannelCardTransactionManager ()
+        }
+        +interface "<color:blue>MultichannelCardTransactionManager" as MultichannelCardTransactionManager <<red>> extends CardTransactionManager {
+            +<color:blue>void processCommandsAndCloseChannel ()
+            +<color:blue>void closeChannel ()
         }
     }
 }
 
 ' EXCEPTIONS
 +class "<<RuntimeException>>\nReaderCommunicationException" as ReaderCommunicationException <<green>> {
-    +ReaderCommunicationException (String message)
-    +ReaderCommunicationException (String message, Throwable cause)
 }
-+class "<<RuntimeException>>\nReaderProtocolNotSupportedException" as ReaderProtocolNotSupportedException <<green>> {
-    +ReaderProtocolNotSupportedException (String physicalProtocolName)
++class "<color:red><s><<RuntimeException>>\n<color:red><s>ReaderProtocolNotSupportedException" as ReaderProtocolNotSupportedException <<green>> {
 }
 +class "<<RuntimeException>>\nCardCommunicationException" as CardCommunicationException <<green>> {
-    +CardCommunicationException (String message)
-    +CardCommunicationException (String message, Throwable cause)
 }
 +class "<<RuntimeException>>\nInvalidCardResponseException" as InvalidCardResponseException <<green>> {
-    +InvalidCardResponseException (String message)
-    +InvalidCardResponseException (String message, Throwable cause)
 }
 
 }
@@ -326,6 +322,8 @@ CardSelectionManager +-- ChannelSelectionPolicy
 CardSelectionManager ..> ChannelSelectionPolicy #C_USE : use >
 
 CardTransactionManager .up.> ChannelControl #C_USE : use >
+
+IsoCardTransactionManager .right.> MultichannelCardTransactionManager #C_LINK : cast to >
 
 ' == LAYOUT ==
 

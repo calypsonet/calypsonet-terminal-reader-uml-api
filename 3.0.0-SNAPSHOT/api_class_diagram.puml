@@ -208,31 +208,25 @@ package "selection" as selectionApi {
 ' TRANSACTION
 package "transaction" as transactionApi {
     package "spi" as transactionSpi {
-        +interface "CardTransactionManager" as CardTransactionManager<T extends CardTransactionManager<T>> <<red>> {
-            +<color:blue>T processCommands ()
+        +interface "CardTransactionManager" as CardTransactionManager <<red>> {
+            +<color:blue>void processCommands ()
         }
-        +interface "<color:blue>MultichannelCardTransactionManager" as MultichannelCardTransactionManager<T extends MultichannelCardTransactionManager<T>> <<red>> extends CardTransactionManager {
-            +<color:blue>T processCommandsAndCloseChannel ()
-            +<color:blue>T closeChannel ()
+        +interface "<color:blue>IsoCardTransactionManager" as IsoCardTransactionManager <<red>> extends CardTransactionManager {
+            +<color:blue>MultichannelCardTransactionManager asMultichannelCardTransactionManager ()
+        }
+        +interface "<color:blue>MultichannelCardTransactionManager" as MultichannelCardTransactionManager <<red>> extends CardTransactionManager {
+            +<color:blue>void processCommandsAndCloseChannel ()
+            +<color:blue>void closeChannel ()
         }
     }
 }
 
 ' EXCEPTIONS
 +class "<<RuntimeException>>\nReaderCommunicationException" as ReaderCommunicationException <<green>> {
-    +ReaderCommunicationException (String message)
-    +ReaderCommunicationException (String message, Throwable cause)
-}
-+class "<<RuntimeException>>\nReaderProtocolNotSupportedException" as ReaderProtocolNotSupportedException <<green>> {
-    +ReaderProtocolNotSupportedException (String physicalProtocolName)
 }
 +class "<<RuntimeException>>\nCardCommunicationException" as CardCommunicationException <<green>> {
-    +CardCommunicationException (String message)
-    +CardCommunicationException (String message, Throwable cause)
 }
 +class "<<RuntimeException>>\nInvalidCardResponseException" as InvalidCardResponseException <<green>> {
-    +InvalidCardResponseException (String message)
-    +InvalidCardResponseException (String message, Throwable cause)
 }
 
 }
@@ -269,6 +263,8 @@ CardSelectionManager +-up- SelectionExecutionPolicy
 CardSelectionManager .up.> SelectionExecutionPolicy #C_USE : use >
 CardSelectionManager +-up- ChannelSelectionPolicy
 CardSelectionManager .up.> ChannelSelectionPolicy #C_USE : use >
+
+IsoCardTransactionManager .right.> MultichannelCardTransactionManager #C_LINK : cast to >
 
 ' == LAYOUT ==
 
