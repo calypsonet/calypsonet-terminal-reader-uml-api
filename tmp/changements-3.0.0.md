@@ -4,22 +4,31 @@
 
 ## Préambule
 
-Ce document a pour objectif de **présenter les évolutions des APIs terminaux** introduites par leur version majeure **3.0.0** — pour les trois APIs existantes (`Reader API`, `Card API`, `Calypso Card API`) ainsi que pour la nouvelle **Terminal Definitions API** créée à cette occasion — **en vue d'une validation par les membres du TC Terminal** (Technical Committee Terminal) de la **Calypso Networks Association** (CNA).
+Ce document a pour objectif de **présenter les évolutions des APIs terminaux** introduites par la version majeure **3.0.0** de la Terminal Reader API et ses répercussions sur l'ensemble des APIs Terminaux CNA — **en vue d'une validation par les membres du TC Terminal** (Technical Committee Terminal) de la **Calypso Networks Association** (CNA).
+
+Sont impactés par cette version majeure :
+
+- les **trois APIs existantes** alignées sur la 3.0.0 : `Reader API`, `Card API`, `Calypso Card API` ;
+- la **nouvelle Terminal Definitions API** (`1.0.0-SNAPSHOT`) créée à cette occasion ;
+- **trois APIs adjacentes** qui s'alignent en parallèle sur le nouveau socle commun, chacune avec sa propre version majeure (`2.0.0-SNAPSHOT`) :
+  - `Terminal Calypso Crypto Legacy SAM API` ;
+  - `Terminal Generic Card API` ;
+  - `Terminal Storage Card API`.
 
 Il décrit, pour chaque thème d'évolution :
 
 - la **motivation** (le « pourquoi ») ;
-- le **détail des changements** dans chacune des quatre APIs concernées ;
+- le **détail des changements** dans chacune des APIs concernées ;
 - la **justification de conception** (le « pourquoi de ce choix-là plutôt qu'un autre »).
 
-L'alignement des implémentations Java Keypop sur la 3.0.0 et la rédaction d'un **guide technique de migration** à destination des intégrateurs interviendront ultérieurement, après validation de la 3.0.0 par le TC Terminal (cf. §8).
+L'alignement des implémentations Java Keypop sur la 3.0.0 et la rédaction d'un **guide technique de migration** à destination des intégrateurs interviendront ultérieurement, après validation par le TC Terminal (cf. §9).
 
 > **Visibilité des APIs vis-à-vis des audiences**
 >
-> - La **Reader API**, la **Calypso Card API** et la nouvelle **Terminal Definitions API** sont des APIs **publiques**, manipulées directement par l'**intégrateur** (le code applicatif).
+> - La **Reader API**, la **Calypso Card API**, la **Terminal Definitions API**, la **Legacy SAM API**, la **Generic Card API** et la **Storage Card API** sont des APIs **publiques**, manipulées directement par l'**intégrateur** (le code applicatif).
 > - La **Card API** est une API **interne** : elle sert de contrat d'intégration entre les implémentations de lecteurs et les extensions de cartes. **L'intégrateur n'y a pas accès**.
 >
-> Le présent document décrit les évolutions des quatre APIs car elles sont solidaires sur le plan de la conception (en particulier pour les thèmes 1, 2 et 6). La **Card API étant interne**, ses évolutions (cf. §2.3, §3.2, §6.2) ne nécessitent **aucune action** de la part de l'intégrateur ; elles sont absorbées par les implémentations Keypop.
+> Le présent document décrit les évolutions de toutes les APIs impactées car elles sont solidaires sur le plan de la conception (en particulier pour les thèmes 1, 2 et 5). La **Card API étant interne**, ses évolutions (cf. §2.3, §3.2, §6.2) ne nécessitent **aucune action** de la part de l'intégrateur ; elles sont absorbées par les implémentations Keypop.
 >
 > **Nouvelle API : Terminal Definitions API**
 >
@@ -48,16 +57,19 @@ Les liens ci-dessous pointent directement vers les fichiers SVG, qui se rendent 
 | **Terminal Card API** *(interne)* | 3.0.0-SNAPSHOT | [SVG final](https://github.com/calypsonet/calypsonet-terminal-card-uml-api/blob/develop/3.0.0-SNAPSHOT/api_class_diagram.svg) | [SVG avec diff](https://github.com/calypsonet/calypsonet-terminal-card-uml-api/blob/develop/3.0.0-SNAPSHOT/api_class_diagram_diff.svg) |
 | **Terminal Calypso Card API** | 3.0.0-SNAPSHOT | [SVG final](https://github.com/calypsonet/calypsonet-terminal-calypso-card-uml-api/blob/develop/3.0.0-SNAPSHOT/api_class_diagram.svg) | [SVG avec diff](https://github.com/calypsonet/calypsonet-terminal-calypso-card-uml-api/blob/develop/3.0.0-SNAPSHOT/api_class_diagram_diff.svg) |
 | **Terminal Definitions API** *(nouveau)* | 1.0.0-SNAPSHOT | [SVG final](https://github.com/calypsonet/calypsonet-terminal-definitions-uml-api/blob/develop/1.0.0-SNAPSHOT/api_class_diagram.svg) | — *(API nouvelle, pas de diff)* |
+| **Terminal Calypso Crypto Legacy SAM API** | 2.0.0-SNAPSHOT | [SVG final](https://github.com/calypsonet/calypsonet-terminal-calypso-crypto-legacysam-uml-api/blob/develop/2.0.0-SNAPSHOT/api_class_diagram.svg) | [SVG avec diff](https://github.com/calypsonet/calypsonet-terminal-calypso-crypto-legacysam-uml-api/blob/develop/2.0.0-SNAPSHOT/api_class_diagram_diff.svg) |
+| **Terminal Generic Card API** | 2.0.0-SNAPSHOT | [SVG final](https://github.com/calypsonet/calypsonet-terminal-genericcard-uml-api/blob/develop/2.0.0-SNAPSHOT/api_class_diagram.svg) | [SVG avec diff](https://github.com/calypsonet/calypsonet-terminal-genericcard-uml-api/blob/develop/2.0.0-SNAPSHOT/api_class_diagram_diff.svg) |
+| **Terminal Storage Card API** | 2.0.0-SNAPSHOT | [SVG final](https://github.com/calypsonet/calypsonet-terminal-storagecard-uml-api/blob/develop/2.0.0-SNAPSHOT/api_class_diagram.svg) | [SVG avec diff](https://github.com/calypsonet/calypsonet-terminal-storagecard-uml-api/blob/develop/2.0.0-SNAPSHOT/api_class_diagram_diff.svg) |
 
 > Les sources PlantUML (`.puml`) sont également disponibles dans les mêmes dossiers de chaque dépôt, pour ceux qui souhaitent regénérer le rendu ou inspecter les annotations.
 
 ---
 
-> Périmètre : **Reader API**, **Card API** et **Calypso Card API** — auxquelles s'ajoute, en tant que **nouvelle API socle**, la **Terminal Definitions API** (cf. encadré du préambule et Thème 6).
+> Périmètre : **Reader API**, **Card API** et **Calypso Card API** (versions `3.0.0-SNAPSHOT`) — auxquelles s'ajoutent la **Terminal Definitions API** (nouvelle, `1.0.0-SNAPSHOT`) et les trois APIs adjacentes **Legacy SAM**, **Generic Card** et **Storage Card** (versions `2.0.0-SNAPSHOT`) (cf. encadré du préambule).
 >
 > **Conventions de lecture des diagrammes** :
-> - **(diff uniquement)** Les éléments **barrés** (`<s>`) dans les diagrammes `_diff` ne sont conservés que pour faciliter la lecture du delta entre la 2.x et la 3.0.0. Ils **n'apparaissent pas** dans les diagrammes finaux.
-> - **(diff uniquement)** Les éléments en **bleu** sont les **ajouts** de la 3.0.0.
+> - **(diff uniquement)** Les éléments **barrés** (`<s>`) dans les diagrammes `_diff` ne sont conservés que pour faciliter la lecture du delta entre la version antérieure et la nouvelle version majeure de chaque API. Ils **n'apparaissent pas** dans les diagrammes finaux.
+> - **(diff uniquement)** Les éléments en **bleu** sont les **ajouts** de la nouvelle version majeure.
 > - **(diff uniquement)** Les éléments en **gris** (`<color:grey>`) sont des éléments **en cours d'étude** (« work in progress ») qui n'avaient jamais été implémentés dans Keypop Java. La 3.0.0 fait le ménage : ces éléments **n'apparaissent pas** dans les diagrammes finaux. Ils sont mentionnés ici quand cela aide à comprendre la trajectoire d'une notion (par exemple le retrait du `MultichannelCardSelector` expérimental au profit du nouveau modèle multicanal porté par le `CardSelectionManager`).
 > - **(final et diff)** Les relations UML notées `+-` (composition par agrégation) indiquent que l'élément pointé est une **classe interne** (`inner class` / type imbriqué) du conteneur — par exemple `CardReaderEvent.Type` est une énumération interne de `CardReaderEvent`, et `IsoCardSelector.FileOccurrence` / `IsoCardSelector.FileControlInformation` sont des énumérations internes d'`IsoCardSelector`. Cette convention conditionne les imports et la nomenclature Java.
 
@@ -73,23 +85,25 @@ Les liens ci-dessous pointent directement vers les fichiers SVG, qui se rendent 
 5. [Thème 4 — Connaissance de l'état courant de la session sécurisée](#5-thème-4--connaissance-de-létat-courant-de-la-session-sécurisée)
 6. [Thème 5 — Améliorations sémantiques (renommages et migration de concepts)](#6-thème-5--améliorations-sémantiques-renommages-et-migration-de-concepts)
 7. [Thème 6 — Typage strict des technologies RF et des types de carte (support ECP)](#7-thème-6--typage-strict-des-technologies-rf-et-des-types-de-carte-support-ecp)
-8. [Procédure de migration](#8-procédure-de-migration)
-9. [Suite et validation par le TC Terminal](#9-suite-et-validation-par-le-tc-terminal)
+8. [Thème 7 — Identification des commandes (`idCommand`)](#8-thème-7--identification-des-commandes-idcommand)
+9. [Procédure de migration](#9-procédure-de-migration)
+10. [Suite et validation par le TC Terminal](#10-suite-et-validation-par-le-tc-terminal)
 
 ---
 
 ## 1. Vue d'ensemble
 
-La version 3.0.0 est une **version majeure** : elle introduit des ruptures de compatibilité sur les trois APIs existantes et **crée une nouvelle API socle** (`Terminal Definitions API`). Les changements sont motivés par six grands chantiers :
+La version majeure 3.0.0 introduit des ruptures de compatibilité sur les trois APIs Terminal existantes, **crée une nouvelle API socle** (`Terminal Definitions API`), et déclenche en cascade des versions majeures `2.0.0` sur les trois APIs adjacentes (Legacy SAM, Generic Card, Storage Card). Les changements sont motivés par sept grands chantiers :
 
-| # | Thème | Reader | Card | Calypso Card | Definitions |
-|---|---|:---:|:---:|:---:|:---:|
-| 1 | Canaux logiques multiples | ● | ● | ● | — |
-| 2 | Contre-mesure attaque relai | — | ● | ● | — |
-| 3 | Simplification observation | ● | — | — | — |
-| 4 | État courant de la session sécurisée | — | — | ● | — |
-| 5 | Améliorations sémantiques | ● | ● | ● | — |
-| 6 | Typage RF / types de carte (ECP) | ● | — | — | ● (création) |
+| # | Thème | Reader | Card | Calypso Card | Definitions | Legacy SAM | Generic Card | Storage Card |
+|---|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| 1 | Canaux logiques multiples | ● | ● | ● | — | — | ● | — |
+| 2 | Contre-mesure attaque relai | — | ● | ● | — | — | ● | — |
+| 3 | Simplification observation | ● | — | — | — | — | — | — |
+| 4 | État courant de la session sécurisée | — | — | ● | — | — | — | — |
+| 5 | Améliorations sémantiques | ● | ● | ● | — | ● | ● | ● |
+| 6 | Typage RF / types de carte (ECP) | ● | — | — | ● (création) | — | — | — |
+| 7 | Identification des commandes (`idCommand`) | — | — | — | — | — | ● | ● |
 
 Les conséquences transverses :
 
@@ -135,11 +149,26 @@ Le déclencheur concret de ce chantier est l'arrivée d'un nouveau produit CNA, 
 
 #### Gestion transactionnelle multi-canal
 
-- **Nouvelle interface** `MultichannelCardTransactionManager<T>` (dans `reader.transactionApi.spi`) qui étend `CardTransactionManager<T>` et ajoute :
-  - `T processCommandsAndCloseChannel()` — exécute les commandes en attente et **ferme le canal** dans la foulée ;
-  - `T closeChannel()` — fermeture explicite du canal.
+La hiérarchie des gestionnaires de transactions (package `reader.transactionApi.spi`) est restructurée en trois niveaux :
 
-> Côté `CardTransactionManager`, `processCommands(ChannelControl)` est remplacé par `processCommands()` sans paramètre : la fermeture du canal est désormais déléguée au nouveau gestionnaire multicanal.
+```text
+CardTransactionManager  (interface racine, non générique)
+  └─ IsoCardTransactionManager  (nouvelle, ISO 7816-4 — porte la passerelle vers le multicanal)
+       └─ MultichannelCardTransactionManager  (multicanal effectif)
+```
+
+- **`CardTransactionManager`** (refondue) — n'est plus générique en 3.0.0 ; expose `void processCommands()` (sans paramètre, return type `void` au lieu de l'ancien `T`). C'est l'interface racine commune à tous les types de gestionnaires de transactions, indépendamment du standard ou du modèle de canal.
+- **`IsoCardTransactionManager`** — **nouvelle interface** intermédiaire dédiée aux cartes ISO 7816-4. Elle expose une unique méthode `MultichannelCardTransactionManager asMultichannelCardTransactionManager()` qui réalise un **transtypage explicite** vers le multicanal lorsque la carte sous-jacente le supporte. Cette interface est le point d'ancrage stéréotypé par les autres APIs Terminal (Calypso Card, Generic Card) qui ciblent des cartes ISO mais qui ne sont pas elles-mêmes intrinsèquement multicanal.
+- **`MultichannelCardTransactionManager`** — **nouvelle interface** étendant `CardTransactionManager` ; expose :
+  - `void processCommandsAndCloseChannel()` — exécute les commandes en attente et **ferme le canal** dans la foulée ;
+  - `void closeChannel()` — fermeture explicite du canal.
+
+> **Stéréotypage attendu côté APIs consommatrices** :
+>
+> - Les APIs ciblant des cartes ISO 7816-4 **non intrinsèquement multicanal** (Calypso Card, Generic Card, etc.) stéréotypent leur gestionnaire de transactions sur **`IsoCardTransactionManager`**. Elles accèdent au multicanal **à la demande**, lorsque la carte sous-jacente le supporte, via l'appel à `asMultichannelCardTransactionManager()`.
+> - Les APIs ciblant des cartes **intrinsèquement multicanal** (la **future Terminal OpenSAM API** en particulier) stéréotypent leur gestionnaire de transactions **directement sur `MultichannelCardTransactionManager`**. Aucun transtypage n'est nécessaire : les méthodes `processCommandsAndCloseChannel()` et `closeChannel()` sont disponibles d'emblée sur le `TransactionManager` exposé.
+>
+> Cette gradation à trois niveaux (`CardTransactionManager` / `IsoCardTransactionManager` / `MultichannelCardTransactionManager`) permet à chaque API consommatrice de **s'ancrer au niveau de capacité qui correspond exactement à son modèle de carte**, sans forcer un transtypage inutile ni masquer une capacité réelle.
 
 ### 2.3 Card API
 
@@ -181,12 +210,21 @@ L'objectif est que, dans tous ces cas, **toute tentative ultérieure d'utiliser 
 
 ### 2.4 Calypso Card API
 
-- **Nouvelle méthode** `TransactionManager.getLogicalChannelSupport() : MultichannelTransactionManager` — point d'entrée vers les opérations multicanal côté Calypso.
-- **Nouvelle interface** `MultichannelTransactionManager` (mappée sur `MultichannelCardTransactionManager` de la Reader API).
+- Le stéréotype du `TransactionManager` Calypso évolue de `<<CardTransactionManager>>` (Reader API) vers `<<IsoCardTransactionManager>>` (Reader API). Une carte Calypso étant intrinsèquement ISO 7816-4, elle hérite donc de la méthode `asMultichannelCardTransactionManager()` introduite au niveau Reader API (cf. §2.2).
+- L'accès au multicanal côté Calypso s'effectue donc **sans méthode dédiée** dans la Calypso Card API : l'intégrateur appelle directement `transactionManager.asMultichannelCardTransactionManager()` puis utilise les méthodes `processCommandsAndCloseChannel()` / `closeChannel()` du `MultichannelCardTransactionManager` ainsi obtenu.
 
-### 2.5 Justification
+### 2.5 Generic Card API
+
+- Le stéréotype du `CardTransactionManager` Generic Card évolue de `<<CardTransactionManager>>` (Reader API) vers `<<IsoCardTransactionManager>>` (Reader API). Une carte générique étant manipulée au niveau ISO 7816-4, elle bénéficie elle aussi du transtypage multicanal via `asMultichannelCardTransactionManager()` hérité.
+
+### 2.6 Justification
 
 Le contrôle « par paramètre » (`ChannelControl.KEEP_OPEN` / `CLOSE_AFTER`) reposait sur une notion implicite et globale d'« unique canal courant ». Dans un contexte multi-canal, ce modèle est ambigu : sur quel canal s'applique le `CLOSE_AFTER` ? Le passage à un modèle où la cible (la `SmartCard(Spi)`) est **explicitement nommée** dans chaque appel résout cette ambiguïté et rend l'API auto-descriptive.
+
+La hiérarchie à trois niveaux (`CardTransactionManager` / `IsoCardTransactionManager` / `MultichannelCardTransactionManager`) répond à un principe simple : **chaque API consommatrice s'ancre au niveau de capacité qui correspond exactement à son modèle de carte**.
+
+- Le placement du transtypage `asMultichannelCardTransactionManager()` sur **`IsoCardTransactionManager`** évite la duplication de la passerelle multicanal et garantit une homogénéité de l'accès au multicanal pour toutes les APIs ciblant des cartes ISO 7816-4 dont le multicanal n'est qu'une **capacité optionnelle de la carte sous-jacente** (Calypso Card, Generic Card, et toute extension future de même nature).
+- Le stéréotypage **direct sur `MultichannelCardTransactionManager`** est réservé aux APIs dont la carte cible est **intrinsèquement multicanal** par conception, à l'image de la **future Terminal OpenSAM API**. Pour ces APIs, l'exposition du multicanal sans étape de transtypage est sémantiquement correcte (il n'y a pas de cas où la capacité serait absente) et améliore l'ergonomie en supprimant un appel intermédiaire systématique.
 
 ---
 
@@ -224,9 +262,15 @@ Toutes les nouvelles méthodes prennent un paramètre `csnMin` qui est un **seui
   - `assignOpenSecureSessionMaxDuration(long csnMin, byte[] dfName, long maxDuration)` ;
   - `assignOpenSecureSessionMaxDuration(long csnMin, long maxDuration)`.
 
-### 3.4 Justification
+### 3.4 Generic Card API
 
-Une attaque relai introduit un délai significatif et systématique sur les échanges APDU ; surveiller ce délai au niveau du lecteur (Card API) et au niveau de la session Calypso (Calypso Card API) permet de couvrir aussi bien la lutte au coup-par-coup que la lutte au niveau du protocole transactionnel sécurisé.
+- **`CardTransactionManager.prepareCommand(byte[] apdu, int idCommand, long maxDuration)`** — surcharge avec borne de durée explicite. La sémantique de `maxDuration` est identique à celle de `ApduRequestSpi.getApduExchangeMaxDuration()` côté Card API (cf. §3.2) : durée maximale tolérée en millisecondes pour cet échange APDU spécifique. Le `idCommand` (cf. Thème 7) permet d'identifier précisément la commande dont la durée a été dépassée si une exception est levée.
+
+> La Generic Card API expose ainsi la contre-mesure relai **au niveau de chaque commande individuelle** plutôt qu'au niveau d'une session : c'est cohérent avec son modèle d'usage (séquences d'APDU sans transaction sécurisée explicite).
+
+### 3.5 Justification
+
+Une attaque relai introduit un délai significatif et systématique sur les échanges APDU ; surveiller ce délai au niveau du lecteur (Card API), au niveau de la session Calypso (Calypso Card API) et au niveau de chaque commande générique (Generic Card API) permet de couvrir l'ensemble des scénarios d'usage des APIs Terminal.
 
 ---
 
@@ -343,6 +387,15 @@ Conséquence sur les signatures :
 - **Supprimée** : `ChannelControl` (énumération) — cf. Thème 1.
 - **Supprimée** : `CardTransactionManager.processCommands(ChannelControl)`, remplacée par `processCommands()` sans paramètre.
 
+#### Simplifications de la hiérarchie des gestionnaires de transactions
+
+- `CardTransactionManager` **n'est plus générique** (`<T extends CardTransactionManager<T>>` disparaît). La méthode `processCommands()` retourne désormais `void` au lieu de `T`. Conséquence : le chaînage fluide (`mgr.prepareXxx().prepareYyy().processCommands()`) n'est plus pris en charge au niveau racine ; il reste possible au niveau des sous-types (Calypso, Generic Card) qui le réintroduisent par leur propre signature de retour. Ce choix simplifie la hiérarchie tout en préservant les usages courants.
+- **Nouvelle interface** `IsoCardTransactionManager extends CardTransactionManager` introduite comme point d'ancrage commun pour toutes les cartes ISO 7816-4 (Calypso, Generic Card, etc.) — cf. Thème 1 §2.2 pour le détail.
+
+#### Suppression d'exceptions devenues obsolètes
+
+- **Supprimée** : `ReaderProtocolNotSupportedException` — disparait avec le retrait de `ConfigurableCardReader.activateProtocol(...)`. Cette exception n'a plus de point de levée valide dans la 3.0.0.
+
 #### Disparitions liées à la configuration de protocole par chaînes libres
 
 Ces évolutions sont **détaillées au Thème 6** (cf. §7) et listées ici à titre récapitulatif :
@@ -370,7 +423,61 @@ Ces évolutions sont **détaillées au Thème 6** (cf. §7) et listées ici à t
 
 #### Cohérence avec les renommages Reader API
 
-- L'interface `CardTransactionManager` (Reader API) reste référencée par stéréotype sur `TransactionManager` (Calypso) ; la nouvelle interface multicanal `MultichannelCardTransactionManager` est elle aussi référencée par stéréotype sur le nouveau `MultichannelTransactionManager` Calypso. Les renommages internes à la Reader API se propagent ainsi par stéréotype dans le diagramme Calypso, sans nécessiter de modification supplémentaire côté Calypso Card API.
+- Le `TransactionManager` Calypso voit son stéréotype évoluer de `<<CardTransactionManager>>` vers `<<IsoCardTransactionManager>>` (Reader API), reflétant l'ancrage des cartes Calypso au standard ISO 7816-4 et donnant accès au transtypage multicanal `asMultichannelCardTransactionManager()` (cf. Thème 1).
+
+### 6.4 Legacy SAM API (Terminal Calypso Crypto Legacy SAM API)
+
+#### Suppressions
+
+- `TransactionManager.processCommands()` — méthode retirée. Le gestionnaire de transactions Legacy SAM se conforme désormais à la nouvelle interface `CardTransactionManager` (Reader API) non générique, où `processCommands()` est défini une seule fois au niveau racine.
+- `TransactionManager` **n'est plus générique** (`<T extends TransactionManager<T>>` disparaît), par cohérence avec la refonte de `CardTransactionManager` côté Reader API.
+- Exceptions retirées :
+  - `UnexpectedCommandStatusException` ;
+  - `ReaderIOException` (communication lecteur SAM) ;
+  - `SamIOException` (communication SAM).
+
+  Justification : ces trois exceptions doublonnaient des exceptions du niveau Reader API (`InvalidCardResponseException`, `ReaderCommunicationException`, `CardCommunicationException`) qui sont propagées naturellement. Cohérence avec la suppression équivalente côté Calypso Card API (cf. §6.3).
+
+### 6.5 Generic Card API
+
+#### Renommages de méthodes
+
+| Avant (1.x) | Après (2.0.0) | Justification |
+|---|---|---|
+| `CardTransactionManager.prepareApdu(String apduCommand)` | `prepareCommand(byte[] apdu)` | Nom plus court et orienté « commande » plutôt qu'« APDU » (terme déjà clair dans le contexte). Un seul type d'entrée (`byte[]`) au lieu de trois surcharges (String, byte[], champs CLA/INS/P1/P2/data/Le) — la conversion depuis String se fait côté application. |
+| `prepareApdu(byte[] apduCommand)` | `prepareCommand(byte[] apdu)` | (idem ci-dessus) |
+| `prepareApdu(byte cla, byte ins, byte p1, byte p2, byte[] dataIn, Byte le)` | *(supprimée)* | La construction d'APDU par champs est laissée à l'application. |
+| `getResponsesAsByteArrays() : List<byte[]>` | `getLastExecutionResponses() : List<byte[]>` | Le nouveau nom précise la **portée temporelle** (les réponses de la dernière exécution) et lève l'ambiguïté avec d'éventuelles exécutions antérieures. La représentation hexadécimale est laissée à l'application si elle en a besoin. |
+| `getResponsesAsHexStrings() : List<String>` | *(supprimée)* | (idem ci-dessus) |
+
+#### Nouvelles méthodes (en lien avec les Thèmes 2 et 7)
+
+- `prepareCommand(byte[] apdu, int idCommand)` — surcharge avec identifiant de commande (cf. Thème 7).
+- `prepareCommand(byte[] apdu, int idCommand, long maxDuration)` — surcharge avec identifiant **et** borne de durée pour la contre-mesure relai (cf. Thème 2, §3.4).
+- `getLastExecutionResponse(int idCommand) : byte[]` — accès ciblé à la réponse d'une commande spécifique par son `idCommand`.
+
+#### Cohérence avec les renommages Reader API
+
+- Le `CardTransactionManager` Generic Card voit son stéréotype évoluer de `<<CardTransactionManager>>` vers `<<IsoCardTransactionManager>>` (Reader API), donnant accès au transtypage multicanal `asMultichannelCardTransactionManager()` (cf. Thème 1).
+
+### 6.6 Storage Card API
+
+#### Renommages historiques achevés
+
+Les méthodes suivantes, qui avaient été dépréciées dans une version antérieure de la Storage Card API au profit de leurs équivalents préfixés `St25`, sont **définitivement supprimées** en 2.0.0 :
+
+| Supprimée | Subsistante |
+|---|---|
+| `StorageCardTransactionManager.prepareReadSystemBlock()` | `prepareSt25ReadSystemBlock()` |
+| `StorageCardTransactionManager.prepareWriteSystemBlock(byte[] data)` | `prepareSt25WriteSystemBlock(byte[] data)` |
+
+Le préfixe `St25` reflète la nature **produit-spécifique** de ces opérations (notion « System Block » propre aux cartes ST25/SRT512). La suppression des noms génériques évite tout risque de confusion avec d'éventuelles notions analogues sur d'autres familles de cartes de stockage.
+
+#### Nouvelles méthodes (en lien avec le Thème 7)
+
+- `prepareWriteBlocks(int fromBlockAddress, byte[] data, int idCommand)` — surcharge avec identifiant de commande.
+- `prepareSt25WriteSystemBlock(byte[] data, int idCommand)` — surcharge avec identifiant de commande.
+- `StorageCardException.getIdCommand() : Integer` — nouvelle méthode permettant à l'application de récupérer l'identifiant de la commande responsable de l'exception (cf. Thème 7).
 
 ---
 
@@ -522,7 +629,42 @@ Ce placement homogénéise la surface d'API : `CardSelectionResult` est le point
 
 ---
 
-## 8. Procédure de migration
+## 8. Thème 7 — Identification des commandes (`idCommand`)
+
+### 8.1 Motivation
+
+Les APIs Generic Card et Storage Card permettent de **préparer plusieurs commandes** avant de les exécuter en bloc. En 1.x, lorsqu'une exception était levée pendant l'exécution, l'application n'avait pas de moyen direct d'identifier **quelle commande précise** dans la séquence avait posé problème, ni d'accéder à la réponse d'une commande spécifique dans la liste des réponses (récupérée dans son ordre d'origine, sans clé).
+
+La 2.0.0 de ces deux APIs introduit un mécanisme léger de **traçabilité des commandes** basé sur un identifiant entier (`int idCommand`) fourni par l'application au moment de la préparation et retrouvable :
+
+- dans les **réponses** : `getLastExecutionResponse(int idCommand) : byte[]` ;
+- dans les **exceptions** : `StorageCardException.getIdCommand() : Integer`.
+
+### 8.2 Generic Card API
+
+- **Nouvelles surcharges** de `prepareCommand(...)` portant l'identifiant :
+  - `prepareCommand(byte[] apdu, int idCommand)` ;
+  - `prepareCommand(byte[] apdu, int idCommand, long maxDuration)` (combiné avec la contre-mesure relai, cf. Thème 2).
+- **Nouvelle méthode d'accès ciblé** : `getLastExecutionResponse(int idCommand) : byte[]` — retourne la réponse de la commande identifiée par `idCommand`, ou `null` si aucune correspondance.
+- La méthode existante `getLastExecutionResponses() : List<byte[]>` reste disponible pour l'accès séquentiel à toutes les réponses (sans filtrage).
+
+### 8.3 Storage Card API
+
+- **Nouvelles surcharges** des méthodes d'écriture portant l'identifiant :
+  - `prepareWriteBlocks(int fromBlockAddress, byte[] data, int idCommand)` ;
+  - `prepareSt25WriteSystemBlock(byte[] data, int idCommand)`.
+- **Nouvelle méthode** : `StorageCardException.getIdCommand() : Integer` — retourne l'identifiant de la commande responsable de l'exception, ou `null` si l'exception n'est pas rattachable à une commande spécifique.
+
+### 8.4 Justification
+
+- **Sémantique applicative** : l'`idCommand` est un identifiant **fourni par l'application** (et donc significatif pour elle), non un index implicite imposé par le framework. Cela permet à l'application d'utiliser des identifiants alignés sur sa propre logique métier (numéro d'étape, identifiant d'opération, etc.).
+- **Coût d'API minimal** : un simple `int` ajouté en surcharge ; aucune nouvelle interface, aucun objet wrapper. Les méthodes sans `idCommand` restent disponibles pour les usages simples qui n'ont pas besoin de traçabilité.
+- **Combinaison naturelle** : sur Generic Card, la surcharge à trois paramètres (`apdu`, `idCommand`, `maxDuration`) compose proprement le Thème 2 (relai) et le Thème 7 (traçabilité) sur le même point d'entrée.
+- **Cohérence inter-APIs** : le même pattern (identifiant entier optionnel, accesseur dédié) est appliqué uniformément sur Generic Card et Storage Card, ce qui rend la notion immédiatement transférable d'une API à l'autre pour un intégrateur.
+
+---
+
+## 9. Procédure de migration
 
 La migration du code applicatif depuis les versions 1.x ou 2.x vers la 3.0.0 fera l'objet d'un **guide technique de migration dédié**, publié séparément après validation de la 3.0.0 par le TC Terminal et après alignement des implémentations Java Keypop associées.
 
@@ -530,13 +672,13 @@ Ce guide aura pour objectif de **simplifier autant que possible la transition** 
 
 ---
 
-## 9. Suite et validation par le TC Terminal
+## 10. Suite et validation par le TC Terminal
 
-### 9.1 Périmètre soumis à validation
+### 10.1 Périmètre soumis à validation
 
 Le présent document soumet à la validation du **TC Terminal de la CNA** les éléments suivants :
 
-1. **Le principe** des six thèmes d'évolution exposés (§2 à §7) et la cohérence d'ensemble du chantier 3.0.0.
+1. **Le principe** des sept thèmes d'évolution exposés (§2 à §8) et la cohérence d'ensemble du chantier (versions 3.0.0 pour Reader / Card / Calypso Card, 1.0.0 pour Definitions, 2.0.0 pour Legacy SAM / Generic Card / Storage Card).
 2. **Les choix de conception** documentés dans les sections « Justification » de chaque thème — en particulier :
    - le modèle multicanal explicite reposant sur la `SmartCard(Spi)` comme cible nommée (§2.5) ;
    - le bornage de durée porté à la fois au niveau APDU et au niveau session Calypso, avec un filtrage par seuil `csnMin` (§3.4) ;
@@ -545,28 +687,32 @@ Le présent document soumet à la validation du **TC Terminal de la CNA** les é
    - l'extraction de `RfTechnology` et `CardType` dans une **nouvelle API socle** (`Terminal Definitions API`) (§7.2, §7.6) ;
    - le **modèle builder `CardDetectionSettings`** pour la paramétrisation de la détection (§7.4) ;
    - le **filtre `CardSelector.filterByCardType`** comme critère unique de filtrage typé à la sélection (§7.3) ;
-   - l'**exposition du `CardType` détecté sur `CardSelectionResult`** (§7.5).
-3. **Le contenu détaillé** des diagrammes UML `3.0.0-SNAPSHOT` des trois APIs existantes (`Reader`, `Card`, `Calypso Card`) et `1.0.0-SNAPSHOT` du nouveau dépôt UML `calypsonet-terminal-definitions-uml-api`, qui matérialisent ces choix — **accessibles directement** via les liens fournis dans la section [Diagrammes UML de référence](#diagrammes-uml-de-référence) en tête de document, sous deux formes : version finale et version avec diff 2.x → 3.0.0.
-4. **L'introduction** de la nouvelle API socle (dépôt UML créé, module Java `keypop-definitions-jvm-api` à créer).
-5. **Le principe** d'une procédure de migration dédiée fournie ultérieurement aux intégrateurs (cf. §8).
+   - l'**exposition du `CardType` détecté sur `CardSelectionResult`** (§7.5) ;
+   - la **hiérarchie à trois niveaux** `CardTransactionManager` / `IsoCardTransactionManager` / `MultichannelCardTransactionManager` (Reader API), avec transtypage à la demande pour les cartes ISO 7816-4 optionnellement multicanal (Calypso, Generic Card) et stéréotypage direct sur le multicanal pour les cartes intrinsèquement multicanal (future OpenSAM) (§2.2, §2.6) ;
+   - le **modèle d'identification des commandes** par `idCommand` sur Generic Card et Storage Card (§8).
+3. **Le contenu détaillé** des sept diagrammes UML (`3.0.0-SNAPSHOT` pour Reader, Card et Calypso Card ; `1.0.0-SNAPSHOT` pour Definitions ; `2.0.0-SNAPSHOT` pour Legacy SAM, Generic Card et Storage Card), qui matérialisent ces choix — **accessibles directement** via les liens fournis dans la section [Diagrammes UML de référence](#diagrammes-uml-de-référence) en tête de document, sous deux formes : version finale et version avec diff par rapport à la version antérieure.
+4. **L'introduction** de la nouvelle API socle Definitions (dépôt UML créé, module Java `keypop-definitions-jvm-api` à créer).
+5. **L'alignement** des trois APIs adjacentes (Legacy SAM 2.0.0, Generic Card 2.0.0, Storage Card 2.0.0) sur le nouveau socle Reader API 3.0.0.
+6. **Le principe** d'une procédure de migration dédiée fournie ultérieurement aux intégrateurs (cf. §9).
 
-### 9.2 Points d'attention pour la revue
+### 10.2 Points d'attention pour la revue
 
 Quelques points pour lesquels une attention particulière du TC est sollicitée :
 
 - la **stabilité du contenu initial** des énumérations `RfTechnology` et `CardType` (§7.2) — l'ajout futur de valeurs sera rétro-compatible, mais le retrait d'une valeur ne le serait pas ; en particulier, le choix de représenter ISO 14443-4 par une seule valeur `ISO_14443_4` sans distinction A/B (cf. §7.2, note sur `CardType`) mérite une confirmation explicite du TC ;
 - l'opportunité de la **suppression intégrale** de `ConfigurableCardReader` sans phase de dépréciation transitoire (§7.3), justifiée par le contexte de version majeure ;
 - la **sémantique du `csnMin`** comme seuil sur le CSN pour les bornes de durée (§3.3) — ce mécanisme doit pouvoir être exploité par tous les profils de déploiement Calypso ciblés ;
-- le **contrat de cycle de vie des `SmartCard`** mémorisées par le `CardReader` (§2.3.2), qui est documenté en Javadoc côté implémentation mais n'apparaît pas dans le diagramme UML ; le TC est invité à confirmer que cette description en prose suffit, ou à demander une formalisation supplémentaire.
+- le **contrat de cycle de vie des `SmartCard`** mémorisées par le `CardReader` (§2.3.2), qui est documenté en Javadoc côté implémentation mais n'apparaît pas dans le diagramme UML ; le TC est invité à confirmer que cette description en prose suffit, ou à demander une formalisation supplémentaire ;
+- la **gradation à trois niveaux** des gestionnaires de transactions (§2.2) — le TC est invité à confirmer que la séparation entre cartes ISO 7816-4 « optionnellement multicanal » (qui stéréotypent `IsoCardTransactionManager` et utilisent le transtypage à la demande) et cartes « intrinsèquement multicanal » (qui stéréotypent directement `MultichannelCardTransactionManager`, à l'image de la future Terminal OpenSAM API) couvre bien tous les profils de cartes anticipés.
 
-### 9.3 Étapes suivantes
+### 10.3 Étapes suivantes
 
-Une fois la version 3.0.0 validée par le TC Terminal :
+Une fois les versions validées par le TC Terminal :
 
-1. **Finalisation des diagrammes UML** : retrait des éléments barrés (`<s>`) et des éléments en gris (`<color:grey>`) qui ne sont pas retenus, génération des SVG définitifs, passage des dépôts de `3.0.0-SNAPSHOT` à `3.0.0` (et de `1.0.0-SNAPSHOT` à `1.0.0` pour le dépôt UML `calypsonet-terminal-definitions-uml-api`, déjà créé).
-2. **Création du nouveau module Java** `keypop-definitions-jvm-api` correspondant à la Terminal Definitions API, et **alignement des modules Java Keypop** existants (`keypop-reader-java-api`, `keypop-card-java-api`, `keypop-calypso-card-java-api`) sur la 3.0.0.
-3. **Rédaction et publication du guide technique de migration** à destination de l'intégrateur (cf. §8).
-4. **Communication** de la disponibilité de la 3.0.0 aux intégrateurs et aux groupes de travail CNA concernés.
+1. **Finalisation des diagrammes UML** : retrait des éléments barrés (`<s>`) et des éléments en gris (`<color:grey>`) qui ne sont pas retenus, génération des SVG définitifs, passage des dépôts de leurs versions `…-SNAPSHOT` à leurs versions finales (`3.0.0` pour Reader / Card / Calypso Card, `1.0.0` pour Definitions, `2.0.0` pour Legacy SAM / Generic Card / Storage Card).
+2. **Création du nouveau module Java** `keypop-definitions-jvm-api`, et **alignement des modules Java Keypop** existants (`keypop-reader-java-api`, `keypop-card-java-api`, `keypop-calypso-card-java-api`, `keypop-calypso-crypto-legacysam-java-api`, `keypop-genericcard-java-api`, `keypop-storagecard-java-api`) sur leurs nouvelles versions majeures respectives.
+3. **Rédaction et publication du guide technique de migration** à destination de l'intégrateur (cf. §9).
+4. **Communication** de la disponibilité des nouvelles versions aux intégrateurs et aux groupes de travail CNA concernés.
 
 ---
 
