@@ -269,8 +269,6 @@ IsoCardTransactionManager .right.> MultichannelCardTransactionManager #C_LINK : 
 ' == LAYOUT ==
 
 ReaderApiFactory -[hidden]- ApiProperties
-ApiProperties -[hidden]- ReaderProtocolNotSupportedException
-ReaderProtocolNotSupportedException -[hidden]- ReaderCommunicationException
 ReaderCommunicationException -[hidden]- CardCommunicationException
 CardCommunicationException -[hidden]- InvalidCardResponseException
 DetectionMode -[hidden]- CardTransactionManager
