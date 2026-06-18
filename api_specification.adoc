@@ -314,7 +314,6 @@ The design follows a three-tier hierarchy in the `reader.transaction.spi` packag
 
 The following UML class diagram provides a visual representation of the types and relationships defined by this specification:
 
-
 [plantuml, target="api_class_diagram", format="svg"]
 ----
 include::api_class_diagram.puml[Terminal Reader API class diagram, align=center]
@@ -1392,8 +1391,6 @@ This contract MAY be obtained either:
 == Exceptions
 
 All exception types defined by this specification are unchecked (runtime) and MAY be propagated to the application.
-Each exception MUST expose, at minimum, the two-argument constructor `(message: string, cause: throwable)` and
-the single-argument constructor `(message: string)`.
 
 [[type_CardCommunicationException]]
 === CardCommunicationException
@@ -1505,6 +1502,4 @@ implementation prior to any actual exchange with the card.
 
 Copyright (c) {organization}, https://calypsonet.org.
 
-This specification is distributed under the terms of the *Eclipse Public License -- v 2.0* (EPL-2.0). A copy of the
-license is available in the link:LICENSE[`LICENSE`] file alongside this document and at
-https://www.eclipse.org/legal/epl-2.0/.
+This specification is distributed under the terms of the *Eclipse Public License -- v 2.0* (EPL-2.0). See https://www.eclipse.org/legal/epl-2.0/ for the license text.
