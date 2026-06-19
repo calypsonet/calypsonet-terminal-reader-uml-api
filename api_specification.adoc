@@ -358,7 +358,7 @@ fluent composition. Setters that are not invoked default to the values specified
 | Since       | 3.0.0
 | Description | Sets the detection mode (`REPEATING` or `SINGLE_SHOT`).
 | Parameters  | `detectionMode` -- the desired detection mode. MUST be non-`null`.
-| Returns     | The current instance.
+| Returns     | The current instance (`CardDetectionSettings`), to allow fluent composition.
 | Throws      | `IllegalArgumentException` -- if the provided value is `null`.
 |===
 
@@ -372,7 +372,7 @@ fluent composition. Setters that are not invoked default to the values specified
 
   Not relevant for contact readers; on such readers, this setter MUST be accepted without effect.
 | Parameters  | `rfTechnologies` -- the non-`null`, non-empty set of RF technologies to activate.
-| Returns     | The current instance.
+| Returns     | The current instance (`CardDetectionSettings`), to allow fluent composition.
 | Throws      | `IllegalArgumentException` -- if the provided set is `null` or empty.
 |===
 
@@ -388,7 +388,7 @@ fluent composition. Setters that are not invoked default to the values specified
   Relevant only on readers supporting ECP. If the underlying reader does not support ECP, the provided frame MUST
   be silently ignored and a `WARN`-level message SHOULD be logged.
 | Parameters  | `ecpFrame` -- the non-`null`, non-empty ECP frame.
-| Returns     | The current instance.
+| Returns     | The current instance (`CardDetectionSettings`), to allow fluent composition.
 | Throws      | `IllegalArgumentException` -- if the provided array is `null` or empty.
 |===
 
@@ -1046,7 +1046,7 @@ card MUST NOT be selected if at least one of them rejects it.
   The value `UNKNOWN` MAY be used to explicitly capture cards whose type could not be identified by the
   implementation.
 | Parameters  | `cardType` -- the non-`null` `CardType` to use as filter.
-| Returns     | The current instance, to allow fluent composition.
+| Returns     | The current instance (`T`), to allow fluent composition.
 | Throws      | `IllegalArgumentException` -- if `cardType` is `null`.
 |===
 
@@ -1056,7 +1056,7 @@ card MUST NOT be selected if at least one of them rejects it.
 | Since       | 2.0.0
 | Description | Restricts the selection process to cards whose power-on data, as provided by the reader, matches a specific regular expression.
 | Parameters  | `powerOnDataRegex` -- the regular expression to evaluate against the power-on data.
-| Returns     | The current instance, to allow fluent composition.
+| Returns     | The current instance (`T`), to allow fluent composition.
 | Throws      | `IllegalArgumentException` -- if the provided regular expression is `null`, empty or invalid.
 |===
 
@@ -1083,7 +1083,7 @@ card MUST NOT be selected if at least one of them rejects it.
   as defined by ISO/IEC 7816-4 § 4.2.
   The provided AID MUST be used as a parameter of the *Select Application* ISO card command.
 | Parameters  | `aid` -- the AID, encoded as a 5 to 16 byte array.
-| Returns     | The current instance.
+| Returns     | The current instance (`IsoCardSelector`), to allow fluent composition.
 | Throws      | `IllegalArgumentException` -- if the provided array is `null` or out of range.
 |===
 
@@ -1093,7 +1093,7 @@ card MUST NOT be selected if at least one of them rejects it.
 | Since       | 2.0.0
 | Description | Selects a card application DF by its name. The AID is provided as a hexadecimal string. Semantics are otherwise identical to the byte-array overload.
 | Parameters  | `aid` -- AID encoded as a hexadecimal `string` of 5 to 16 bytes.
-| Returns     | The current instance.
+| Returns     | The current instance (`IsoCardSelector`), to allow fluent composition.
 | Throws      | `IllegalArgumentException` -- if the provided string is `null`, invalid or out of range.
 |===
 
@@ -1103,7 +1103,7 @@ card MUST NOT be selected if at least one of them rejects it.
 | Since       | 2.0.0
 | Description | Sets the file occurrence mode (see ISO/IEC 7816-4). The default value is `FIRST`.
 | Parameters  | `fileOccurrence` -- the navigation option to apply.
-| Returns     | The current instance.
+| Returns     | The current instance (`IsoCardSelector`), to allow fluent composition.
 | Throws      | `IllegalArgumentException` -- if `fileOccurrence` is `null`.
 |===
 
@@ -1113,7 +1113,7 @@ card MUST NOT be selected if at least one of them rejects it.
 | Since       | 2.0.0
 | Description | Sets the file control mode (see ISO/IEC 7816-4). The default value is `FCI`.
 | Parameters  | `fileControlInformation` -- the file control mode to apply.
-| Returns     | The current instance.
+| Returns     | The current instance (`IsoCardSelector`), to allow fluent composition.
 | Throws      | `IllegalArgumentException` -- if `fileControlInformation` is `null`.
 |===
 
