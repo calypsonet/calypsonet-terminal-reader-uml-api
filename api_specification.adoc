@@ -500,7 +500,7 @@ both the <<type_CardDetectionSettings,`CardDetectionSettings`>> that govern the 
 [cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `endCardProcessing() -> void`
-| Since       | 1.0.0
+| Since       | 3.0.0
 | Description
 | Notifies the reader that the *business processing* of the current card has been completed. Upon receiving this
   notification, the reader MUST:
@@ -658,7 +658,7 @@ Nested inside <<type_CardReaderEvent,`CardReaderEvent`>>. Possible card reader e
 | `CARD_INSERTED`        | 1.0.0 | A card has been inserted, with or without a specific selection.
 | `CARD_MATCHED`         | 1.0.0 | A card has been inserted that matches the selection criteria.
 | `CARD_REMOVED`         | 1.0.0 | The card has been removed from the reader.
-| `READER_UNREGISTERED`  | 1.0.0 | The reader has been unregistered and is no longer usable.
+| `READER_UNREGISTERED`  | 3.0.0 | The reader has been unregistered and is no longer usable.
 |===
 
 // -----------------------------------------------------------------------------
@@ -1303,7 +1303,7 @@ minimise network exchanges, which is especially valuable in distributed architec
 [cols="1h,4", grid=rows, frame=all]
 |===
 | Signature   | `processCommands() -> void`
-| Since       | 2.1.0
+| Since       | 3.0.0
 | Description
 | Processes all previously prepared commands.
 
