@@ -329,196 +329,6 @@ include::api_class_diagram.puml[Terminal Reader API class diagram, align=center]
 The `reader` package defines the entry points of the API and the abstractions used to manipulate readers and the
 events they produce.
 
-[[type_ReaderApiProperties]]
-==== ReaderApiProperties
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Kind     | Final class
-| Package  | `reader`
-| Since    | 1.0.0
-| Purpose  | Exposes the immutable properties of the {spec-name}.
-|===
-
-===== Constants
-
-[cols="1,1,1,4", options="header"]
-|===
-| Name      | Type     | Since | Description
-
-| `VERSION`
-| `string`
-| 1.0.0
-| String representation of the version of the API implemented by the conforming binding (e.g. `"3.0"`).
-  The value MUST be a dotted decimal of the form `MAJOR.MINOR`.
-|===
-
-[NOTE]
-====
-The `ReaderApiProperties` type MUST NOT be instantiated. Implementations MUST prevent external construction.
-====
-
-[[type_ReaderApiFactory]]
-==== ReaderApiFactory
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Kind     | Interface
-| Package  | `reader`
-| Since    | 2.0.0
-| Purpose  | Factory used by the application to obtain instances of the public types provided by the API.
-|===
-
-The `ReaderApiFactory` is the *only* normative entry point through which the application is allowed to instantiate
-the public types of the API. Implementations MUST expose exactly one instance of this factory and MUST guarantee
-that every invocation returns a fresh, fully initialised object.
-
-===== Operations
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Signature   | `createCardSelectionManager() -> CardSelectionManager`
-| Since       | 2.0.0
-| Description | Returns a new, freshly initialised <<type_CardSelectionManager,`CardSelectionManager`>>.
-| Returns     | A non-`null` <<type_CardSelectionManager,`CardSelectionManager`>>.
-| Throws      | None.
-|===
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Signature   | `createBasicCardSelector() -> BasicCardSelector`
-| Since       | 2.0.0
-| Description | Returns a new, freshly initialised <<type_BasicCardSelector,`BasicCardSelector`>>.
-| Returns     | A non-`null` <<type_BasicCardSelector,`BasicCardSelector`>>.
-| Throws      | None.
-|===
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Signature   | `createIsoCardSelector() -> IsoCardSelector`
-| Since       | 2.0.0
-| Description | Returns a new, freshly initialised <<type_IsoCardSelector,`IsoCardSelector`>>.
-| Returns     | A non-`null` <<type_IsoCardSelector,`IsoCardSelector`>>.
-| Throws      | None.
-|===
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Signature   | `createCardDetectionSettings() -> CardDetectionSettings`
-| Since       | 3.0.0
-| Description | Returns a new, freshly initialised <<type_CardDetectionSettings,`CardDetectionSettings`>>.
-| Returns     | A non-`null` <<type_CardDetectionSettings,`CardDetectionSettings`>>.
-| Throws      | None.
-|===
-
-[[type_CardReader]]
-==== CardReader
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Kind     | Interface
-| Package  | `reader`
-| Since    | 1.0.0
-| Purpose  | Represents a card reader capable of driving the underlying hardware to manage card detection.
-|===
-
-===== Operations
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Signature   | `getName() -> string`
-| Since       | 1.0.0
-| Description | Returns the name of the reader.
-| Returns     | A non-empty `string` identifying the reader. The value MUST be stable for the lifetime of the reader instance.
-| Throws      | None.
-|===
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Signature   | `isContactless() -> boolean`
-| Since       | 1.0.0
-| Description | Indicates whether the card communication mode is contactless.
-| Returns     | `true` if the communication mode is contactless, `false` otherwise.
-| Throws      | None.
-|===
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Signature   | `isCardPresent() -> boolean`
-| Since       | 1.0.0
-| Description | Indicates whether a card is currently present in the reader.
-| Returns     | `true` if a card is inserted in the reader, `false` otherwise.
-| Throws      | `ReaderCommunicationException` -- if the communication with the reader has failed.
-|===
-
-[[type_ObservableCardReader]]
-==== ObservableCardReader
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Kind         | Interface
-| Package      | `reader`
-| Extends      | <<type_CardReader,`CardReader`>>
-| Since        | 1.0.0
-| Purpose      | A `CardReader` capable of observing the insertion and removal of cards.
-|===
-
-The observation contract is co-located with the start of detection: a single call to `startCardDetection` provides
-both the <<type_CardDetectionSettings,`CardDetectionSettings`>> that govern the polling behaviour and the
-<<type_CardReaderEventHandler,`CardReaderEventHandler`>> that receives the resulting events.
-
-===== Operations
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Signature
-| `startCardDetection(settings: CardDetectionSettings, eventHandler: CardReaderEventHandler) -> void`
-| Since       | 3.0.0
-| Description
-| Activates card detection. Once activated, the application is notified of card events through the registered
-  <<type_CardReaderEventHandler,`CardReaderEventHandler`>>. The
-  <<type_CardDetectionSettings,`CardDetectionSettings`>> configure the detection mode, the targeted RF technologies
-  and, when applicable, the ECP frame to emit at polling startup.
-
-  Parameters carried by `CardDetectionSettings` that are not supported by the underlying reader (for example an
-  unsupported `RfTechnology`, or an ECP frame on a reader that does not support ECP) MUST be silently ignored.
-  The implementation SHOULD log a `WARN`-level message in such cases. No exception is thrown.
-| Parameters
-| `settings`     -- the detection configuration. MUST be non-`null`. +
-  `eventHandler` -- the application-side handler that receives reader events and errors. MUST be non-`null`.
-| Throws        | `IllegalArgumentException` -- if any parameter is `null`.
-|===
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Signature   | `stopCardDetection() -> void`
-| Since       | 1.0.0
-| Description | Stops card detection. After this operation has returned, the registered event handler MUST NOT receive card events until detection is restarted.
-| Throws      | None.
-|===
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Signature   | `endCardProcessing() -> void`
-| Since       | 3.0.0
-| Description
-| Notifies the reader that the *business processing* of the current card has been completed. Upon receiving this
-  notification, the reader MUST:
-
-  - perform the *DESELECT* sequence on the card (when applicable to the underlying technology) so that the card
-    is brought to a clean idle state, and
-  - transition to the *waiting-for-card-removal* phase, during which the observation cycle waits for the card to
-    leave the reader's field before becoming able to detect a new card.
-
-  In addition, the reader MUST release the references to the <<type_SmartCard,`SmartCard`>> instances held
-  following the last selection (see <<sec_smartcard_lifecycle>>).
-
-  This operation MUST be idempotent: calling it twice on the same card processing cycle MUST be a no-op after the
-  first call. It is RECOMMENDED to invoke `endCardProcessing` systematically (e.g. inside a `finally` block) at
-  the end of a card processing whatever the outcome.
-| Throws      | None.
-|===
-
 [[type_CardDetectionSettings]]
 ==== CardDetectionSettings
 
@@ -596,6 +406,46 @@ processing cycle has terminated. _Since 3.0.0._
 | `SINGLE_SHOT`  | 3.0.0 | The reader stops detection and waits for an explicit restart signal.
 |===
 
+[[type_CardReader]]
+==== CardReader
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Kind     | Interface
+| Package  | `reader`
+| Since    | 1.0.0
+| Purpose  | Represents a card reader capable of driving the underlying hardware to manage card detection.
+|===
+
+===== Operations
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature   | `getName() -> string`
+| Since       | 1.0.0
+| Description | Returns the name of the reader.
+| Returns     | A non-empty `string` identifying the reader. The value MUST be stable for the lifetime of the reader instance.
+| Throws      | None.
+|===
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature   | `isContactless() -> boolean`
+| Since       | 1.0.0
+| Description | Indicates whether the card communication mode is contactless.
+| Returns     | `true` if the communication mode is contactless, `false` otherwise.
+| Throws      | None.
+|===
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature   | `isCardPresent() -> boolean`
+| Since       | 1.0.0
+| Description | Indicates whether a card is currently present in the reader.
+| Returns     | `true` if a card is inserted in the reader, `false` otherwise.
+| Throws      | `ReaderCommunicationException` -- if the communication with the reader has failed.
+|===
+
 [[type_CardReaderEvent]]
 ==== CardReaderEvent
 
@@ -662,6 +512,156 @@ Nested inside <<type_CardReaderEvent,`CardReaderEvent`>>. Possible card reader e
 |===
 
 // -----------------------------------------------------------------------------
+[[type_ObservableCardReader]]
+==== ObservableCardReader
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Kind         | Interface
+| Package      | `reader`
+| Extends      | <<type_CardReader,`CardReader`>>
+| Since        | 1.0.0
+| Purpose      | A `CardReader` capable of observing the insertion and removal of cards.
+|===
+
+The observation contract is co-located with the start of detection: a single call to `startCardDetection` provides
+both the <<type_CardDetectionSettings,`CardDetectionSettings`>> that govern the polling behaviour and the
+<<type_CardReaderEventHandler,`CardReaderEventHandler`>> that receives the resulting events.
+
+===== Operations
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature
+| `startCardDetection(settings: CardDetectionSettings, eventHandler: CardReaderEventHandler) -> void`
+| Since       | 3.0.0
+| Description
+| Activates card detection. Once activated, the application is notified of card events through the registered
+  <<type_CardReaderEventHandler,`CardReaderEventHandler`>>. The
+  <<type_CardDetectionSettings,`CardDetectionSettings`>> configure the detection mode, the targeted RF technologies
+  and, when applicable, the ECP frame to emit at polling startup.
+
+  Parameters carried by `CardDetectionSettings` that are not supported by the underlying reader (for example an
+  unsupported `RfTechnology`, or an ECP frame on a reader that does not support ECP) MUST be silently ignored.
+  The implementation SHOULD log a `WARN`-level message in such cases. No exception is thrown.
+| Parameters
+| `settings`     -- the detection configuration. MUST be non-`null`. +
+  `eventHandler` -- the application-side handler that receives reader events and errors. MUST be non-`null`.
+| Throws        | `IllegalArgumentException` -- if any parameter is `null`.
+|===
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature   | `stopCardDetection() -> void`
+| Since       | 1.0.0
+| Description | Stops card detection. After this operation has returned, the registered event handler MUST NOT receive card events until detection is restarted.
+| Throws      | None.
+|===
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature   | `endCardProcessing() -> void`
+| Since       | 3.0.0
+| Description
+| Notifies the reader that the *business processing* of the current card has been completed. Upon receiving this
+  notification, the reader MUST:
+
+  - perform the *DESELECT* sequence on the card (when applicable to the underlying technology) so that the card
+    is brought to a clean idle state, and
+  - transition to the *waiting-for-card-removal* phase, during which the observation cycle waits for the card to
+    leave the reader's field before becoming able to detect a new card.
+
+  In addition, the reader MUST release the references to the <<type_SmartCard,`SmartCard`>> instances held
+  following the last selection (see <<sec_smartcard_lifecycle>>).
+
+  This operation MUST be idempotent: calling it twice on the same card processing cycle MUST be a no-op after the
+  first call. It is RECOMMENDED to invoke `endCardProcessing` systematically (e.g. inside a `finally` block) at
+  the end of a card processing whatever the outcome.
+| Throws      | None.
+|===
+
+[[type_ReaderApiFactory]]
+==== ReaderApiFactory
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Kind     | Interface
+| Package  | `reader`
+| Since    | 2.0.0
+| Purpose  | Factory used by the application to obtain instances of the public types provided by the API.
+|===
+
+The `ReaderApiFactory` is the *only* normative entry point through which the application is allowed to instantiate
+the public types of the API. Implementations MUST expose exactly one instance of this factory and MUST guarantee
+that every invocation returns a fresh, fully initialised object.
+
+===== Operations
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature   | `createCardSelectionManager() -> CardSelectionManager`
+| Since       | 2.0.0
+| Description | Returns a new, freshly initialised <<type_CardSelectionManager,`CardSelectionManager`>>.
+| Returns     | A non-`null` <<type_CardSelectionManager,`CardSelectionManager`>>.
+| Throws      | None.
+|===
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature   | `createBasicCardSelector() -> BasicCardSelector`
+| Since       | 2.0.0
+| Description | Returns a new, freshly initialised <<type_BasicCardSelector,`BasicCardSelector`>>.
+| Returns     | A non-`null` <<type_BasicCardSelector,`BasicCardSelector`>>.
+| Throws      | None.
+|===
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature   | `createIsoCardSelector() -> IsoCardSelector`
+| Since       | 2.0.0
+| Description | Returns a new, freshly initialised <<type_IsoCardSelector,`IsoCardSelector`>>.
+| Returns     | A non-`null` <<type_IsoCardSelector,`IsoCardSelector`>>.
+| Throws      | None.
+|===
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature   | `createCardDetectionSettings() -> CardDetectionSettings`
+| Since       | 3.0.0
+| Description | Returns a new, freshly initialised <<type_CardDetectionSettings,`CardDetectionSettings`>>.
+| Returns     | A non-`null` <<type_CardDetectionSettings,`CardDetectionSettings`>>.
+| Throws      | None.
+|===
+
+[[type_ReaderApiProperties]]
+==== ReaderApiProperties
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Kind     | Final class
+| Package  | `reader`
+| Since    | 1.0.0
+| Purpose  | Exposes the immutable properties of the {spec-name}.
+|===
+
+===== Constants
+
+[cols="1,1,1,4", options="header"]
+|===
+| Name      | Type     | Since | Description
+
+| `VERSION`
+| `string`
+| 1.0.0
+| String representation of the version of the API implemented by the conforming binding (e.g. `"3.0"`).
+  The value MUST be a dotted decimal of the form `MAJOR.MINOR`.
+|===
+
+[NOTE]
+====
+The `ReaderApiProperties` type MUST NOT be instantiated. Implementations MUST prevent external construction.
+====
+
 === Package reader.spi
 
 The `reader.spi` package gathers the contracts that are implemented by the *application* (as opposed to the reader
@@ -717,49 +717,6 @@ The `reader.selection` package describes the orchestration of card selection sce
 <<type_CardSelectionManager,`CardSelectionManager`>>, the family of selectors, the policies governing the scenario
 execution and the structures used to expose selection results.
 
-[[type_CardSelector]]
-==== CardSelector&lt;T extends CardSelector&lt;T&gt;&gt;
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Kind     | Interface
-| Package  | `reader.selection`
-| Since    | 2.0.0
-| Purpose  | Base contract for all card selectors. Defines filters used to restrict the selection process to a subset of cards.
-|===
-
-All filters defined by this interface are *optional* and MAY be combined. If no filter is specified, any card that
-responds when inserted in the reader is considered selected. Conversely, if one or more filters are defined, a
-card MUST NOT be selected if at least one of them rejects it.
-
-===== Operations
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Signature   | `filterByCardType(cardType: CardType) -> T`
-| Since       | 3.0.0
-| Description
-| Restricts the selection process to cards whose detected type matches the provided value.
-  The `CardType` enumeration is defined in the Terminal Definitions API (see <<ref_cna_def>>) and characterises the
-  detected card as a combination of transport protocol family and, when applicable, product identity.
-
-  The value `UNKNOWN` MAY be used to explicitly capture cards whose type could not be identified by the
-  implementation.
-| Parameters  | `cardType` -- the non-`null` `CardType` to use as filter.
-| Returns     | The current instance, to allow fluent composition.
-| Throws      | `IllegalArgumentException` -- if `cardType` is `null`.
-|===
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Signature   | `filterByPowerOnData(powerOnDataRegex: string) -> T`
-| Since       | 2.0.0
-| Description | Restricts the selection process to cards whose power-on data, as provided by the reader, matches a specific regular expression.
-| Parameters  | `powerOnDataRegex` -- the regular expression to evaluate against the power-on data.
-| Returns     | The current instance, to allow fluent composition.
-| Throws      | `IllegalArgumentException` -- if the provided regular expression is `null`, empty or invalid.
-|===
-
 [[type_BasicCardSelector]]
 ==== BasicCardSelector
 
@@ -774,93 +731,6 @@ card MUST NOT be selected if at least one of them rejects it.
 
 `BasicCardSelector` does not add any operation to <<type_CardSelector,`CardSelector`>>. It exists to express the
 absence of ISO/IEC 7816-4-specific filters at the type level.
-
-[[type_IsoCardSelector]]
-==== IsoCardSelector
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Kind     | Interface
-| Package  | `reader.selection`
-| Extends  | `CardSelector<IsoCardSelector>`
-| Since    | 2.0.0
-| Purpose  | ISO/IEC 7816-4 card selector. An instance is obtained via <<type_ReaderApiFactory,`ReaderApiFactory.createIsoCardSelector`>>.
-|===
-
-===== Operations
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Signature   | `filterByDfName(aid: byte array) -> IsoCardSelector`
-| Since       | 2.0.0
-| Description
-| Selects a card application DF by its name. The DF is selected only if its name starts with the provided AID,
-  as defined by ISO/IEC 7816-4 § 4.2.
-  The provided AID MUST be used as a parameter of the *Select Application* ISO card command.
-| Parameters  | `aid` -- the AID, encoded as a 5 to 16 byte array.
-| Returns     | The current instance.
-| Throws      | `IllegalArgumentException` -- if the provided array is `null` or out of range.
-|===
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Signature   | `filterByDfName(aid: string) -> IsoCardSelector`
-| Since       | 2.0.0
-| Description | Selects a card application DF by its name. The AID is provided as a hexadecimal string. Semantics are otherwise identical to the byte-array overload.
-| Parameters  | `aid` -- AID encoded as a hexadecimal `string` of 5 to 16 bytes.
-| Returns     | The current instance.
-| Throws      | `IllegalArgumentException` -- if the provided string is `null`, invalid or out of range.
-|===
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Signature   | `setFileOccurrence(fileOccurrence: FileOccurrence) -> IsoCardSelector`
-| Since       | 2.0.0
-| Description | Sets the file occurrence mode (see ISO/IEC 7816-4). The default value is `FIRST`.
-| Parameters  | `fileOccurrence` -- the navigation option to apply.
-| Returns     | The current instance.
-| Throws      | `IllegalArgumentException` -- if `fileOccurrence` is `null`.
-|===
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Signature   | `setFileControlInformation(fileControlInformation: FileControlInformation) -> IsoCardSelector`
-| Since       | 2.0.0
-| Description | Sets the file control mode (see ISO/IEC 7816-4). The default value is `FCI`.
-| Parameters  | `fileControlInformation` -- the file control mode to apply.
-| Returns     | The current instance.
-| Throws      | `IllegalArgumentException` -- if `fileControlInformation` is `null`.
-|===
-
-[[type_FileOccurrence]]
-===== Enumeration FileOccurrence
-
-Nested inside `IsoCardSelector`. Navigation options through the applications contained on the card according to
-ISO/IEC 7816-4. _Since 2.0.0._
-
-[cols="1,1,4", options="header"]
-|===
-| Value      | Since | Description
-| `FIRST`    | 2.0.0 | First occurrence.
-| `LAST`     | 2.0.0 | Last occurrence.
-| `NEXT`     | 2.0.0 | Next occurrence.
-| `PREVIOUS` | 2.0.0 | Previous occurrence.
-|===
-
-[[type_FileControlInformation]]
-===== Enumeration FileControlInformation
-
-Nested inside `IsoCardSelector`. Types of templates returned in response to the *Select Application* command,
-according to ISO/IEC 7816-4. _Since 2.0.0._
-
-[cols="1,1,4", options="header"]
-|===
-| Value          | Since | Description
-| `FCI`          | 2.0.0 | File Control Information.
-| `FCP`          | 2.0.0 | File Control Parameters.
-| `FMD`          | 2.0.0 | File Management Data.
-| `NO_RESPONSE`  | 2.0.0 | No response expected.
-|===
 
 [[type_CardSelectionManager]]
 ==== CardSelectionManager
@@ -1146,6 +1016,137 @@ to the active selected card. In multi-channel mode, several active selections ma
 | Throws      | None.
 |===
 
+[[type_CardSelector]]
+==== CardSelector
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Kind     | Interface
+| Package  | `reader.selection`
+| Generics | `<T extends CardSelector<T>>`
+| Since    | 2.0.0
+| Purpose  | Base contract for all card selectors. Defines filters used to restrict the selection process to a subset of cards.
+|===
+
+All filters defined by this interface are *optional* and MAY be combined. If no filter is specified, any card that
+responds when inserted in the reader is considered selected. Conversely, if one or more filters are defined, a
+card MUST NOT be selected if at least one of them rejects it.
+
+===== Operations
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature   | `filterByCardType(cardType: CardType) -> T`
+| Since       | 3.0.0
+| Description
+| Restricts the selection process to cards whose detected type matches the provided value.
+  The `CardType` enumeration is defined in the Terminal Definitions API (see <<ref_cna_def>>) and characterises the
+  detected card as a combination of transport protocol family and, when applicable, product identity.
+
+  The value `UNKNOWN` MAY be used to explicitly capture cards whose type could not be identified by the
+  implementation.
+| Parameters  | `cardType` -- the non-`null` `CardType` to use as filter.
+| Returns     | The current instance, to allow fluent composition.
+| Throws      | `IllegalArgumentException` -- if `cardType` is `null`.
+|===
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature   | `filterByPowerOnData(powerOnDataRegex: string) -> T`
+| Since       | 2.0.0
+| Description | Restricts the selection process to cards whose power-on data, as provided by the reader, matches a specific regular expression.
+| Parameters  | `powerOnDataRegex` -- the regular expression to evaluate against the power-on data.
+| Returns     | The current instance, to allow fluent composition.
+| Throws      | `IllegalArgumentException` -- if the provided regular expression is `null`, empty or invalid.
+|===
+
+[[type_IsoCardSelector]]
+==== IsoCardSelector
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Kind     | Interface
+| Package  | `reader.selection`
+| Extends  | `CardSelector<IsoCardSelector>`
+| Since    | 2.0.0
+| Purpose  | ISO/IEC 7816-4 card selector. An instance is obtained via <<type_ReaderApiFactory,`ReaderApiFactory.createIsoCardSelector`>>.
+|===
+
+===== Operations
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature   | `filterByDfName(aid: byte array) -> IsoCardSelector`
+| Since       | 2.0.0
+| Description
+| Selects a card application DF by its name. The DF is selected only if its name starts with the provided AID,
+  as defined by ISO/IEC 7816-4 § 4.2.
+  The provided AID MUST be used as a parameter of the *Select Application* ISO card command.
+| Parameters  | `aid` -- the AID, encoded as a 5 to 16 byte array.
+| Returns     | The current instance.
+| Throws      | `IllegalArgumentException` -- if the provided array is `null` or out of range.
+|===
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature   | `filterByDfName(aid: string) -> IsoCardSelector`
+| Since       | 2.0.0
+| Description | Selects a card application DF by its name. The AID is provided as a hexadecimal string. Semantics are otherwise identical to the byte-array overload.
+| Parameters  | `aid` -- AID encoded as a hexadecimal `string` of 5 to 16 bytes.
+| Returns     | The current instance.
+| Throws      | `IllegalArgumentException` -- if the provided string is `null`, invalid or out of range.
+|===
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature   | `setFileOccurrence(fileOccurrence: FileOccurrence) -> IsoCardSelector`
+| Since       | 2.0.0
+| Description | Sets the file occurrence mode (see ISO/IEC 7816-4). The default value is `FIRST`.
+| Parameters  | `fileOccurrence` -- the navigation option to apply.
+| Returns     | The current instance.
+| Throws      | `IllegalArgumentException` -- if `fileOccurrence` is `null`.
+|===
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature   | `setFileControlInformation(fileControlInformation: FileControlInformation) -> IsoCardSelector`
+| Since       | 2.0.0
+| Description | Sets the file control mode (see ISO/IEC 7816-4). The default value is `FCI`.
+| Parameters  | `fileControlInformation` -- the file control mode to apply.
+| Returns     | The current instance.
+| Throws      | `IllegalArgumentException` -- if `fileControlInformation` is `null`.
+|===
+
+[[type_FileOccurrence]]
+===== Enumeration FileOccurrence
+
+Nested inside `IsoCardSelector`. Navigation options through the applications contained on the card according to
+ISO/IEC 7816-4. _Since 2.0.0._
+
+[cols="1,1,4", options="header"]
+|===
+| Value      | Since | Description
+| `FIRST`    | 2.0.0 | First occurrence.
+| `LAST`     | 2.0.0 | Last occurrence.
+| `NEXT`     | 2.0.0 | Next occurrence.
+| `PREVIOUS` | 2.0.0 | Previous occurrence.
+|===
+
+[[type_FileControlInformation]]
+===== Enumeration FileControlInformation
+
+Nested inside `IsoCardSelector`. Types of templates returned in response to the *Select Application* command,
+according to ISO/IEC 7816-4. _Since 2.0.0._
+
+[cols="1,1,4", options="header"]
+|===
+| Value          | Since | Description
+| `FCI`          | 2.0.0 | File Control Information.
+| `FCP`          | 2.0.0 | File Control Parameters.
+| `FMD`          | 2.0.0 | File Management Data.
+| `NO_RESPONSE`  | 2.0.0 | No response expected.
+|===
+
 [[type_ScheduledCardSelectionsResponse]]
 ==== ScheduledCardSelectionsResponse
 
@@ -1182,6 +1183,46 @@ selection machinery defined above.
 This interface declares no operation at the API level; the contract between the selection manager and the
 extension is defined by the card extension specification consuming this SPI.
 
+[[type_IsoSmartCard]]
+==== IsoSmartCard
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Kind     | Interface (SPI)
+| Package  | `reader.selection.spi`
+| Extends  | <<type_SmartCard,`SmartCard`>>
+| Since    | 2.0.0
+| Purpose  | ISO/IEC 7816-4 smart card whose communication has been established after a successful selection.
+|===
+
+In addition to the inherited power-on data, an `IsoSmartCard` exposes the response to the *Select Application*
+command. Both the power-on data and the *Select Application* response are OPTIONAL but they MUST NOT both be
+absent at the same time.
+
+===== Operations
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature   | `getSelectApplicationResponse() -> byte array`
+| Since       | 1.0.0
+| Description | Returns the data received from the card in response to the *Select Application* command, including the status word.
+| Returns     | The response bytes, or `null` if no *Select Application* command has been performed.
+| Throws      | None.
+|===
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature   | `isBasicChannel() -> boolean`
+| Since       | 3.0.0
+| Description
+| Indicates whether this smart card is attached to the basic channel (channel `0`) of the underlying ISO/IEC 7816-4
+  card, or to an additional logical channel.
+| Returns     | `true` if attached to the basic channel, `false` if attached to an additional logical channel.
+| Throws      | None.
+|===
+
+// -----------------------------------------------------------------------------
+[[sec_pkg_reader_transaction_spi]]
 [[type_SmartCard]]
 ==== SmartCard
 
@@ -1230,46 +1271,6 @@ selection.
 | Throws      | None.
 |===
 
-[[type_IsoSmartCard]]
-==== IsoSmartCard
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Kind     | Interface (SPI)
-| Package  | `reader.selection.spi`
-| Extends  | <<type_SmartCard,`SmartCard`>>
-| Since    | 2.0.0
-| Purpose  | ISO/IEC 7816-4 smart card whose communication has been established after a successful selection.
-|===
-
-In addition to the inherited power-on data, an `IsoSmartCard` exposes the response to the *Select Application*
-command. Both the power-on data and the *Select Application* response are OPTIONAL but they MUST NOT both be
-absent at the same time.
-
-===== Operations
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Signature   | `getSelectApplicationResponse() -> byte array`
-| Since       | 1.0.0
-| Description | Returns the data received from the card in response to the *Select Application* command, including the status word.
-| Returns     | The response bytes, or `null` if no *Select Application* command has been performed.
-| Throws      | None.
-|===
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Signature   | `isBasicChannel() -> boolean`
-| Since       | 3.0.0
-| Description
-| Indicates whether this smart card is attached to the basic channel (channel `0`) of the underlying ISO/IEC 7816-4
-  card, or to an additional logical channel.
-| Returns     | `true` if attached to the basic channel, `false` if attached to an additional logical channel.
-| Throws      | None.
-|===
-
-// -----------------------------------------------------------------------------
-[[sec_pkg_reader_transaction_spi]]
 === Package reader.transaction.spi
 
 The `reader.transaction.spi` package defines the common contract shared by all card transaction managers exposed
