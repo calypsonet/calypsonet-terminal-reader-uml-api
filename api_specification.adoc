@@ -771,8 +771,8 @@ scenario or its result for distributed architectures.
   scenario (`0` for the first case, `1` for the second, etc.) and MUST be used to retrieve the corresponding
   result in the <<type_CardSelectionResult,`CardSelectionResult`>>.
 | Parameters
-| `cardSelector` -- the selector containing the filters to be used. +
-  `cardSelectionExtension` -- the extension used to parse the selection response.
+| `cardSelector` -- the card selector containing the filters to be used to select the card. +
+  `cardSelectionExtension` -- the card selection extension to be used to parse the card selection response.
 | Returns      | A non-negative `integer` -- the index of the appended selection case.
 | Throws       | `IllegalArgumentException` -- if either argument is `null`.
 |===
@@ -791,7 +791,7 @@ scenario or its result for distributed architectures.
 | Signature   | `importCardSelectionScenario(cardSelectionScenario: string) -> integer`
 | Since       | 1.1.0
 | Description | Imports a previously exported scenario. The input MUST have been produced by `exportCardSelectionScenario`.
-| Parameters  | `cardSelectionScenario` -- the previously exported scenario.
+| Parameters  | `cardSelectionScenario` -- the `string` containing the exported card selection scenario.
 | Returns     | The index of the last imported selection in the scenario.
 | Throws      | `IllegalArgumentException` -- if the string is `null` or malformed.
 |===
@@ -859,7 +859,7 @@ scenario or its result for distributed architectures.
 | `parseScheduledCardSelectionsResponse(scheduledCardSelectionsResponse: ScheduledCardSelectionsResponse) -> CardSelectionResult`
 | Since       | 1.0.0
 | Description | Analyses the responses provided by a <<type_CardReaderEvent,`CardReaderEvent`>> following the insertion of a card and the execution of the scheduled selection scenario.
-| Parameters  | `scheduledCardSelectionsResponse` -- the scenario execution response carried by the event.
+| Parameters  | `scheduledCardSelectionsResponse` -- the card selection scenario execution response.
 | Returns     | A non-`null` <<type_CardSelectionResult,`CardSelectionResult`>>.
 | Throws
 | `IllegalArgumentException` -- if the provided response is `null`. +
@@ -895,7 +895,7 @@ scenario or its result for distributed architectures.
   *Prerequisites:* the input MUST have been produced by `exportProcessedCardSelectionScenario`; the local
   environment MUST possess every card extension involved; the current manager MUST first have been configured
   with the same selection scenario as the manager that produced the export.
-| Parameters  | `processedCardSelectionScenario` -- the previously exported processed scenario.
+| Parameters  | `processedCardSelectionScenario` -- the `string` containing the exported processed card selection scenario.
 | Returns     | A non-`null` <<type_CardSelectionResult,`CardSelectionResult`>>.
 | Throws
 | `IllegalArgumentException` -- if the string is `null`, malformed or contains more selection cases than the
@@ -1055,7 +1055,7 @@ card MUST NOT be selected if at least one of them rejects it.
 | Signature   | `filterByPowerOnData(powerOnDataRegex: string) -> T`
 | Since       | 2.0.0
 | Description | Restricts the selection process to cards whose power-on data, as provided by the reader, matches a specific regular expression.
-| Parameters  | `powerOnDataRegex` -- the regular expression to evaluate against the power-on data.
+| Parameters  | `powerOnDataRegex` -- the regular expression to use as filter.
 | Returns     | The current instance (`T`), to allow fluent composition.
 | Throws      | `IllegalArgumentException` -- if the provided regular expression is `null`, empty or invalid.
 |===
@@ -1082,7 +1082,7 @@ card MUST NOT be selected if at least one of them rejects it.
 | Selects a card application DF by its name. The DF is selected only if its name starts with the provided AID,
   as defined by ISO/IEC 7816-4 § 4.2.
   The provided AID MUST be used as a parameter of the *Select Application* ISO card command.
-| Parameters  | `aid` -- the AID, encoded as a 5 to 16 byte array.
+| Parameters  | `aid` -- the AID as a `byte array` containing 5 to 16 bytes.
 | Returns     | The current instance (`IsoCardSelector`), to allow fluent composition.
 | Throws      | `IllegalArgumentException` -- if the provided array is `null` or out of range.
 |===
@@ -1092,7 +1092,7 @@ card MUST NOT be selected if at least one of them rejects it.
 | Signature   | `filterByDfName(aid: string) -> IsoCardSelector`
 | Since       | 2.0.0
 | Description | Selects a card application DF by its name. The AID is provided as a hexadecimal string. Semantics are otherwise identical to the byte-array overload.
-| Parameters  | `aid` -- AID encoded as a hexadecimal `string` of 5 to 16 bytes.
+| Parameters  | `aid` -- the AID as a hexadecimal `string` of 5 to 16 bytes.
 | Returns     | The current instance (`IsoCardSelector`), to allow fluent composition.
 | Throws      | `IllegalArgumentException` -- if the provided string is `null`, invalid or out of range.
 |===
