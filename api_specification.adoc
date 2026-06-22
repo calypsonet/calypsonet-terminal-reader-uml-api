@@ -337,7 +337,7 @@ include::api_class_diagram.puml[Terminal Reader API class diagram, align=center]
 
 // -----------------------------------------------------------------------------
 [[sec_pkg_reader]]
-=== Reader Discovery and Observation (`reader`)
+=== Namespace -- reader
 
 The `reader` package defines the entry points of the API and the abstractions used to manipulate readers and the
 events they produce.
@@ -348,7 +348,7 @@ events they produce.
 [cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface (builder)
-| Package  | `reader`
+| Namespace  | `reader`
 | Since    | 3.0
 | Purpose  | Carries the configuration of a card detection cycle. An instance is obtained via <<type_ReaderApiFactory,`ReaderApiFactory.createCardDetectionSettings`>>.
 |===
@@ -427,7 +427,7 @@ processing cycle has terminated. _Since 3.0._
 [cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface
-| Package  | `reader`
+| Namespace  | `reader`
 | Since    | 1.0
 | Purpose  | Represents a card reader capable of driving the underlying hardware to manage card detection.
 |===
@@ -467,7 +467,7 @@ processing cycle has terminated. _Since 3.0._
 [cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface
-| Package  | `reader`
+| Namespace  | `reader`
 | Since    | 1.0
 | Purpose  | Data container describing a change of state observed by a `CardReader`.
 |===
@@ -601,7 +601,7 @@ both the <<type_CardDetectionSettings,`CardDetectionSettings`>> that govern the 
 [cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface
-| Package  | `reader`
+| Namespace  | `reader`
 | Since    | 2.0
 | Purpose  | Factory used by the application to obtain instances of the public types provided by the API.
 |===
@@ -654,7 +654,7 @@ that every invocation returns a fresh, fully initialised object.
 [cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Final class
-| Package  | `reader`
+| Namespace  | `reader`
 | Since    | 1.0
 | Purpose  | Exposes the immutable properties of the {spec-name}.
 |===
@@ -678,7 +678,7 @@ The `ReaderApiProperties` type MUST NOT be instantiated. Implementations MUST pr
 ====
 
 [[sec_pkg_reader_spi]]
-=== Reader Observer SPI (`reader.spi`)
+=== Namespace -- reader.spi
 
 The `reader.spi` package gathers the contracts that are implemented by the *application* (as opposed to the reader
 implementation) when readers are observed.
@@ -689,7 +689,7 @@ implementation) when readers are observed.
 [cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface (SPI)
-| Package  | `reader.spi`
+| Namespace  | `reader.spi`
 | Since    | 3.0
 | Purpose  | Implemented by the application to receive reader events and observation errors from an <<type_ObservableCardReader,`ObservableCardReader`>>.
 |===
@@ -730,7 +730,7 @@ This SPI unifies the reception of nominal events (`onReaderEvent`) and of fatal 
 
 // -----------------------------------------------------------------------------
 [[sec_pkg_reader_selection]]
-=== Card Selection Scenario (`reader.selection`)
+=== Namespace -- reader.selection
 
 The `reader.selection` package describes the orchestration of card selection scenarios. It introduces the central
 <<type_CardSelectionManager,`CardSelectionManager`>>, the family of selectors, the policies governing the scenario
@@ -742,7 +742,7 @@ execution and the structures used to expose selection results.
 [cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface
-| Package  | `reader.selection`
+| Namespace  | `reader.selection`
 | Extends  | `CardSelector<BasicCardSelector>`
 | Since    | 2.0
 | Purpose  | Basic, technology-agnostic card selector. An instance is obtained via <<type_ReaderApiFactory,`ReaderApiFactory.createBasicCardSelector`>>.
@@ -757,7 +757,7 @@ absence of ISO/IEC 7816-4-specific filters at the type level.
 [cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface
-| Package  | `reader.selection`
+| Namespace  | `reader.selection`
 | Since    | 1.0
 | Purpose  | Service responsible for preparing and executing card selection scenarios. An instance is obtained via <<type_ReaderApiFactory,`ReaderApiFactory.createCardSelectionManager`>>.
 |===
@@ -969,7 +969,7 @@ in a multi-channel selection scenario. _Since 3.0._
 [cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface
-| Package  | `reader.selection`
+| Namespace  | `reader.selection`
 | Since    | 1.0
 | Purpose  | Result of a selection process.
 |===
@@ -1040,7 +1040,7 @@ to the active selected card. In multi-channel mode, several active selections ma
 [cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface
-| Package  | `reader.selection`
+| Namespace  | `reader.selection`
 | Generics | `<T extends CardSelector<T>>`
 | Since    | 2.0
 | Purpose  | Base contract for all card selectors. Defines filters used to restrict the selection process to a subset of cards.
@@ -1085,7 +1085,7 @@ card MUST NOT be selected if at least one of them rejects it.
 [cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface
-| Package  | `reader.selection`
+| Namespace  | `reader.selection`
 | Extends  | `CardSelector<IsoCardSelector>`
 | Since    | 2.0
 | Purpose  | ISO/IEC 7816-4 card selector. An instance is obtained via <<type_ReaderApiFactory,`ReaderApiFactory.createIsoCardSelector`>>.
@@ -1174,7 +1174,7 @@ according to ISO/IEC 7816-4. _Since 2.0._
 [cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface (marker)
-| Package  | `reader.selection`
+| Namespace  | `reader.selection`
 | Since    | 1.0
 | Purpose  | Carrier for the response of the execution of a scheduled selection scenario, provided by a <<type_CardReaderEvent,`CardReaderEvent`>>.
 |===
@@ -1185,7 +1185,7 @@ cases (selection step itself plus any subsequent commands). Its content MUST be 
 
 // -----------------------------------------------------------------------------
 [[sec_pkg_reader_selection_spi]]
-=== Card Selection Extension SPI (`reader.selection.spi`)
+=== Namespace -- reader.selection.spi
 
 The `reader.selection.spi` package gathers the contracts that *card extensions* implement to plug into the
 selection machinery defined above.
@@ -1196,7 +1196,7 @@ selection machinery defined above.
 [cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface (SPI, marker)
-| Package  | `reader.selection.spi`
+| Namespace  | `reader.selection.spi`
 | Since    | 2.0
 | Purpose  | Provided by card extensions to enrich a selection case with additional commands and to interpret the response in order to build the corresponding <<type_SmartCard,`SmartCard`>>.
 |===
@@ -1210,7 +1210,7 @@ extension is defined by the card extension specification consuming this SPI.
 [cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface (SPI)
-| Package  | `reader.selection.spi`
+| Namespace  | `reader.selection.spi`
 | Extends  | <<type_SmartCard,`SmartCard`>>
 | Since    | 2.0
 | Purpose  | ISO/IEC 7816-4 smart card whose communication has been established after a successful selection.
@@ -1249,7 +1249,7 @@ absent at the same time.
 [cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface (SPI)
-| Package  | `reader.selection.spi`
+| Namespace  | `reader.selection.spi`
 | Since    | 1.0
 | Purpose  | Basic smart card whose communication has been established after a successful selection. The instance is ready to receive APDUs.
 |===
@@ -1292,7 +1292,7 @@ selection.
 |===
 
 [[sec_pkg_reader_transaction_spi]]
-=== Card Transaction SPI (`reader.transaction.spi`)
+=== Namespace -- reader.transaction.spi
 
 The `reader.transaction.spi` package defines the common contract shared by all card transaction managers exposed
 by card extensions. The three interfaces of this package form a hierarchy that allows each card extension to
@@ -1310,7 +1310,7 @@ anchor its own transaction manager at the capability level that matches its card
 [cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface (SPI)
-| Package  | `reader.transaction.spi`
+| Namespace  | `reader.transaction.spi`
 | Since    | 2.1
 | Purpose  | Root contract common to every card transaction manager exposed by a card extension. Defines the single operation `processCommands`.
 |===
@@ -1345,7 +1345,7 @@ minimise network exchanges, which is especially valuable in distributed architec
 [cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface (SPI)
-| Package  | `reader.transaction.spi`
+| Namespace  | `reader.transaction.spi`
 | Extends  | <<type_CardTransactionManager,`CardTransactionManager`>>
 | Since    | 3.0
 | Purpose  | Intermediate contract for ISO/IEC 7816-4 cards. Exposes the on-demand cast to multi-channel.
@@ -1373,7 +1373,7 @@ minimise network exchanges, which is especially valuable in distributed architec
 [cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Interface (SPI)
-| Package  | `reader.transaction.spi`
+| Namespace  | `reader.transaction.spi`
 | Extends  | <<type_CardTransactionManager,`CardTransactionManager`>>
 | Since    | 3.0
 | Purpose  | Multi-channel contract. Exposes the operations to close a logical channel explicitly.
@@ -1420,7 +1420,7 @@ All exception types defined by this specification are unchecked (runtime) and MA
 [cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Runtime exception
-| Package  | `reader`
+| Namespace  | `reader`
 | Since    | 1.0
 | Purpose  | Indicates that the communication with the card has failed.
 |===
@@ -1431,7 +1431,7 @@ All exception types defined by this specification are unchecked (runtime) and MA
 [cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Runtime exception
-| Package  | `reader`
+| Namespace  | `reader`
 | Since    | 2.1
 | Purpose
 | Indicates that a response received from the card was invalid, either during a selection process or during the
@@ -1445,7 +1445,7 @@ All exception types defined by this specification are unchecked (runtime) and MA
 [cols="1h,4", grid=rows, frame=all]
 |===
 | Kind     | Runtime exception
-| Package  | `reader`
+| Namespace  | `reader`
 | Since    | 1.0
 | Purpose  | Indicates that the communication with the reader has failed. The most likely cause is a physical disconnection of the reader, but other technical problems MAY also be at the origin of the failure.
 |===
