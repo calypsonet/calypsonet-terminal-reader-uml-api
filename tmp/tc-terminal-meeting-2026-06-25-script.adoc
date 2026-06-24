@@ -51,100 +51,86 @@ sharing at that point.
 
 Three topics, in this order:
 
-. *Reader Layer Requirements -- version 3.0P2.*
+. *Reader Layer Requirements -- version 3.0P3.*
 . *Relay attack -- the new defence we propose.*
 . *Terminal APIs -- version 3.0.*
 
 Let me start with the first one -- the Reader Layer Requirements.
 
 // =============================================================================
-== TOPIC 1 -- Reader Layer Requirements (v2.0 to v3.0P2) -- 15 min
+== TOPIC 1 -- Reader Layer Requirements (v2.0 to v3.0P3) -- 15 min
 
 === [S4] Section opener -- 1 min
 
-The version we look at today is *3.0 Patch 2*. The last version you approved
+The version we look at today is *3.0 Patch 3*. The last version you approved
 is *2.0*. That was on September 7, 2023. So I will show you what changed
-*between 2.0 and 3.0P2*. As one single set of changes. This is the package
+*between 2.0 and 3.0P3*. As one single set of changes. This is the package
 you must approve.
 
-A word on the "P2" name. The document is still under review. *P1* and *P2*
-are just two review rounds of the same major step. For today, you can ignore
-the "P2". What I will show you is the full 3.0 content as it stands now.
+A word on the "P3" name. The document is still under review. *P1*, *P2* and
+*P3* are just review rounds of the same major step. For today, you can
+ignore the "P3". What I will show you is the full 3.0 content as it stands now.
 
 === [S5] Changes overview -- 10 min
 
 ==== Why a new major version
 
-Since version 2.0 was approved in 2023, the *STA certification* has become
-required for every CNA-certified terminal. STA stands for *Smart Ticketing
-Alliance*. STA now covers many things our Reader Layer document used to
-describe. Things like RF behaviour, contactless polling, and presence check.
+Since version 2.0 was approved in 2023, the *RF certification landscape* has
+matured. *RF stands for Radio Frequency* -- everything about how the reader
+talks to a contactless card through the air. Today, the RF behaviour of a
+Calypso terminal is checked by external certification bodies. The Smart
+Ticketing Alliance is one of them.
 
-If we keep saying the same things in *two documents*, we have a problem.
-If STA changes a rule and we forget to change ours, the two documents *no
-longer agree*. The people who build the terminals do not know which one to
-follow. The CNA tests and the STA tests can even ask for opposite things.
+Our 2.0 document spent many pages describing the *same* RF rules. That
+created a problem. If an external body changed a rule and we forgot to
+follow, the two documents *no longer agreed*. The people who build the
+terminals did not know which one to follow. The CNA tests and the external
+tests could even ask for opposite things.
 
-So the idea of 3.0 is simple: *what STA already covers, we drop from our
-document*. We keep only what is *truly specific* to the Calypso Reader Layer.
+So the idea of 3.0 is bigger than a cleanup. It is a *change of scope*:
 
-==== What changes between v2.0 and v3.0P2
+* The Reader Layer Requirements is now *a software-only document*.
+* All the *RF requirements are dropped*. They belong to the certification
+  bodies, not to us.
+* RF compliance is still needed, of course. But the *guidance for operators*
+  on how to ask for it -- in a tender, in a spec sheet -- moves to the
+  *Tender Drafting Guide*.
 
-Six rules are *removed*. STA already checks all six. Keeping them was just
-saying the same thing twice:
+==== What changes between v2.0 and v3.0P3
 
-[cols="2,3,3", options="header"]
-|===
-| Rule (in v2.0) | What it asked for | Now checked by
+Four points to remember:
 
-| `RL-CL-SHUTOFF.1`   | Turn off the RF field                          | STA test *PCD 2.8*
-| `RL-CL-PROTOCOL.1`  | Turn each contactless protocol on or off       | No longer needed -- STA sets the baseline
-| `RL-CL-POLLING.1`   | Pick the polling scenario                      | STA test *PCD 2.4*
-| `RL-DET-PCRQ.1`     | Ask the card if it is still there              | STA test *PCD 2.5*
-| `RL-DET-PCAPDU.1`   | Card-presence check by APDU                    | STA presence-check tests
-| `RL-DET-PCIBLOCK.1` | Card-presence check by I-Block                 | STA presence-check tests
-|===
+. *RF requirements are removed.* All the rules describing the RF behaviour
+  of the contactless interface -- polling, presence check, shut-off, type
+  A and type B handling, and so on -- are no longer in the document.
+. *The scope is now software-only.* The document keeps only the software
+  rules: command and response handling, status word management, logical
+  channels, selection by application name, and so on. These are the rules
+  that *only Calypso defines* -- no external body covers them.
+. *No certification body is named anywhere.* We do not point to one body
+  today and another tomorrow. The document stays neutral.
+. The *Tender Drafting Guide for
+  operators* will tell operators how to write their RF compliance needs in
+  their tenders -- which certifications to ask for, how to assess them.
+  That is a separate piece of work, with its own publication calendar.
 
-One rule is *updated*:
+No new software rule is added in this delta.
 
-* `RL-CL-RFSTA.2` becomes the *single entry point* for all RF rules. Before,
-  it pointed to the old standard name (ISO/IEC TS 24192). Now it points
-  straight to the *STA Technical Guidelines, version 3.3 or later*. So when
-  STA gives us a new version, we follow it without doing anything.
+==== Why this is the right time
 
-No new rule is added. *The document gets smaller. It does not grow.*
-
-==== Small editorial changes
-
-We also rewrote a few short parts to fit the new, shorter RF section.
-No new technical content. Just text cleanup.
-
-==== A wider idea -- not for today
-
-We are also thinking about a bigger move. The idea: *make our Reader Layer
-Requirements free from any certification body*. Today we point to STA.
-Tomorrow it could be another body. If we keep naming one body in the rules,
-we tie our own document to *their update calendar*. We do not want that.
-
-The plan we are studying:
-
-* keep the Reader Layer rules *neutral* -- no certification body named;
-* and move all the body-specific text -- like the STA mapping tables --
-  into *separate operator documents*.
-
-The patch we show you today (3.0P2) is the *first step*: it removes the
-duplicate rules. The full move to a neutral document is *a separate piece of
-work*. The TC will decide on it later. Today we only ask you to approve
-v3.0P2.
+This change of scope was already being discussed during 3.0P2. The TC and
+the workgroup converged on the same answer: a software-only document is
+cleaner, easier to maintain, and avoids being tied to any single external
+body. So 3.0P3 turns that direction into the actual content.
 
 ==== Questions for the TC -- three points to confirm
 
-. *The six removals* -- can you confirm they are OK? Is there any system
-  where one of these rules was still useful *on its own, without STA*?
-. *The update to `RL-CL-RFSTA.2`* -- pointing to STA Technical Guidelines
-  3.3 or later -- is this how your test labs already work?
-. *The wider idea* -- a neutral document, free from any certification body
-  -- do you want it on the agenda of the next meeting? Any worry to share now?
+. *The change of scope* -- software-only, no RF -- can you confirm this
+  matches the direction you want for the Reader Layer?
+. *The removed RF rules* -- is there any system where one of these rules
+  was still useful *on its own*, beyond what external certifications cover?
+. *The Tender Drafting Guide* -- is the workgroup the right place to write
+  it? What should be in scope of this companion document, beyond RF?
 
 [NOTE]
 ====
@@ -628,7 +614,7 @@ Two hours, three topics, many questions. Thank you all for the rich talk.
 
 *Three decisions we need today* -- here is what I will report back:
 
-. *Reader Layer Requirements 3.0P2* -- approved as is? Yes / No / Conditions.
+. *Reader Layer Requirements 3.0P3* -- approved as is? Yes / No / Conditions.
 . *Relay attack defence* -- principle approved? Which setup way do you
   prefer: CSN ranges, startup info, or both?
 . *Terminal APIs 3.0* -- approved for release? Does any of the seven themes
@@ -652,7 +638,7 @@ Thank you very much. Have a good rest of the day.
 | Block                          | Slides   | Time | Cumulated
 
 | Opening & agenda               | S1, S3   | 5    | 5
-| Reader Layer 3.0P2             | S4-S5    | 15   | 20
+| Reader Layer 3.0P3             | S4-S5    | 15   | 20
 | Relay -- opener + demo         | S6, S7   | 16   | 36
 | Relay -- principle             | S8       | 15   | 51
 | Relay -- setup challenges      | S9       | 15   | 66
