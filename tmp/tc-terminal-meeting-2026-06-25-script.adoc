@@ -13,141 +13,138 @@ Calypso Networks Association <https://calypsonet.org>
 [abstract]
 == About this script
 
-This document is the facilitator script for the *TC Terminal meeting of June 25, 2026*.
-It is built to be read aloud during a *2-hour session*, with a *15-minute live demo* by
-*Monetech* inserted at the dedicated slide (slide S7).
+This is the speaker script for the *TC Terminal meeting of June 25, 2026*.
+It is written to be read out loud. The meeting lasts *2 hours*. *Monetech* will
+give a short *15-minute live demo* on slide S7.
 
-*Style guide for the speaker*
+*Speaking style*
 
-* Short sentences (15-20 words max).
-* Repeat each acronym in plain words on its first occurrence.
-* For every topic: state the *why* first, then the *what*, then ask an open question to the TC.
-* Pause after each open question -- silence is part of the script.
+* Use very short sentences. Stop often.
+* Each time you say a new short word (an acronym), say what it means.
+* For each topic: first the *why*, then the *what*, then ask a question.
+* After each question, *stop and wait*. Silence is fine.
 
-*Slide markers* `[S1] ... [S13]` follow the order of the deck (`Présentation.pdf`).
-*Time estimates* are in minutes, cumulative in the cheatsheet at the end.
+*Slide markers* `[S1] ... [S13]` follow the deck order (`Présentation.pdf`).
+*Time* is in minutes. The full table is at the end.
 
 // =============================================================================
 == Opening -- [S1] Title slide -- 3 min
 
-Welcome everyone. Thank you for joining this TC Terminal meeting. Today is June 25, 2026.
+Hello everyone. Thank you for coming to this TC Terminal meeting. Today is
+June 25, 2026.
 
-We have three topics to cover. All three need your *approval* by the end of the session.
+We have three topics. You need to *approve* all three before we close.
 
-Two hours is short. So I will keep each topic focused.
+Two hours is not a lot. So I will stay focused on each topic.
 
-A word on how we will run the session. *At the end of each of the three topics*, I will
-*open the floor for questions and discussion*. That is the right moment to challenge
-the proposals, raise concerns, or share constraints from your own deployments. Of
-course, if anything is unclear *during* a topic, do not wait -- interrupt me.
+A word on how we will work. *At the end of each topic*, I will *stop and ask
+for your questions*. That is the right moment to push back, to share doubts,
+or to tell us what your own system needs. And if something is not clear
+*during* a topic, please stop me right away.
 
-One practical point: in the middle of the agenda, our colleagues from *Monetech* will run
-a short live demo on the relay attack. About 15 minutes. I will hand over the floor to
-them at that point.
+One last thing. In the middle of the meeting, our friends from *Monetech* will
+show you a short presentation. About 15 minutes. I will give them the screen
+sharing at that point.
 
 // =============================================================================
 == Agenda -- [S3] Table of contents -- 2 min
 
 Three topics, in this order:
 
-. *Reader Layer Requirements -- version 3.0P2.* A short update, mostly cleanup.
-. *Relay attack countermeasure.* A new security proposal. This is the heaviest topic of the day.
-. *Terminal APIs -- version 3.0.* A major release, with seven themes.
+. *Reader Layer Requirements -- version 3.0P2.*
+. *Relay attack -- the new defence we propose.*
+. *Terminal APIs -- version 3.0.*
 
-Let me start with the simplest one -- the Reader Layer Requirements.
+Let me start with the first one -- the Reader Layer Requirements.
 
 // =============================================================================
 == TOPIC 1 -- Reader Layer Requirements (v2.0 to v3.0P2) -- 15 min
 
 === [S4] Section opener -- 1 min
 
-The version we look at today is *3.0 Patch 2*. The last approved version is *2.0*,
-dated September 7, 2023. So I will describe the changes *between 2.0 and 3.0P2*,
-as a single delta. This is the package you are asked to approve.
+The version we look at today is *3.0 Patch 2*. The last version you approved
+is *2.0*. That was on September 7, 2023. So I will show you what changed
+*between 2.0 and 3.0P2*. As one single set of changes. This is the package
+you must approve.
 
-A reminder on the patch suffix: the document is still under TC review.
-*P1* and *P2* are review iterations of the same major step. There is no functional
-difference between them that matters for this presentation. The content I describe
-is the full 3.0 content as it stands today.
+A word on the "P2" name. The document is still under review. *P1* and *P2*
+are just two review rounds of the same major step. For today, you can ignore
+the "P2". What I will show you is the full 3.0 content as it stands now.
 
 === [S5] Changes overview -- 10 min
 
-==== Why this new major version
+==== Why a new major version
 
-Since version 2.0 was approved in 2023, the *STA certification* has become mandatory
-for every CNA-certified terminal. STA -- the Smart Ticketing Alliance -- now covers a
-large part of what our Reader Layer document used to specify itself: RF behaviour,
-contactless polling, presence check.
+Since version 2.0 was approved in 2023, the *STA certification* has become
+required for every CNA-certified terminal. STA stands for *Smart Ticketing
+Alliance*. STA now covers many things our Reader Layer document used to
+describe. Things like RF behaviour, contactless polling, and presence check.
 
-Keeping the same content in *two specifications* creates a real risk. If STA updates a
-rule and we don't update our document at the same time, the two specifications *drift
-apart*. Implementers don't know which one to follow. The CNA test plan and the STA test
-plan may even start to contradict each other.
+If we keep saying the same things in *two documents*, we have a problem.
+If STA changes a rule and we forget to change ours, the two documents *no
+longer agree*. The people who build the terminals do not know which one to
+follow. The CNA tests and the STA tests can even ask for opposite things.
 
-The principle of 3.0 is therefore clear: *what STA already covers, we remove from our
-document*. We keep only the requirements that are *specific to the Calypso Reader
-Layer* and not already verified by the STA certification.
+So the idea of 3.0 is simple: *what STA already covers, we drop from our
+document*. We keep only what is *truly specific* to the Calypso Reader Layer.
 
 ==== What changes between v2.0 and v3.0P2
 
-Six requirements are *deleted*. All six were already verified through STA certification
--- keeping them was pure redundancy:
+Six rules are *removed*. STA already checks all six. Keeping them was just
+saying the same thing twice:
 
 [cols="2,3,3", options="header"]
 |===
-| Requirement (in v2.0) | What it covered | Now covered by
+| Rule (in v2.0) | What it asked for | Now checked by
 
-| `RL-CL-SHUTOFF.1`   | Shut-off the operational RF field                              | STA ICS item *PCD 2.8*
-| `RL-CL-PROTOCOL.1`  | Activate / deactivate each contactless protocol individually   | Not required anymore -- STA defines the baseline
-| `RL-CL-POLLING.1`   | Choose the polling scenario                                    | STA ICS item *PCD 2.4*
-| `RL-DET-PCRQ.1`     | Presence check request                                         | STA ICS item *PCD 2.5*
-| `RL-DET-PCAPDU.1`   | Presence check by APDU                                         | STA presence check verification tests
-| `RL-DET-PCIBLOCK.1` | Presence check by I-Block                                      | STA presence check verification tests
+| `RL-CL-SHUTOFF.1`   | Turn off the RF field                          | STA test *PCD 2.8*
+| `RL-CL-PROTOCOL.1`  | Turn each contactless protocol on or off       | No longer needed -- STA sets the baseline
+| `RL-CL-POLLING.1`   | Pick the polling scenario                      | STA test *PCD 2.4*
+| `RL-DET-PCRQ.1`     | Ask the card if it is still there              | STA test *PCD 2.5*
+| `RL-DET-PCAPDU.1`   | Card-presence check by APDU                    | STA presence-check tests
+| `RL-DET-PCIBLOCK.1` | Card-presence check by I-Block                 | STA presence-check tests
 |===
 
-One requirement is *updated*:
+One rule is *updated*:
 
-* `RL-CL-RFSTA.2` is rewritten to become the *single entry point* for all contactless
-  interface properties. Instead of pointing to the old standard name
-  (ISO/IEC TS 24192, formerly CEN/TS 16794), it now points directly to the
-  *STA Technical Guidelines version 3.3 or later*. So when STA publishes a new
-  version, the alignment is automatic at our level.
+* `RL-CL-RFSTA.2` becomes the *single entry point* for all RF rules. Before,
+  it pointed to the old standard name (ISO/IEC TS 24192). Now it points
+  straight to the *STA Technical Guidelines, version 3.3 or later*. So when
+  STA gives us a new version, we follow it without doing anything.
 
-No new requirement is added in this delta. *The document shrinks, it does not grow.*
+No new rule is added. *The document gets smaller. It does not grow.*
 
-==== Editorial alignment
+==== Small editorial changes
 
-Beyond the seven changes above, the document structure is *rephrased* in a few places
-to reflect the simplified RF section. No technical content change beyond the seven
-items above.
+We also rewrote a few short parts to fit the new, shorter RF section.
+No new technical content. Just text cleanup.
 
-==== The wider direction -- beyond this patch
+==== A wider idea -- not for today
 
-We are also exploring a broader principle: *decouple our Reader Layer Requirements from
-any certification scheme*. Today we mention STA. Tomorrow other schemes might apply
-(NFC Forum, others). If we keep naming a specific scheme inside the requirements, we
-tie our normative document to *scheme update cycles* that we do not control.
+We are also thinking about a bigger move. The idea: *make our Reader Layer
+Requirements free from any certification body*. Today we point to STA.
+Tomorrow it could be another body. If we keep naming one body in the rules,
+we tie our own document to *their update calendar*. We do not want that.
 
-The direction under discussion is to:
+The plan we are studying:
 
-* keep the Reader Layer Requirements *scheme-neutral*,
-* and move certification-specific guidance -- including STA mapping tables -- into
-  *separate operator-facing documents*.
+* keep the Reader Layer rules *neutral* -- no certification body named;
+* and move all the body-specific text -- like the STA mapping tables --
+  into *separate operator documents*.
 
-This patch (3.0P2) takes the *first step*: it removes the duplicated requirements.
-The full decoupling is a *separate workstream*, which the TC will decide on later.
-Today we are not asking you to validate the wider decoupling -- only the
-v2.0 -> v3.0P2 delta.
+The patch we show you today (3.0P2) is the *first step*: it removes the
+duplicate rules. The full move to a neutral document is *a separate piece of
+work*. The TC will decide on it later. Today we only ask you to approve
+v3.0P2.
 
-==== Questions to the TC -- three points to confirm
+==== Questions for the TC -- three points to confirm
 
-. *The six deletions* -- do you confirm they are acceptable? Is there any deployment
-  where one of these six requirements was still useful *independently of STA*?
-. *The update to `RL-CL-RFSTA.2`* -- pointing directly to STA Technical Guidelines
-  v3.3+ -- does it match how your test labs already operate?
-. *The wider direction* -- full decoupling from certification schemes -- does the TC
-  want this on the agenda of the next meeting as a separate workstream? Any blocker
-  or early concern?
+. *The six removals* -- can you confirm they are OK? Is there any system
+  where one of these rules was still useful *on its own, without STA*?
+. *The update to `RL-CL-RFSTA.2`* -- pointing to STA Technical Guidelines
+  3.3 or later -- is this how your test labs already work?
+. *The wider idea* -- a neutral document, free from any certification body
+  -- do you want it on the agenda of the next meeting? Any worry to share now?
 
 [NOTE]
 ====
@@ -155,189 +152,194 @@ Pause for discussion -- 3 to 5 minutes.
 ====
 
 // =============================================================================
-== TOPIC 2 -- Relay Attack Countermeasure -- 50 min
+== TOPIC 2 -- Relay Attack -- the New Defence -- 50 min
 
 === [S6] Section opener -- 1 min
 
-We now move to a security proposal. This proposal was first shared on the forum by
-*Jean-Pierre Fortune*. Several of you replied -- *Stéphane Didier*, *Pierre Terrée*.
-Thank you. I will integrate your input as we go.
+We now move to a security topic. The proposal was first posted on the forum
+by *Jean-Pierre Fortune*. Some of you replied -- *Stéphane Didier*,
+*Pierre Terrée*. Thank you. I will use your input as I go.
 
-Let me set the stage with a one-minute story. Then I will let Monetech show you the
-attack live.
+I will set the scene in one minute. Then I let Monetech show you the attack
+for real.
 
 === [S7] Monetech demo -- ≈ 15 min
 
-Before we discuss the solution, let's see the *problem with our own eyes*.
+Before we talk about the fix, let's *see the problem with our own eyes*.
 
-A relay attack is easy to describe on a slide. But you really understand it when you
-watch one happen. Monetech has built a working setup. They will show you a genuine
-card, a fake terminal, and how the attacker uses both to perform a fraudulent action.
+A relay attack is easy to draw on a slide. But you really get it when you
+*see one live*. Monetech has built a working setup. They will show you a real
+card, a fake terminal, and how an attacker uses both to cheat.
 
-I now hand over the floor to Monetech.
+I give the floor to Monetech.
 
 [NOTE]
 ====
-*MONETECH DEMO -- 15 min* -- facilitator stays silent except for a time cue at 12 min.
+*MONETECH DEMO -- 15 min* -- the facilitator stays quiet. Give a time cue at
+12 min.
 ====
 
 Thank you Monetech.
 
 [NOTE]
 ====
-Quick reaction round, 2 min: any first impression from the TC?
+Short reaction round -- 2 min: first feeling from the TC?
 ====
 
-=== [S8] What it is -- threat and countermeasure principle -- 15 min
+=== [S8] What it is -- the threat and the fix idea -- 15 min
 
-==== Why we need to act now
+==== Why we must act now
 
-The attack you just saw works on *any contactless terminal* today. The card does not
-know it is being relayed. The terminal does not know the card is far away. From the
-protocol point of view, *everything looks normal*.
+The attack you just saw *works on any contactless terminal today*. The card
+does not know it is being relayed. The terminal does not know the card is far
+away. Looking at the messages, *everything looks normal*.
 
-Until now, our defences against this attack were either at the *back office*
--- anti-clone detection -- or at the *cryptographic layer* -- Calypso REV3 protects
-against data injection. None of these defences detect a simple *spatial relay* in real
-time, at the terminal level. We need a *local, immediate* detection.
+Until today, our defences sat in two places. Some were in the *back office*
+-- looking for clones in the logs. Others were in the *crypto layer* --
+Calypso REV3 stops people from injecting fake data. *None of them catches a
+simple spatial relay in real time, at the terminal*. We need a check that
+runs *now, locally, at the terminal*.
 
 ==== A word on the risk -- it depends on the use case
 
-Before we go further, one nuance. *The level of risk is not the same for every
-deployment.*
+One word before we go on. *The risk is not the same for every system.*
 
-* For *access control* -- building access, restricted-area control, anything where a
-  *single fraudulent entry* has a real impact -- the risk is *particularly important*.
-  Back-office detection arrives too late. The local check is the only line of defence.
-* For *ticketing systems* already equipped with *robust anti-clone back-office
-  countermeasures*, the risk may be *negligible in practice*. Fraud at scale would
-  show up in the logs and be blocked before it spreads. So for those operators,
-  enabling the relay countermeasure is more a *defence-in-depth* choice than a
+* For *access control* -- a door, a restricted area, anything where *one
+  fake entry already hurts* -- the risk is *high*. The back office sees the
+  fraud too late. The local check is your only line.
+* For *transit ticketing systems* that already have *strong anti-clone checks
+  in the back office*, the risk may be *very small in practice*. Mass fraud
+  shows up in the logs. The back office stops it before it spreads. For these
+  operators, the relay defence is more an *extra layer of safety* than a
   must-have.
 
-In other words: the proposal we discuss today gives every operator the *option* to
-enable this protection. It does not impose it. Each operator stays free to enable or
-disable the countermeasure, based on its own threat assessment.
+In short: today's proposal *gives every operator the option* to turn this
+defence on. We do not force it. Each operator decides, based on what they
+think their own risk is.
 
 ==== The key idea
 
-A relay attack has one thing it cannot hide: *time*. The attacker must add a second
-contactless link, plus a network link to the remote card. That adds delay. Always.
-It cannot be reduced below a physical limit -- typically tens of milliseconds.
+A relay attack has one thing it cannot hide: *time*. The attacker must add
+a second contactless link, plus a network link to the far-away card. That
+takes time. Always. It cannot be made shorter than a physical limit -- about
+a few tens of milliseconds.
 
-So if we can *measure* the duration of certain card commands precisely, and we know
-the *normal range* for that card, we can detect a relay as an *abnormal lengthening*
-of the exchange.
+So if we can *measure* how long a card command takes, and if we know what is
+*normal for that card*, we can spot a relay as an *abnormal extra wait*.
 
 ==== Which commands can we measure
 
-We need commands where both the *input* and the *output* are unpredictable. If they
-are predictable, the attacker can pre-compute the answer and avoid the network
-round-trip. So they would escape the timing check.
+We need commands where *both the question and the answer are unpredictable*.
+If they can be guessed, an attacker can prepare the answer in advance. Then
+they avoid the round-trip on the network. And our timing check sees nothing.
 
-Three Calypso commands fit this requirement:
+Three Calypso commands fit this need:
 
-* *Open Secure Session* -- terminal challenge in, card challenge out. Both random.
-* *Close Secure Session* -- random by construction of the session.
-* *SV operations* -- Debit, Reload, Undebit. All carry random inputs and outputs.
+* *Open Secure Session* -- a random number from the terminal goes in. A
+  random number from the card comes out.
+* *Close Secure Session* -- random by design of the session.
+* *SV operations* -- Debit, Reload, Undebit. Each one carries random data
+  in and out. SV stands for *Stored Value*.
 
-These three commands become our *temporal probes*.
+These three commands become our *time probes*.
 
-==== Fleet calibration
+==== Tuning per card family
 
-A Calypso card from generation X is not as fast as a card from generation Y. The
-processing time depends on the chip and the embedded software. So we cannot apply
-*one global threshold* to all cards. If we did, we would either block slow legitimate
-cards, or let the relay pass on a fast card.
+A Calypso card from one chip family is not as fast as one from another. The
+time depends on the chip and the software inside. So we cannot use *one
+single time limit* for the whole network. If we did, we would either block
+slow but honest cards, or let the relay pass on a fast card.
 
-The solution is to *segment the fleet* into homogeneous card batches and assign a
-*dedicated threshold* to each batch.
+The fix: *split the card fleet into groups* and give *each group its own
+time limit*.
 
-==== Questions to the TC
+==== Questions for the TC
 
-Two open questions before we go into the configuration details:
+Two questions before we look at how to set this up:
 
-. Does the principle -- measure, compare, abort if exceeded -- match the threat model
-  you face on your networks?
-. Are there other commands you would also want to instrument? Or do OSS, CSS and SV
-  cover your full set of sensitive operations?
+. The idea -- measure, compare, stop if too long -- does it fit the risk you
+  face on your own network?
+. Are there other commands you would also want to time? Or do OSS, CSS and
+  SV cover all the sensitive ones for you?
 
 [NOTE]
 ====
 Discussion -- 5 min.
 ====
 
-=== [S9] Key technical challenges -- card profile identification -- 15 min
+=== [S9] Setup challenges -- how to identify each card -- 15 min
 
 ==== Why this slide matters
 
-The principle is clear. But the *implementation* is where it gets hard. The terminal
-must answer one question every time a card touches the reader:
+The idea is clear. But *the setup is the hard part*. Each time a card
+touches the reader, the terminal must answer one question:
 
 [quote]
 ____
-This card I see -- which timing profile does it belong to?
+This card I just saw -- which time group does it belong to?
 ____
 
-If the terminal cannot identify the card profile, it cannot apply the right threshold.
-So we need a *profile identification mechanism*.
+If the terminal cannot tell the card apart, it cannot pick the right time
+limit. So we need a way to *identify* the card.
 
-Two approaches have been considered. Both have pros and cons. We need your input on
-which one -- or which combination -- to standardize.
+Two ways have been looked at. Each has good and bad sides. We need your view
+on which one -- or both -- to put in the standard.
 
-==== Approach 1 -- Serial Number ranges (CSN boundaries)
+==== Way 1 -- by Serial Number range (CSN ranges)
 
-The operator declares: _"cards with serial number between A and B follow profile P1,
-cards between B and C follow profile P2"_, and so on. Configuration is done by giving
-a *minimum serial number per range* -- what we call `csnMin`.
+The operator says: _"cards with a serial number between A and B follow time
+profile P1, cards between B and C follow P2"_, and so on. The setup is done
+by giving a *lower limit* for each range -- we call it `csnMin`.
 
-* *Target cards.* This approach is *especially adapted to older REV1 and REV2 cards*,
-  where the startup data was often *altered to emulate older products*. On those
-  cards, the startup bytes cannot be trusted. The serial number is the only reliable
-  identification key.
-* *Pros:* very precise for *closed-loop systems* where the operator knows exactly
-  which cards it issued.
-* *Cons:* serial number ranges are *not always contiguous* within a manufacturer.
-  A manufacturer may split ranges by factory, by customer, by chip family. Each new
-  batch may use a new range. Maintaining this mapping in the field is *operationally
-  heavy*.
+* *Which cards.* This way works best for *older REV1 and REV2 cards*. On
+  those cards, the startup bytes were often *changed on purpose to look
+  like older products* (we call that emulation). So we cannot trust the
+  startup data. The serial number is the only safe key.
+* *Good side:* very precise for *closed systems* -- when the operator knows
+  exactly which cards it has put in the field.
+* *Bad side:* serial number ranges *do not always come as one big block*.
+  A maker can split them by factory, by customer, by chip type. Each new
+  batch can use new numbers. Keeping that map up to date in the field is
+  *a lot of work*.
 
-This is the concern Stéphane raised in the forum thread.
+This is the worry Stéphane raised on the forum.
 
-==== Approach 2 -- Startup Information
+==== Way 2 -- by Startup Information
 
-Each Calypso card exposes four bytes that describe its *product identity*: Platform,
-Software Issuer, Software Version, Software Revision. We can use these four bytes as
-the *profile key* instead of the serial number range.
+Each Calypso card sends back four short bytes. These bytes describe the
+*product*: Platform, Software Issuer, Software Version, Software Revision.
+We can use these four bytes as the *group key*, instead of the serial number.
 
-* *Target cards.* This approach is *adapted to modern Calypso products* -- *Prime*,
-  *Light*, *Basic*, *HCE* implementations on mobile -- where the startup data is
-  stable and reflects a real product identity.
-* *Pros:* much simpler mapping. The same four bytes mean the same chip family. Could
-  even be maintained by *terminal vendors*, not by each operator.
-* *Cons:* these four bytes are returned *outside the secure session* at application
-  selection. So on a relayed or counterfeit card, an attacker could spoof them. To be
-  safe, we must re-read them *inside the secure session* -- using a Get Data command
-  on tag 6F. This works on *Prime Revision 3 and above*.
+* *Which cards.* This way works for *modern Calypso products*: *Prime*,
+  *Light*, *Basic*, and *HCE* on mobile phones. (HCE stands for *Host Card
+  Emulation*.) On these cards, the startup data is stable and tells you the
+  real product.
+* *Good side:* much simpler map. The same four bytes mean the same chip
+  family, every time. *Terminal vendors could even keep this map* -- so
+  each operator does not have to.
+* *Bad side:* these four bytes are sent back *outside the secure session*.
+  So on a fake or relayed card, an attacker could lie about them. To be safe,
+  we re-read them *inside the secure session* -- using a special command
+  (Get Data on tag 6F). This only works from *Prime Revision 3 onwards*.
 
-Pierre's answer in the thread aligns these two methods clearly:
+Pierre's reply on the forum says it well:
 
-* *REV1 / REV2 cards* -- use the serial number, because startup data can be altered
+* *REV1 and REV2 cards* -- use the serial number. Startup data can be faked
   (emulation).
-* *REV3 and beyond -- Prime, Light, Basic, HCE* -- use the startup data inside the
-  session.
+* *REV3 and later -- Prime, Light, Basic, HCE* -- use the startup data,
+  inside the session.
 
-==== Proposed direction
+==== Where we want to go
 
-The final API will likely support *both approaches*, configurable per use case.
-The operator chooses what fits their fleet best.
+The final API will most likely support *both ways*. The operator picks the
+one that fits its own card mix.
 
-==== Questions to the TC
+==== Questions for the TC
 
-. Do you confirm the principle of supporting *both* approaches in the standard?
-. Operators in the room -- which approach is realistic for *your* deployment today?
-. Terminal vendors -- could you maintain a *startup-info-to-profile* mapping as a
-  vendor service?
+. Do you agree that *both ways* should be in the standard?
+. Operators in the room -- which way works for *your* system today?
+. Terminal vendors -- could you keep a *startup-info to time-profile* map
+  as a vendor service?
 
 [NOTE]
 ====
@@ -345,213 +347,212 @@ Discussion -- 5 to 7 min.
 ====
 
 // =============================================================================
-== Mini-break -- 5 min
+== Short break -- 5 min
 
-Let's take a 5-minute break before the last topic. Stretch, coffee, and we restart on
-the Terminal APIs 3.0.
+Let's take a 5-minute break before the last topic. Stretch, get a coffee.
+We come back on the Terminal APIs 3.0.
 
 // =============================================================================
 == TOPIC 3 -- Terminal APIs 3.0 -- 45 min
 
 === [S10] Section opener -- 1 min
 
-The third topic is the major release of the Terminal APIs. Version 3.0.
+The third topic is the big new release of the Terminal APIs. Version 3.0.
 
-This release is *for approval*. Today we don't go into Java code or UML class diagrams.
-We focus on the *rationale* for each change. A detailed change document and the UML
-diagrams are linked from the forum.
+This release is *for approval*. Today we do not look at Java code or UML
+class diagrams. We focus on the *why* of each change. The full change
+document and the UML diagrams are linked from the forum.
 
-=== [S11] Scope, triggers, migration support -- 10 min
+=== [S11] Scope, drivers, migration support -- 10 min
 
 ==== Why a major version, and why now
 
-Three pressures have built up in parallel:
+Three things pushed for it at the same time:
 
-. A new CNA product, *OpenSAM*. Its usage model needs *several application channels
-  open at the same time* on the same physical SAM. The current APIs assume one channel
-  at a time. We cannot model OpenSAM properly without breaking that assumption.
-. *Apple ECP* -- Enhanced Contactless Polling. This is the polling frame Apple
-  requires to make Calypso work in transit mode on iPhone. Our 2.x API has no clean
-  place to declare it.
-. The *relay attack countermeasure* we just discussed needs to *measure and bound*
-  the duration of every card exchange. That requires new contracts on our request and
+. A new CNA product, *OpenSAM*. To work, OpenSAM needs *many application
+  channels open at the same time* on one SAM. Today's APIs assume only one
+  at a time. We cannot fit OpenSAM in without breaking that.
+. *Apple ECP* -- *Enhanced Contactless Polling*. This is the special polling
+  frame Apple asks for, to make Calypso work in transit mode on the iPhone.
+  Our 2.x API has no clean place for it.
+. The *relay attack defence* we just talked about needs to *measure and cap*
+  the time of each card exchange. We have to add this to our request and
   response objects.
 
-A major version is also the right moment for *cleanup*: removing every deprecated
-element accumulated since 1.0. We take that opportunity in 3.0.
+A major version is also the right moment for *cleanup*. We can drop every
+old, marked-for-removal item we kept since 1.0. We take that chance in 3.0.
 
 ==== Scope of the release
 
-Seven APIs are touched at once:
+Seven APIs change at the same time:
 
-* The *three existing APIs* move to 3.0.0: Reader API, Card API (internal), Calypso
-  Card API.
-* One *new foundation API* is created: the Terminal Definitions API, version 1.0.0.
-* Three *adjacent APIs* align in parallel to 2.0.0: Legacy SAM, Generic Card,
+* The *three current APIs* move to 3.0.0: Reader API, Card API (internal),
+  Calypso Card API.
+* One *new base API* is created: the Terminal Definitions API, version 1.0.0.
+* Three *side APIs* move to 2.0.0 at the same time: Legacy SAM, Generic Card,
   Storage Card.
 
-==== On the integrator's side -- a guided, mechanical migration
+==== On the integrator side -- a step-by-step migration
 
-I want to be reassuring on this point. Yes, 3.0 brings breaking changes -- it is a
-major version, that is expected. But the migration is *designed to be simple,
-predictable and mostly mechanical*.
+We want to be reassuring on this point. Yes, 3.0 breaks some application code.
+That is what a major version means. But the migration is *simple, known in
+advance, and step by step*.
 
-A *complete technical migration guide* will be published alongside the release. It is
-written with one goal in mind: *no integrator should have to reverse-engineer what
-changed or why*. Concretely, the guide provides:
+A *full migration guide* will come out with the release. It is written with
+one goal in mind: *no integrator should have to guess what changed or why*.
+The guide gives you:
 
-* a *1-to-1 mapping* for every renamed, refactored or removed element -- you read the
-  table, you apply the change;
-* *before / after code patterns* for the most common usage scenarios (selection,
-  observation, transaction processing, multi-channel access, exception handling) --
-  you copy the new shape;
-* *step-by-step recipes* for typical integrator code -- so a junior developer can
-  follow them without architectural decisions;
-* a *known-pitfalls checklist* -- the small things that catch people the first time.
+* a *one-to-one map* for every renamed, refactored or removed item. You read
+  the table, you apply the change.
+* *before / after code snippets* for the common cases (selection, observation,
+  transactions, multi-channel access, exceptions). You copy the new shape.
+* *short recipes* for typical code. A junior developer can follow them with
+  no big decision to make.
+* a *known-pitfalls list* -- the small things that catch people the first
+  time.
 
-In practice, most migrations come down to *find-and-replace* operations plus a few
-localized rewrites. Nothing exotic. The structure of an application code base does
-*not* need to change.
+In real life, most of the work is *find and replace*, plus a few local
+rewrites. Nothing odd. *Your code structure does not have to change.*
 
-==== Questions to the TC
+==== Questions for the TC
 
-. Does the *guided migration approach* -- a complete, mechanical guide rather than a
-  long deprecation phase -- match what your integrator teams need?
-. Is there any integrator in the room with a *specific concern* on a part of their
-  code base that would not be covered by such a guide? We would like to identify
-  those cases now, so we can address them explicitly in the guide.
+. Does this *step-by-step migration plan* -- one full guide instead of a
+  long deprecation phase -- match what your developer teams need?
+. Is there any integrator with a *special concern* on a part of their code
+  that a simple guide would not cover? We want to find these cases now, and
+  add them to the guide.
 
 [NOTE]
 ====
-Quick discussion -- 3 min.
+Short discussion -- 3 min.
 ====
 
-=== [S12] The seven themes -- 30 min (about 4 min per theme)
+=== [S12] The seven themes -- 30 min (about 4 min each)
 
-I will now go through the seven themes one by one. For each theme, I will say:
+I will now go through the seven themes one by one. For each one, I will say:
 
 * *Why* we did it,
-* *What* the application sees changing,
-* And then I ask: any concern from the TC?
+* *What* the application sees,
+* And then I ask: any worry from the TC?
 
 ==== Theme 1 -- Multiple logical channels -- 5 min
 
-*Why.* OpenSAM. A SAM that hosts several security applications, each accessible
-*in parallel* on its own logical channel. The current API cannot describe that. We
-also see use cases on cards: selecting two card applications side by side for combined
-services.
+*Why.* The OpenSAM is able to hold *several security apps, all open at the
+same time*, each on its own channel. Today's API cannot describe that.
 
-*What changes.* Several card applications can now be selected and operated *in
-parallel* on distinct logical channels. Each card knows on which channel it sits and
-whether it is still active. The framework offers a clean way to ask:
-_"Is my card still active? Which channel is it on?"_
+*What changes.* Many card apps can now be picked and used *at the same
+time*, each on its own channel. Each card *knows on which channel it is*
+and *if it is still alive*. The framework gives a clean way to ask:
+_"Is my card still active? On which channel?"_
 
-*Question.* Any concern on multi-channel? Any deployment that would be disrupted by
-this generalization?
+*Question.* Any worry about multi-channel? Any system that would break
+because of this change?
 
-==== Theme 2 -- Relay-attack countermeasure -- 4 min
+==== Theme 2 -- Relay-attack defence -- 4 min
 
-*Why.* This is the API-level landing of the proposal we discussed in topic 2. The
-framework needs contracts to *carry the maximum duration into a request*, and to
-*carry the measured duration back from the response*.
+*Why.* This is the API side of the proposal from Topic 2. The framework
+needs a way to *send a max time with each request*, and *send back the
+measured time with each response*.
 
 *What changes.* Two layers:
 
-* At the *Card API* layer: an APDU exchange can now declare a maximum duration; a
-  dedicated exception fires if the bound is exceeded.
-* At the *Calypso Card API* layer: durations can be set globally for entire secure
-  sessions and for SV operations, with a `csnMin` filter -- the progressive tightening
-  rule we mentioned.
+* In the *Card API*: each APDU exchange can now carry a max time. A special
+  exception fires if the time goes over.
+* In the *Calypso Card API*: you can set time caps for full secure sessions
+  and for SV operations. With a `csnMin` filter -- so the cap can be made
+  stricter for newer cards, as we talked about.
 
-*Question.* This wires the proposal of Topic 2 directly into the API. Does the TC
-confirm both layers -- APDU level and session level?
+*Question.* This puts the Topic 2 proposal straight into the API. Does the
+TC agree on both layers -- per-APDU and per-session?
 
-==== Theme 3 -- Simplified observation -- 3 min
+==== Theme 3 -- Simpler observation -- 3 min
 
-*Why.* In version 2.x, starting card detection was a multi-step dance: register an
-observer, register an exception handler, then call start. Several invalid intermediate
-states existed. In practice, every integrator we surveyed registered exactly one
-observer.
+*Why.* In 2.x, starting card detection took many small steps. Register an
+observer. Register an error handler. Then call start. Some halfway states
+were not valid. In real life, every integrator we asked registered exactly
+*one* observer.
 
-*What changes.* Starting card detection, configuring it, and registering the
-application listener for events *and* errors -- all in a *single atomic call*. No
-intermediate state. Simpler API surface.
+*What changes.* Starting card detection, setting it up, and registering
+*one* listener for events *and* errors -- all in *one call*. No halfway
+state. Smaller API.
 
-*Question.* Any integrator using more than one observer today? If yes, please raise
-the case.
+*Question.* Anyone here using more than one observer today? If so, please
+speak up.
 
-==== Theme 4 -- Secure session introspection -- 3 min
+==== Theme 4 -- See the secure session state -- 3 min
 
-*Why.* Until 2.x, the application had no way to ask: _"Is a secure session open right
-now?"_. It had to track this state itself, in parallel with the framework. That is
-error-prone.
+*Why.* Until 2.x, the application had no way to ask:
+_"Is a secure session open right now?"_. It had to track the state on its
+own side, in parallel. That is easy to get wrong.
 
-*What changes.* The application can ask at any moment: is a Calypso secure session
-open? What is its cryptographic nature -- symmetric or asymmetric (PKI)? Which write
-access level was requested? An *immutable snapshot* is returned.
+*What changes.* The application can now ask, any time: is a Calypso secure
+session open? What kind is it -- symmetric or asymmetric (PKI)? Which write
+level was asked for? The answer is a *snapshot* -- a copy that does not
+change later.
 
-*Question.* Does this match what your business code needs? Anything missing in the
-snapshot?
+*Question.* Does this match what your business code needs? Is anything
+missing from the snapshot?
 
-==== Theme 5 -- Strict typing of RF and card types -- 4 min
+==== Theme 5 -- Strong types for RF and card types -- 4 min
 
-*Why.* In versions 1.x and 2.x, protocols were configured with *free-form strings*:
-`"ISO_14443_4"`, `"FELICA"`, etc. No two integrators used exactly the same strings.
-Typos were undetected at compile time. There was no central documentation of valid
-values. And there was no clean way to declare the *Apple ECP* polling frame at all.
+*Why.* In 1.x and 2.x, you set up protocols with *free text strings*:
+`"ISO_14443_4"`, `"FELICA"`, and so on. No two integrators used the exact
+same strings. Typos went through the compiler. There was no central list of
+valid values. And there was no clean place to set the *Apple ECP* polling
+frame.
 
-*What changes.* Strings disappear. Two typed enumerations take their place:
-`RfTechnology` for the radio layer, `CardType` for the detected product. Compile-time
-safety, IDE auto-completion, central documentation. The Apple ECP frame is now
-declared natively in the detection settings.
+*What changes.* The strings go away. Two strong-typed lists take their
+place: `RfTechnology` for the radio layer, `CardType` for the detected
+product. Now the compiler catches typos. The IDE shows you what is valid.
+The Apple ECP frame fits naturally into the detection settings.
 
-*Question.* The initial content of the enums is in the change document. Two specific
-points need your green light:
+*Question.* The starting content of the two lists is in the change document.
+Two specific points need your green light:
 
-* The choice to *merge ISO 14443-A and ISO 14443-B* into one transport-level value
-  `ISO_14443_4`, while distinguishing A and B at the product level -- does that match
-  your modelling?
-* Any value missing from `RfTechnology` or `CardType` that you need from day one?
+* We *merge ISO 14443-A and ISO 14443-B* into one value `ISO_14443_4` at the
+  transport level. At the product level we still tell A and B apart. Does
+  this match how you model things?
+* Is any value missing from `RfTechnology` or `CardType` that you need from
+  day one?
 
 ==== Theme 6 -- New Definitions API -- 3 min
 
-*Why.* The two enumerations of Theme 5 do not belong specifically to the Reader API.
-They are *cross-cutting* notions that other Terminal APIs may want to reuse. Putting
-them in the Reader API would force every consumer to depend on the full Reader API
-just to use a constant. So we extract them into a new *foundation module*.
+*Why.* The two lists from Theme 5 do not belong to the Reader API alone.
+They are *shared* between several APIs. If we put them in the Reader API,
+every other API that wants to use them must depend on the full Reader API.
+That is too much. So we move them out, into a *new base module*.
 
-*What changes.* A new repository, `calypsonet-terminal-definitions-uml-api`, version
-1.0.0. A new Java module, `keypop-definitions-jvm-api`. The Reader API now depends on
-it. Other Terminal APIs may depend on it in the future.
+*What changes.* A new repository, `calypsonet-terminal-definitions-uml-api`,
+version 1.0.0. A new Java module, `keypop-definitions-jvm-api`. The Reader
+API now depends on it. Other Terminal APIs may depend on it later.
 
-*Question.* Do you confirm the principle of a dedicated foundation API, rather than a
-sub-package of the Reader API?
+*Question.* Do you agree with the idea of a separate base API, instead of
+a sub-package inside the Reader API?
 
 ==== Theme 7 -- Command identification -- 3 min
 
-*Why.* On Generic Card and Storage Card, the application *batches* several commands
-before executing them in one go. Today, if one command fails, the application cannot
-easily tell *which one* failed in the batch.
+*Why.* On Generic Card and Storage Card, the application *prepares many
+commands*, then sends them all together. Today, if one fails, the
+application cannot easily tell *which one* in the group failed.
 
-*What changes.* When preparing a batched command, the application can tag it with its
-*own integer identifier*. On failure, the application retrieves the identifier of the
-offending command. On success, it can fetch the response of a specific command
-directly by its id.
+*What changes.* When you prepare a command, you can now tag it with *your
+own number*. If something fails, you get back the number of the broken
+command. If all is fine, you can also pick one response by its number.
 
-*Question.* Any concern with the chosen pattern -- an application-supplied integer?
-Any need for a different identifier type?
+*Question.* Any worry about this design -- a simple number given by the
+application? Do you need another kind of id?
 
 ==== Cross-cutting cleanup -- 2 min
 
-Beyond the seven themes, version 3.0 also removes:
+On top of the seven themes, version 3.0 also drops:
 
-* *All deprecated elements* accumulated since 1.0.
-* The `ChannelControl` enum -- replaced by explicit channel-closure methods.
-* Several *redundant exceptions* on the Calypso and SAM sides that were duplicating
-  Reader-level exceptions.
+* *All deprecated items* kept since 1.0.
+* The `ChannelControl` enum. It is replaced by clear channel-close methods.
+* Some *duplicate exceptions* on the Calypso and SAM side. They were just
+  copies of Reader-level ones.
 
-*Question.* Any TC member relying today on one of the deprecated elements?
-Speak up now.
+*Question.* Is any TC member using one of these deprecated items today?
+Please speak up now.
 
 [NOTE]
 ====
@@ -561,21 +562,22 @@ Final discussion on the seven themes -- 5 min.
 // =============================================================================
 == Closing -- [S13] Thank you -- 5 min
 
-Two hours, three topics, many questions. Thank you all for the rich discussion.
+Two hours, three topics, many questions. Thank you all for the rich talk.
 
-*Three decisions we need today* -- let me summarize what I will report back:
+*Three decisions we need today* -- here is what I will report back:
 
-. *Reader Layer Requirements 3.0P2* -- approved as submitted? Yes / No / Conditions.
-. *Relay attack countermeasure* -- principle approved? Configuration strategy
-  (CSN, startup info, or both) -- your preference?
-. *Terminal APIs 3.0* -- approved for release? Any of the seven themes need rework?
+. *Reader Layer Requirements 3.0P2* -- approved as is? Yes / No / Conditions.
+. *Relay attack defence* -- principle approved? Which setup way do you
+  prefer: CSN ranges, startup info, or both?
+. *Terminal APIs 3.0* -- approved for release? Does any of the seven themes
+  need more work?
 
-Next steps after this meeting:
+What happens next:
 
-* Decisions go into the *TC minutes*, published this week.
-* A *detailed migration guide* for Terminal APIs 3.0 will follow, alongside the
+* Decisions go into the *TC minutes*. Published this week.
+* The *full migration guide* for Terminal APIs 3.0 will follow, with the
   Keypop Java alignment.
-* The forum threads stay open for written follow-ups.
+* The forum threads stay open for written follow-up.
 
 Thank you very much. Have a good rest of the day.
 
@@ -591,7 +593,7 @@ Thank you very much. Have a good rest of the day.
 | Reader Layer 3.0P2             | S4-S5    | 15   | 20
 | Relay -- opener + demo         | S6, S7   | 16   | 36
 | Relay -- principle             | S8       | 15   | 51
-| Relay -- challenges            | S9       | 15   | 66
+| Relay -- setup challenges      | S9       | 15   | 66
 | *Break*                        | --       | 5    | 71
 | APIs -- opener + scope         | S10-S11  | 11   | 82
 | APIs -- 7 themes               | S12      | 30   | 112
