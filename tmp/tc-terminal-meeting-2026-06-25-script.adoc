@@ -34,8 +34,12 @@ Welcome everyone. Thank you for joining this TC Terminal meeting. Today is June 
 
 We have three topics to cover. All three need your *approval* by the end of the session.
 
-Two hours is short. So I will keep each topic focused. After each topic, I will open the
-floor for questions. Please interrupt me anytime if something is not clear.
+Two hours is short. So I will keep each topic focused.
+
+A word on how we will run the session. *At the end of each of the three topics*, I will
+*open the floor for questions and discussion*. That is the right moment to challenge
+the proposals, raise concerns, or share constraints from your own deployments. Of
+course, if anything is unclear *during* a topic, do not wait -- interrupt me.
 
 One practical point: in the middle of the agenda, our colleagues from *Monetech* will run
 a short live demo on the relay attack. About 15 minutes. I will hand over the floor to
@@ -197,6 +201,24 @@ Until now, our defences against this attack were either at the *back office*
 against data injection. None of these defences detect a simple *spatial relay* in real
 time, at the terminal level. We need a *local, immediate* detection.
 
+==== A word on the risk -- it depends on the use case
+
+Before we go further, one nuance. *The level of risk is not the same for every
+deployment.*
+
+* For *access control* -- building access, restricted-area control, anything where a
+  *single fraudulent entry* has a real impact -- the risk is *particularly important*.
+  Back-office detection arrives too late. The local check is the only line of defence.
+* For *ticketing systems* already equipped with *robust anti-clone back-office
+  countermeasures*, the risk may be *negligible in practice*. Fraud at scale would
+  show up in the logs and be blocked before it spreads. So for those operators,
+  enabling the relay countermeasure is more a *defence-in-depth* choice than a
+  must-have.
+
+In other words: the proposal we discuss today gives every operator the *option* to
+enable this protection. It does not impose it. Each operator stays free to enable or
+disable the countermeasure, based on its own threat assessment.
+
 ==== The key idea
 
 A relay attack has one thing it cannot hide: *time*. The attacker must add a second
@@ -269,6 +291,10 @@ The operator declares: _"cards with serial number between A and B follow profile
 cards between B and C follow profile P2"_, and so on. Configuration is done by giving
 a *minimum serial number per range* -- what we call `csnMin`.
 
+* *Target cards.* This approach is *especially adapted to older REV1 and REV2 cards*,
+  where the startup data was often *altered to emulate older products*. On those
+  cards, the startup bytes cannot be trusted. The serial number is the only reliable
+  identification key.
 * *Pros:* very precise for *closed-loop systems* where the operator knows exactly
   which cards it issued.
 * *Cons:* serial number ranges are *not always contiguous* within a manufacturer.
@@ -284,6 +310,9 @@ Each Calypso card exposes four bytes that describe its *product identity*: Platf
 Software Issuer, Software Version, Software Revision. We can use these four bytes as
 the *profile key* instead of the serial number range.
 
+* *Target cards.* This approach is *adapted to modern Calypso products* -- *Prime*,
+  *Light*, *Basic*, *HCE* implementations on mobile -- where the startup data is
+  stable and reflects a real product identity.
 * *Pros:* much simpler mapping. The same four bytes mean the same chip family. Could
   even be maintained by *terminal vendors*, not by each operator.
 * *Cons:* these four bytes are returned *outside the secure session* at application
@@ -293,8 +322,10 @@ the *profile key* instead of the serial number range.
 
 Pierre's answer in the thread aligns these two methods clearly:
 
-* *REV1 / REV2 cards* -- use the serial number, because startup data can be altered.
-* *REV3 and beyond* -- use the startup data inside the session.
+* *REV1 / REV2 cards* -- use the serial number, because startup data can be altered
+  (emulation).
+* *REV3 and beyond -- Prime, Light, Basic, HCE* -- use the startup data inside the
+  session.
 
 ==== Proposed direction
 
@@ -359,21 +390,36 @@ Seven APIs are touched at once:
 * Three *adjacent APIs* align in parallel to 2.0.0: Legacy SAM, Generic Card,
   Storage Card.
 
-==== On the integrator's side -- what to expect
+==== On the integrator's side -- a guided, mechanical migration
 
-I want to be very clear on this point: 3.0 *breaks* application code. There is no
-soft transition. To make the move as smooth as possible, a *detailed technical
-migration guide* will be published with the release. It will provide a 1-to-1 mapping
-for every breaking change, before / after rewriting patterns for the most common code
-shapes, and a checklist of known pitfalls. The aim is that no integrator has to
-reverse-engineer what changed and why.
+I want to be reassuring on this point. Yes, 3.0 brings breaking changes -- it is a
+major version, that is expected. But the migration is *designed to be simple,
+predictable and mostly mechanical*.
+
+A *complete technical migration guide* will be published alongside the release. It is
+written with one goal in mind: *no integrator should have to reverse-engineer what
+changed or why*. Concretely, the guide provides:
+
+* a *1-to-1 mapping* for every renamed, refactored or removed element -- you read the
+  table, you apply the change;
+* *before / after code patterns* for the most common usage scenarios (selection,
+  observation, transaction processing, multi-channel access, exception handling) --
+  you copy the new shape;
+* *step-by-step recipes* for typical integrator code -- so a junior developer can
+  follow them without architectural decisions;
+* a *known-pitfalls checklist* -- the small things that catch people the first time.
+
+In practice, most migrations come down to *find-and-replace* operations plus a few
+localized rewrites. Nothing exotic. The structure of an application code base does
+*not* need to change.
 
 ==== Questions to the TC
 
-. Are you comfortable with a clean major break, with a migration guide as the only
-  transition support?
-. Is there any integrator in the room with a fleet so large that they would need a
-  *deprecation phase* instead of a clean break?
+. Does the *guided migration approach* -- a complete, mechanical guide rather than a
+  long deprecation phase -- match what your integrator teams need?
+. Is there any integrator in the room with a *specific concern* on a part of their
+  code base that would not be covered by such a guide? We would like to identify
+  those cases now, so we can address them explicitly in the guide.
 
 [NOTE]
 ====
