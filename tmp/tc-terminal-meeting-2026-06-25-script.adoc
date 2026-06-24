@@ -440,10 +440,23 @@ I will now go through the seven themes one by one. For each one, I will say:
 *Why.* The OpenSAM is able to hold *several security apps, all open at the
 same time*, each on its own channel. Today's API cannot describe that.
 
-*What changes.* Many card apps can now be picked and used *at the same
-time*, each on its own channel. Each card *knows on which channel it is*
-and *if it is still alive*. The framework gives a clean way to ask:
-_"Is my card still active? On which channel?"_
+*What changes.* Five functional changes:
+
+* *A new selection mode.* The selection step now has two flavours. The old
+  one, single-channel -- one card app at a time, like today. And a new one,
+  multi-channel -- many card apps picked together, each on its own channel.
+  The application chooses which one to run.
+* *A simple rule for the basic channel.* In multi-channel mode, the
+  application can say if the basic channel (channel zero) can also host
+  one of the selections, or if only extra channels are used.
+* *More than one active result.* The selection result no longer carries one
+  active card. It carries a *list* of active cards, one per channel.
+* *Each card now carries its own state.* Two new pieces of info travel with
+  each selected card: the channel number it sits on, and a flag telling if
+  it is still alive. The application can read both at any time.
+* *Closing a channel becomes a clear action.* In 2.x, you closed a channel
+  by passing a hint to a command. In 3.0, you call a dedicated close action
+  on the channel you want to close. No more side effect on commands.
 
 *Question.* Any worry about multi-channel? Any system that would break
 because of this change?
