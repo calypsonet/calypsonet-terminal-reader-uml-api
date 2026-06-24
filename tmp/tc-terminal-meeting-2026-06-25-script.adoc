@@ -369,7 +369,7 @@ document and the UML diagrams are linked from the forum.
 
 Three things pushed for it at the same time:
 
-. A new CNA product, *OpenSAM*. To work, OpenSAM needs *many application
+. The *OpenSAM* offers the possibility to have *several application
   channels open at the same time* on one SAM. Today's APIs assume only one
   at a time. We cannot fit OpenSAM in without breaking that.
 . *Apple ECP* -- *Enhanced Contactless Polling*. This is the special polling
@@ -464,32 +464,48 @@ because of this change?
 ==== Theme 2 -- Relay-attack defence -- 4 min
 
 *Why.* This is the API side of the proposal from Topic 2. The framework
-needs a way to *send a max time with each request*, and *send back the
-measured time with each response*.
+needs a way to *carry a max time with each request*, and *get back the
+real measured time with each response*.
 
-*What changes.* Two layers:
+*What changes.* Three functional changes:
 
-* In the *Card API*: each APDU exchange can now carry a max time. A special
-  exception fires if the time goes over.
-* In the *Calypso Card API*: you can set time caps for full secure sessions
-  and for SV operations. With a `csnMin` filter -- so the cap can be made
-  stricter for newer cards, as we talked about.
+* *A max time on each card exchange.* The application can attach a max
+  time to any card command. If the real time goes over, the command is
+  stopped right away. The transaction is cancelled.
+* *A max time on Calypso secure sessions and on SV operations.* On top of
+  the per-command time discussed before, there are new settings in the
+  Calypso Card API defining the max execution time for the open/close secure
+  session and SV operation APDUs. If the time goes
+  over, the transaction is cancelled.
+* *Time caps can target a card group.* You do not have to use the same time
+  cap for every card. You can say: _"cards above this serial number boundary
+  must use this stricter cap"_. So you can tighten the limit as newer, faster
+  card generations come out, without hurting the older ones.
 
 *Question.* This puts the Topic 2 proposal straight into the API. Does the
-TC agree on both layers -- per-APDU and per-session?
+TC agree on the three levels -- per-command, per-session, per-SV operation?
 
 ==== Theme 3 -- Simpler observation -- 3 min
 
-*Why.* In 2.x, starting card detection took many small steps. Register an
-observer. Register an error handler. Then call start. Some halfway states
-were not valid. In real life, every integrator we asked registered exactly
-*one* observer.
+*Why.* In 2.x, starting card detection took many small steps. First, give
+a piece of code that listens to card events. Then, give another piece of
+code that listens to errors. Then, call start. Some halfway states between
+these steps were not valid. And in real life, every integrator we asked
+used the same piece of code for both events and errors.
 
-*What changes.* Starting card detection, setting it up, and registering
-*one* listener for events *and* errors -- all in *one call*. No halfway
-state. Smaller API.
+*What changes.* Three functional changes:
 
-*Question.* Anyone here using more than one observer today? If so, please
+* *One single start call.* Starting card detection, setting up its
+  parameters, and giving the piece of code that listens to events and
+  errors -- all happens in one single call. No more inconsistent states.
+* *One single listener.* The two listening roles -- for normal events and
+  for errors -- are now merged into one. The application writes one piece
+  of code instead of two.
+* *Detection parameters travel together.* All the small pieces of detection
+  setup -- detection mode, target radio technologies, special polling frames
+  -- are grouped together. They are passed in at start time, in one go.
+
+*Question.* Anyone here using more than one listener today? If so, please
 speak up.
 
 ==== Theme 4 -- See the secure session state -- 3 min
@@ -498,35 +514,46 @@ speak up.
 _"Is a secure session open right now?"_. It had to track the state on its
 own side, in parallel. That is easy to get wrong.
 
-*What changes.* The application can now ask, any time: is a Calypso secure
-session open? What kind is it -- symmetric or asymmetric (PKI)? Which write
-level was asked for? The answer is a *snapshot* -- a copy that does not
-change later.
+*What changes.* One functional change with three pieces of info:
+
+* The application can now ask, at any moment, *for a snapshot of the
+  current secure session*. The snapshot is a copy. Once you have it, it
+  does not change.
+* The snapshot tells you three things: *is a session open right now?* What
+  *kind* of session is it -- symmetric (SAM-based) or asymmetric (PKI)?
+  And, when relevant, *which write level* was asked for at the start.
+* If you need fresh info later, you simply ask for a new snapshot.
 
 *Question.* Does this match what your business code needs? Is anything
 missing from the snapshot?
 
-==== Theme 5 -- Strong types for RF and card types -- 4 min
+==== Theme 5 -- Strong types for radio and card types -- 4 min
 
-*Why.* In 1.x and 2.x, you set up protocols with *free text strings*:
-`"ISO_14443_4"`, `"FELICA"`, and so on. No two integrators used the exact
-same strings. Typos went through the compiler. There was no central list of
-valid values. And there was no clean place to set the *Apple ECP* polling
-frame.
+*Why.* In 1.x and 2.x, you set up protocols with *free text strings*. Each
+integrator wrote their own values. Typos went through the compiler. There
+was no central list of valid values. And there was no clean place to set
+the *Apple ECP* polling frame -- Apple ECP stands for *Enhanced Contactless
+Polling*, the frame Apple needs for Calypso on the iPhone.
 
-*What changes.* The strings go away. Two strong-typed lists take their
-place: `RfTechnology` for the radio layer, `CardType` for the detected
-product. Now the compiler catches typos. The IDE shows you what is valid.
-The Apple ECP frame fits naturally into the detection settings.
+*What changes.* Three functional changes:
+
+* *Free text strings are gone.* Two fixed, controlled lists take their
+  place. One for the *radio technology* used to poll the card. One for the
+  *type of card* the terminal detects.
+* *Compiler-checked values.* The application can only use values from the
+  two lists. The compiler catches any typo at build time. The IDE shows
+  you which values are valid.
+* *Apple ECP has a clean home.* The special polling frame now has its own,
+  dedicated place in the detection setup. No need to bend the rest of the
+  API to fit it in.
 
 *Question.* The starting content of the two lists is in the change document.
-Two specific points need your green light:
+Two points need your green light:
 
-* We *merge ISO 14443-A and ISO 14443-B* into one value `ISO_14443_4` at the
-  transport level. At the product level we still tell A and B apart. Does
+* For the *transport-level* card type, we *merge ISO 14443-A and ISO 14443-B
+  into one value*. At the product level we still tell A and B apart. Does
   this match how you model things?
-* Is any value missing from `RfTechnology` or `CardType` that you need from
-  day one?
+* Is any value missing from either list that you need from day one?
 
 ==== Theme 6 -- New Definitions API -- 3 min
 
@@ -535,36 +562,58 @@ They are *shared* between several APIs. If we put them in the Reader API,
 every other API that wants to use them must depend on the full Reader API.
 That is too much. So we move them out, into a *new base module*.
 
-*What changes.* A new repository, `calypsonet-terminal-definitions-uml-api`,
-version 1.0.0. A new Java module, `keypop-definitions-jvm-api`. The Reader
-API now depends on it. Other Terminal APIs may depend on it later.
+*What changes.* Three functional changes:
+
+* *A new, small, base API is created.* Its only job is to *host the shared
+  types* -- the lists from Theme 5, and any future shared item of the same
+  kind. It has no business logic of its own.
+* *The Reader API now uses this base API.* When the application uses one
+  of the shared types, it gets it from the base API. The link is set up
+  for the application without any extra step.
+* *Other Terminal APIs can join later.* The Calypso Card API, the SAM API,
+  and future APIs can all use the same shared types -- without dragging in
+  the full Reader API as a side effect.
 
 *Question.* Do you agree with the idea of a separate base API, instead of
-a sub-package inside the Reader API?
+putting these types inside the Reader API?
 
 ==== Theme 7 -- Command identification -- 3 min
 
-*Why.* On Generic Card and Storage Card, the application *prepares many
-commands*, then sends them all together. Today, if one fails, the
-application cannot easily tell *which one* in the group failed.
+*Why.* On Generic Card and Storage Card, the application often *prepares
+many commands*, then sends them all together as one batch. Today, if one
+of these commands fails, the application cannot easily tell *which one*
+in the batch failed. The responses come back in order, but with no key.
 
-*What changes.* When you prepare a command, you can now tag it with *your
-own number*. If something fails, you get back the number of the broken
-command. If all is fine, you can also pick one response by its number.
+*What changes.* Three functional changes:
 
-*Question.* Any worry about this design -- a simple number given by the
+* *Tag a command with your own number.* When the application prepares a
+  command, it can give it *its own number* -- any number that makes sense
+  to its business logic.
+* *Get the tag back on a failure.* If the batch fails, the error carries
+  the number of the broken command. The application can react with full
+  context.
+* *Get a response by its tag.* When everything goes well, the application
+  can also pick one specific response directly by its number. No need to
+  count positions in the result list.
+
+*Question.* Any worry about this design -- a simple number, given by the
 application? Do you need another kind of id?
 
 ==== Cross-cutting cleanup -- 2 min
 
-On top of the seven themes, version 3.0 also drops:
+On top of the seven themes, version 3.0 also brings three pieces of cleanup:
 
-* *All deprecated items* kept since 1.0.
-* The `ChannelControl` enum. It is replaced by clear channel-close methods.
-* Some *duplicate exceptions* on the Calypso and SAM side. They were just
-  copies of Reader-level ones.
+* *All deprecated items are dropped.* Every item we had marked _"to be
+  removed later"_ since version 1.0 is now gone. The API surface gets
+  smaller and clearer.
+* *The old channel-control hint is gone.* In 2.x, you closed a channel by
+  passing a hint to a command. That mode is replaced by the clear
+  channel-close action we saw in Theme 1.
+* *Duplicate errors are merged.* On the Calypso and SAM side, several error
+  types were just copies of the lower-level Reader ones. They are removed.
+  The application now sees a single, common error for the same situation.
 
-*Question.* Is any TC member using one of these deprecated items today?
+*Question.* Is any TC member using one of these dropped items today?
 Please speak up now.
 
 [NOTE]
