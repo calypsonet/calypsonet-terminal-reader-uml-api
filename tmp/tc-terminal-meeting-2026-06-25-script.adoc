@@ -55,6 +55,8 @@ One last thing. In the middle of the meeting, our friends from *Monetech*
 will show you a short presentation. About 15 minutes. We will give them the
 screen sharing at that point.
 
+Let me show you the three topics on screen.
+
 // =============================================================================
 == Agenda -- [S3] Table of contents -- 2 min
 
@@ -79,6 +81,8 @@ package we submit to your review.
 A word on the "P3" name. The document is still under review. *P1*, *P2* and
 *P3* are just review rounds of the same major step. For today, you can
 ignore the "P3". What I will show you is the full 3.0 content as it stands now.
+
+That said, let's look at what actually changed.
 
 === [S5] Changes overview -- 10 min
 
@@ -150,6 +154,9 @@ you have one month after today.
 Pause for discussion -- 3 to 5 minutes.
 ====
 
+That closes our first topic. Let's now move
+to the second one -- the relay attack.
+
 // =============================================================================
 == TOPIC 2 -- Relay Attack -- the New Defence -- 50 min
 
@@ -159,18 +166,9 @@ We now move to a security topic. The proposal was first posted on the forum
 by *Jean-Pierre Fortune*. Some of you replied -- *Stéphane Didier*,
 *Pierre Terrée*. Thank you. I will use your input as we go.
 
-I will set the scene in one minute. Then I let Monetech show you the attack
-for real.
-
 === [S7] Monetech demo -- ≈ 15 min
 
-Before we talk about the fix, let's *see the problem with our own eyes*.
-
-A relay attack is easy to draw on a slide. But you really get it when you
-*see one live*. Monetech has built a working setup. They will show you a real
-card, a fake terminal, and how an attacker uses both to cheat.
-
-I give the floor to Monetech.
+Before we talk about the fix, let's Monetech take the control of the screen.
 
 [NOTE]
 ====
@@ -185,7 +183,26 @@ Thank you Monetech.
 Short reaction round -- 2 min: first feeling from the TC?
 ====
 
+Thank you again Monetech.
+
 === [S8] What it is -- the threat and the fix idea -- 15 min
+
+==== A word on the risk -- it depends on the use case
+
+One word before we go on. *The risk is not the same for every system.*
+
+* For *access control* -- a door, a restricted area, anything where *one
+fake entry already hurts* -- the risk is *high*. The back office sees the
+fraud too late. The local check is your only line.
+* For *transit ticketing systems* that already have *strong anti-clone checks
+in the back office*, the risk may be *very small in practice*. Mass fraud
+shows up in the logs. The back office stops it before it spreads. For these
+operators, the relay defence is more an *extra layer of safety* than a
+must-have.
+
+In short: today's proposal *gives every operator the option* to turn this
+defence on. We do not force it. Each operator decides, based on what they
+think their own risk is.
 
 ==== Why we must act now
 
@@ -198,23 +215,6 @@ Until today, our defences sat in two places. Some were in the *back office*
 Calypso REV3 stops people from injecting fake data. *None of them catches a
 simple spatial relay in real time, at the terminal*. We need a check that
 runs *now, locally, at the terminal*.
-
-==== A word on the risk -- it depends on the use case
-
-One word before we go on. *The risk is not the same for every system.*
-
-* For *access control* -- a door, a restricted area, anything where *one
-  fake entry already hurts* -- the risk is *high*. The back office sees the
-  fraud too late. The local check is your only line.
-* For *transit ticketing systems* that already have *strong anti-clone checks
-  in the back office*, the risk may be *very small in practice*. Mass fraud
-  shows up in the logs. The back office stops it before it spreads. For these
-  operators, the relay defence is more an *extra layer of safety* than a
-  must-have.
-
-In short: today's proposal *gives every operator the option* to turn this
-defence on. We do not force it. Each operator decides, based on what they
-think their own risk is.
 
 ==== The key idea
 
@@ -265,6 +265,9 @@ Two questions before we look at how to set this up:
 ====
 Discussion -- 5 min.
 ====
+
+The principle is now clear. The real question is: how do we actually set
+this up on terminals already in the field?
 
 === [S9] Setup challenges -- how to identify each card -- 15 min
 
@@ -345,11 +348,16 @@ one that fits its own card mix.
 Discussion -- 5 to 7 min.
 ====
 
+And that closes the relay topic for now. Let's take a short break before
+we move to the last one.
+
 // =============================================================================
 == Short break -- 5 min
 
-Let's take a 5-minute break before the last topic. Stretch, get a coffee.
-We come back on the Terminal APIs 3.0.
+Let's take a 5-minute break. Stretch, get a coffee.
+
+Welcome back. We now move to the third and last topic -- the new release
+of the Terminal APIs.
 
 // =============================================================================
 == TOPIC 3 -- Terminal APIs 3.0 -- 45 min
@@ -361,6 +369,9 @@ The third topic is the big new release of the Terminal APIs. Version 3.0.
 We submit this release *for your review*. Today we do not look at Java code
 or UML class diagrams. We focus on the *why* of each change. The full change
 document and the UML diagrams are linked from the forum.
+
+Let me start with the scope of this release and why we picked this moment
+for it.
 
 === [S11] Scope, drivers, migration support -- 10 min
 
@@ -437,7 +448,8 @@ I will now go through the seven themes one by one. For each one, I will say:
 ==== Theme 1 -- Multiple logical channels -- 5 min
 
 *Why.* The OpenSAM is able to hold *several security apps, all open at the
-same time*, each on its own channel. Today's API cannot describe that.
+same time*, each on its own channel. The current API cannot describe that,
+and we will need it shortly.
 
 *What changes.* Five functional changes:
 
@@ -459,6 +471,9 @@ same time*, each on its own channel. Today's API cannot describe that.
 
 *Question.* Any worry about multi-channel? Any system that would break
 because of this change?
+
+Let's move to Theme 2 -- the API side of the relay defence we discussed
+earlier.
 
 ==== Theme 2 -- Relay-attack defence -- 4 min
 
@@ -484,6 +499,8 @@ real measured time with each response*.
 *Question.* This puts the Topic 2 proposal straight into the API. Does the
 TC agree on the three levels -- per-command, per-session, per-SV operation?
 
+Now Theme 3 -- a much simpler way to observe a reader.
+
 ==== Theme 3 -- Simpler observation -- 3 min
 
 *Why.* In 2.x, starting card detection took many small steps. First, give
@@ -507,6 +524,8 @@ used the same piece of code for both events and errors.
 *Question.* Anyone here using more than one listener today? If so, please
 speak up.
 
+Next, Theme 4 -- looking inside the secure session.
+
 ==== Theme 4 -- See the secure session state -- 3 min
 
 *Why.* Until 2.x, the application had no way to ask:
@@ -525,6 +544,8 @@ own side, in parallel. That is easy to get wrong.
 
 *Question.* Does this match what your business code needs? Is anything
 missing from the snapshot?
+
+On to Theme 5 -- strong types for radio and card types.
 
 ==== Theme 5 -- Strong types for radio and card types -- 4 min
 
@@ -554,6 +575,8 @@ Two points we would like your view on:
   this match how you model things?
 * Is any value missing from either list that you need from day one?
 
+Theme 6 follows naturally from what we just said -- the new Definitions API.
+
 ==== Theme 6 -- New Definitions API -- 3 min
 
 *Why.* The two lists from Theme 5 do not belong to the Reader API alone.
@@ -575,6 +598,8 @@ That is too much. So we move them out, into a *new base module*.
 
 *Question.* Do you agree with the idea of a separate base API, instead of
 putting these types inside the Reader API?
+
+And the last of the seven -- command identification.
 
 ==== Theme 7 -- Command identification -- 3 min
 
@@ -598,6 +623,8 @@ in the batch failed. The responses come back in order, but with no key.
 *Question.* Any worry about this design -- a simple number, given by the
 application? Do you need another kind of id?
 
+Before I close Topic 3, two short minutes on the cross-cutting cleanup.
+
 ==== Cross-cutting cleanup -- 2 min
 
 On top of the seven themes, version 3.0 also brings three pieces of cleanup:
@@ -619,6 +646,9 @@ Please speak up now.
 ====
 Final discussion on the seven themes -- 5 min.
 ====
+
+And that closes the seven themes. We are now at the end of today's agenda.
+Time to wrap up.
 
 // =============================================================================
 == Closing -- [S13] Thank you -- 5 min
