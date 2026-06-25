@@ -63,7 +63,7 @@ Let me show you the three topics on screen.
 Three topics, in this order:
 
 . *Reader Layer Requirements -- version 3.0P3.*
-. *Relay attack -- the new defence we propose.*
+. *Relay attack -- presentation and countermeasure.*
 . *Terminal APIs -- version 3.0.*
 
 Let me start with the first one -- the Reader Layer Requirements.
@@ -158,7 +158,7 @@ That closes our first topic. Let's now move
 to the second one -- the relay attack.
 
 // =============================================================================
-== TOPIC 2 -- Relay Attack -- the New Defence -- 50 min
+== TOPIC 2 -- Relay Attack -- presentation and countermeasure -- 50 min
 
 === [S6] Section opener -- 1 min
 
@@ -362,9 +362,30 @@ of the Terminal APIs.
 // =============================================================================
 == TOPIC 3 -- Terminal APIs 3.0 -- 45 min
 
-=== [S10] Section opener -- 1 min
+=== [S10] Section opener -- 3 min
 
 The third topic is the big new release of the Terminal APIs. Version 3.0.
+
+==== A short word on what these APIs are
+
+Before I go into the changes, a quick reminder on *what these APIs are*
+and *why they exist*.
+
+The Calypso Terminal APIs are a set of *code contracts*. They were created
+for one reason: to make it *easier for terminal vendors* to build software
+that matches our written specifications -- the *Reader Layer* on one side,
+the *Calypso Layer* on the other.
+
+In short, the APIs turn written rules into *ready-to-use building blocks*.
+The vendor uses the building blocks. The compliance with our specifications
+comes with them.
+
+The long-term goal is bigger. We want these APIs to be the foundation for
+*automated certification* of terminals. A terminal built on top of the
+official APIs should one day be certified without a long, manual test
+campaign. Each new release of the APIs is one step closer to that goal.
+
+==== About today's release
 
 We submit this release *for your review*. Today we do not look at Java code
 or UML class diagrams. We focus on the *why* of each change. The full change
@@ -700,9 +721,11 @@ Thank you very much. Have a good rest of the day. See you on the forum.
 | Relay -- principle             | S8       | 15   | 51
 | Relay -- setup challenges      | S9       | 15   | 66
 | *Break*                        | --       | 5    | 71
-| APIs -- opener + scope         | S10-S11  | 11   | 82
-| APIs -- 7 themes               | S12      | 30   | 112
-| Closing                        | S13      | 5    | 117
+| APIs -- opener + context        | S10      | 3    | 74
+| APIs -- scope + migration       | S11      | 10   | 84
+| APIs -- 7 themes                | S12      | 30   | 114
+| Closing                         | S13      | 5    | 119
 |===
 
-≈ *2 hours total* with 3 minutes of slack for transitions.
+≈ *2 hours total* (the 4 extra minutes absorb naturally into the discussion
+slots if needed).
