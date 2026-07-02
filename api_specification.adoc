@@ -396,149 +396,7 @@ anchor its own transaction manager at the capability level that matches its card
 The `ReaderApiProperties` type MUST NOT be instantiated. Implementations MUST prevent external construction.
 ====
 
-=== Enumerations
-
-[[type_CardPresenceNotificationPolicy]]
-==== Card Presence Notification Policy
-
-Nested inside <<type_CardSelectionManager,`CardSelectionManager`>>. Options applied when a card is detected, used
-to decide which cards trigger event-handler notifications. _Since 3.0._
-
-[cols="1,1,4", options="header"]
-|===
-| Value          | Since | Description
-
-| `ALWAYS`       | 3.0 | All cards presented to the reader are notified, regardless of the result of the selection.
-| `MATCHED_ONLY` | 3.0 | Only cards that have been successfully selected are notified. The others MUST be ignored.
-|===
-
-[[type_CardReaderEventType]]
-==== Card Reader Event Type
-
-Nested inside <<type_CardReaderEvent,`CardReaderEvent`>>. Possible card reader events. _Since 1.0._
-
-[cols="1,1,4", options="header"]
-|===
-| Value                  | Since | Description
-
-| `CARD_INSERTED`        | 1.0 | A card has been inserted, with or without a specific selection.
-| `CARD_MATCHED`         | 1.0 | A card has been inserted that matches the selection criteria.
-| `CARD_REMOVED`         | 1.0 | The card has been removed from the reader.
-| `READER_UNREGISTERED`  | 3.0 | The reader has been unregistered and is no longer usable.
-|===
-
-[[type_ChannelSelectionPolicy]]
-==== Channel Selection Policy
-
-Nested inside <<type_CardSelectionManager,`CardSelectionManager`>>. Policy governing the use of the basic channel
-in a multi-channel selection scenario. _Since 3.0._
-
-[cols="1,1,4", options="header"]
-|===
-| Value                  | Since | Description
-
-| `ALLOW_BASIC_CHANNEL`  | 3.0 | The basic channel (channel `0`) MAY host selection cases in addition to the additional logical channels.
-| `LOGICAL_CHANNEL_ONLY` | 3.0 | Selection cases MUST be placed only on additional logical channels; the basic channel is not used.
-|===
-
-[[type_DetectionMode]]
-==== Detection Mode
-
-Nested inside <<type_CardDetectionSettings,`CardDetectionSettings`>>. Defines the behaviour to apply after a card
-processing cycle has terminated. _Since 3.0._
-
-[cols="1,1,4", options="header"]
-|===
-| Value          | Since | Description
-
-| `REPEATING`    | 3.0 | The reader continues waiting for the next card insertion.
-| `SINGLE_SHOT`  | 3.0 | The reader stops detection and waits for an explicit restart signal.
-|===
-
-[[type_FileControlInformation]]
-==== File Control Information
-
-Nested inside `IsoCardSelector`. Types of templates returned in response to the *Select Application* command,
-according to ISO/IEC 7816-4. _Since 2.0._
-
-[cols="1,1,4", options="header"]
-|===
-| Value          | Since | Description
-| `FCI`          | 2.0 | File Control Information.
-| `FCP`          | 2.0 | File Control Parameters.
-| `FMD`          | 2.0 | File Management Data.
-| `NO_RESPONSE`  | 2.0 | No response expected.
-|===
-
-[[type_FileOccurrence]]
-==== File Occurrence
-
-Nested inside `IsoCardSelector`. Navigation options through the applications contained on the card according to
-ISO/IEC 7816-4. _Since 2.0._
-
-[cols="1,1,4", options="header"]
-|===
-| Value      | Since | Description
-| `FIRST`    | 2.0 | First occurrence.
-| `LAST`     | 2.0 | Last occurrence.
-| `NEXT`     | 2.0 | Next occurrence.
-| `PREVIOUS` | 2.0 | Previous occurrence.
-|===
-
-[[type_SelectionExecutionPolicy]]
-==== Selection Execution Policy
-
-Nested inside <<type_CardSelectionManager,`CardSelectionManager`>>. Policy governing the iteration over the
-selection cases of a scenario. _Since 3.0._
-
-[cols="1,1,4", options="header"]
-|===
-| Value                  | Since | Description
-
-| `STOP_ON_FIRST_MATCH`  | 3.0 | The manager MUST stop at the first successful selection case.
-| `PROCESS_ALL`          | 3.0 | The manager MUST process every selection case regardless of intermediate successes.
-|===
-
-[[sec_exceptions]]
-=== Exceptions
-
-[[type_CardCommunicationException]]
-==== Card Communication Exception
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Kind     | Runtime exception
-| Namespace  | `reader`
-| Since    | 1.0
-| Purpose  | Indicates that the communication with the card has failed.
-|===
-
-[[type_InvalidCardResponseException]]
-==== Invalid Card Response Exception
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Kind     | Runtime exception
-| Namespace  | `reader`
-| Since    | 2.1
-| Purpose
-| Indicates that a response received from the card was invalid, either during a selection process or during the
-  processing of a transaction. This exception is also raised when an ISO/IEC 7816-4 card does not support a
-  requested multi-channel operation.
-|===
-
-[[type_ReaderCommunicationException]]
-==== Reader Communication Exception
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Kind     | Runtime exception
-| Namespace  | `reader`
-| Since    | 1.0
-| Purpose  | Indicates that the communication with the reader has failed. The most likely cause is a physical disconnection of the reader, but other technical problems MAY also be at the origin of the failure.
-|===
-
-=== Interfaces
+=== API Interfaces
 
 [[type_BasicCardSelector]]
 ==== Basic Card Selector
@@ -721,67 +579,6 @@ card selection response.
 | Returns     | A <<type_CardReaderEventType,`Type`>> value.
 | Throws      | None.
 |===
-
-[[type_CardReaderEventHandler]]
-==== Card Reader Event Handler
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Kind     | Interface (SPI)
-| Namespace  | `reader.spi`
-| Since    | 3.0
-| Purpose  | Implemented by the application to receive reader events and observation errors from an <<type_ObservableCardReader,`ObservableCardReader`>>.
-|===
-
-This SPI unifies the reception of nominal events (`onReaderEvent`) and of fatal observation errors
-(`onReaderError`) into a single contract, which the application implements once and registers at the call to
-<<type_ObservableCardReader,`startCardDetection`>>.
-
-[[op_CardReaderEventHandler_onReaderError]]
-===== On Reader Error
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Signature
-| `onReaderError(context: string, readerName: string, e: throwable) -> void`
-| Since       | 3.0
-| Description
-| Invoked when a fatal error occurs on the observed reader. After the operation returns, the observation process
-  MUST be considered stopped.
-| Parameters
-| `context`     -- contextual information describing the operation that failed. +
-  `readerName`  -- name of the reader on which the error occurred. +
-  `e`           -- the original exception that triggered the notification.
-| Throws       | None.
-|===
-
-[[op_CardReaderEventHandler_onReaderEvent]]
-===== On Reader Event
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Signature   | `onReaderEvent(cardReaderEvent: CardReaderEvent) -> void`
-| Since       | 3.0
-| Description
-| Invoked when a reader event occurs. The dispatch SHOULD be performed *sequentially* and *synchronously* unless
-  the implementation explicitly documents a different policy.
-| Parameters  | `cardReaderEvent` -- the event payload.
-| Throws      | None. Implementations MUST ensure that exceptions thrown by the handler are routed to `onReaderError`.
-|===
-
-[[type_CardSelectionExtension]]
-==== Card Selection Extension
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Kind     | Interface (SPI, marker)
-| Namespace  | `reader.selection.spi`
-| Since    | 2.0
-| Purpose  | Provided by card extensions to enrich a selection case with additional commands and to interpret the response in order to build the corresponding <<type_SmartCard,`SmartCard`>>.
-|===
-
-This interface declares no operation at the API level; the contract between the selection manager and the
-extension is defined by the card extension specification consuming this SPI.
 
 [[type_CardSelectionManager]]
 ==== Card Selection Manager
@@ -1095,41 +892,6 @@ card MUST NOT be selected if at least one of them rejects it.
 | Throws      | `IllegalArgumentException` -- if the provided regular expression is empty or invalid.
 |===
 
-[[type_CardTransactionManager]]
-==== Card Transaction Manager
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Kind     | Interface (SPI)
-| Namespace  | `reader.transaction.spi`
-| Since    | 2.1
-| Purpose  | Root contract common to every card transaction manager exposed by a card extension. Defines the single operation `processCommands`.
-|===
-
-To exchange data with a card, the application MUST first prepare the commands to transmit (via the operations of
-the consuming card extension) and then process them. The preparation step allows commands to be grouped to
-minimise network exchanges, which is especially valuable in distributed architectures. The
-<<type_SmartCard,`SmartCard`>> registered with the manager MUST be updated after each data exchange with the card.
-
-===== Process Commands
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Signature   | `processCommands() -> void`
-| Since       | 3.0
-| Description
-| Processes all previously prepared commands.
-
-  All APDUs corresponding to the prepared commands MUST be sent to the card, their responses retrieved and used
-  to update the <<type_SmartCard,`SmartCard`>> associated with the transaction.
-  For write commands, the `SmartCard` MUST be updated only when the command is successful. The process MUST be
-  interrupted at the first failed command.
-| Throws
-| `ReaderCommunicationException` -- if a communication error with the reader occurs. +
-  `CardCommunicationException` -- if a communication error with the card occurs. +
-  `InvalidCardResponseException` -- if a command returns an unexpected status.
-|===
-
 [[type_IsoCardSelector]]
 ==== ISO Card Selector
 
@@ -1193,117 +955,6 @@ minimise network exchanges, which is especially valuable in distributed architec
 | Description | Sets the file occurrence mode (see ISO/IEC 7816-4). The default value is `FIRST`.
 | Parameters  | `fileOccurrence` -- the navigation option to apply.
 | Returns     | The current instance (`IsoCardSelector`).
-|===
-
-[[type_IsoCardTransactionManager]]
-==== ISO Card Transaction Manager
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Kind     | Interface (SPI)
-| Namespace  | `reader.transaction.spi`
-| Extends  | <<type_CardTransactionManager,`CardTransactionManager`>>
-| Since    | 3.0
-| Purpose  | Intermediate contract for ISO/IEC 7816-4 cards. Exposes the on-demand cast to multi-channel.
-|===
-
-===== As Multichannel Card Transaction Manager
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Signature   | `asMultichannelCardTransactionManager() -> MultichannelCardTransactionManager`
-| Since       | 3.0
-| Description
-| Returns a view of this manager as a <<type_MultichannelCardTransactionManager,
-  `MultichannelCardTransactionManager`>>, granting access to the multi-channel operations.
-
-  *Prerequisite:* the underlying ISO/IEC 7816-4 card MUST support multi-channel. Implementations MUST raise
-  `InvalidCardResponseException` if the cast is requested on a card that does not support multi-channel.
-| Returns     | A <<type_MultichannelCardTransactionManager,`MultichannelCardTransactionManager`>>.
-| Throws      | `InvalidCardResponseException` -- if the card does not support multi-channel.
-|===
-
-[[type_IsoSmartCard]]
-==== ISO Smart Card
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Kind     | Interface (SPI)
-| Namespace  | `reader.selection.spi`
-| Extends  | <<type_SmartCard,`SmartCard`>>
-| Since    | 2.0
-| Purpose  | ISO/IEC 7816-4 smart card whose communication has been established after a successful selection.
-|===
-
-In addition to the inherited power-on data, an `IsoSmartCard` exposes the response to the *Select Application*
-command. Both the power-on data and the *Select Application* response are OPTIONAL but they MUST NOT both be
-absent at the same time.
-
-===== Get Select Application Response
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Signature   | `getSelectApplicationResponse() -> byte array`
-| Since       | 1.0
-| Description | Returns the data received from the card in response to the *Select Application* command, including the status word.
-| Returns     | The response bytes, or `null` if no *Select Application* command has been performed.
-| Throws      | None.
-|===
-
-===== Is Basic Channel
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Signature   | `isBasicChannel() -> boolean`
-| Since       | 3.0
-| Description
-| Indicates whether this smart card is attached to the basic channel (channel `0`) of the underlying ISO/IEC 7816-4
-  card, or to an additional logical channel.
-| Returns     | `true` if attached to the basic channel, `false` if attached to an additional logical channel.
-| Throws      | None.
-|===
-
-[[type_MultichannelCardTransactionManager]]
-==== Multichannel Card Transaction Manager
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Kind     | Interface (SPI)
-| Namespace  | `reader.transaction.spi`
-| Extends  | <<type_CardTransactionManager,`CardTransactionManager`>>
-| Since    | 3.0
-| Purpose  | Multi-channel contract. Exposes the operations to close a logical channel explicitly.
-|===
-
-This contract MAY be obtained either:
-
-* through <<type_IsoCardTransactionManager,`IsoCardTransactionManager.asMultichannelCardTransactionManager`>>, for
-  ISO/IEC 7816-4 cards on which multi-channel is an optional capability;
-* directly as the declared stereotype of a card extension targeting intrinsically multi-channel cards.
-
-===== Close Channel
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Signature   | `closeChannel() -> void`
-| Since       | 3.0
-| Description | Closes the underlying logical channel without processing any pending command.
-| Throws
-| `ReaderCommunicationException` -- if a communication error with the reader occurs. +
-  `CardCommunicationException` -- if a communication error with the card occurs.
-|===
-
-===== Process Commands And Close Channel
-
-[cols="1h,4", grid=rows, frame=all]
-|===
-| Signature   | `processCommandsAndCloseChannel() -> void`
-| Since       | 3.0
-| Description | Processes all previously prepared commands and, upon success, closes the underlying logical channel.
-| Throws
-| `ReaderCommunicationException` -- if a communication error with the reader occurs. +
-  `CardCommunicationException` -- if a communication error with the card occurs. +
-  `InvalidCardResponseException` -- if a command returns an unexpected status.
 |===
 
 [[type_ObservableCardReader]]
@@ -1452,6 +1103,215 @@ This interface declares no operation. It conveys the card responses to one or mo
 cases (selection step itself plus any subsequent commands). Its content MUST be interpreted through
 <<op_parseScheduledCardSelectionsResponse,`CardSelectionManager.parseScheduledCardSelectionsResponse`>>.
 
+=== SPI Interfaces
+
+[[type_CardReaderEventHandler]]
+==== Card Reader Event Handler
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Kind     | Interface (SPI)
+| Namespace  | `reader.spi`
+| Since    | 3.0
+| Purpose  | Implemented by the application to receive reader events and observation errors from an <<type_ObservableCardReader,`ObservableCardReader`>>.
+|===
+
+This SPI unifies the reception of nominal events (`onReaderEvent`) and of fatal observation errors
+(`onReaderError`) into a single contract, which the application implements once and registers at the call to
+<<type_ObservableCardReader,`startCardDetection`>>.
+
+[[op_CardReaderEventHandler_onReaderError]]
+===== On Reader Error
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature
+| `onReaderError(context: string, readerName: string, e: throwable) -> void`
+| Since       | 3.0
+| Description
+| Invoked when a fatal error occurs on the observed reader. After the operation returns, the observation process
+  MUST be considered stopped.
+| Parameters
+| `context`     -- contextual information describing the operation that failed. +
+  `readerName`  -- name of the reader on which the error occurred. +
+  `e`           -- the original exception that triggered the notification.
+| Throws       | None.
+|===
+
+[[op_CardReaderEventHandler_onReaderEvent]]
+===== On Reader Event
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature   | `onReaderEvent(cardReaderEvent: CardReaderEvent) -> void`
+| Since       | 3.0
+| Description
+| Invoked when a reader event occurs. The dispatch SHOULD be performed *sequentially* and *synchronously* unless
+  the implementation explicitly documents a different policy.
+| Parameters  | `cardReaderEvent` -- the event payload.
+| Throws      | None. Implementations MUST ensure that exceptions thrown by the handler are routed to `onReaderError`.
+|===
+
+[[type_CardSelectionExtension]]
+==== Card Selection Extension
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Kind     | Interface (SPI, marker)
+| Namespace  | `reader.selection.spi`
+| Since    | 2.0
+| Purpose  | Provided by card extensions to enrich a selection case with additional commands and to interpret the response in order to build the corresponding <<type_SmartCard,`SmartCard`>>.
+|===
+
+This interface declares no operation at the API level; the contract between the selection manager and the
+extension is defined by the card extension specification consuming this SPI.
+
+[[type_CardTransactionManager]]
+==== Card Transaction Manager
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Kind     | Interface (SPI)
+| Namespace  | `reader.transaction.spi`
+| Since    | 2.1
+| Purpose  | Root contract common to every card transaction manager exposed by a card extension. Defines the single operation `processCommands`.
+|===
+
+To exchange data with a card, the application MUST first prepare the commands to transmit (via the operations of
+the consuming card extension) and then process them. The preparation step allows commands to be grouped to
+minimise network exchanges, which is especially valuable in distributed architectures. The
+<<type_SmartCard,`SmartCard`>> registered with the manager MUST be updated after each data exchange with the card.
+
+===== Process Commands
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature   | `processCommands() -> void`
+| Since       | 3.0
+| Description
+| Processes all previously prepared commands.
+
+  All APDUs corresponding to the prepared commands MUST be sent to the card, their responses retrieved and used
+  to update the <<type_SmartCard,`SmartCard`>> associated with the transaction.
+  For write commands, the `SmartCard` MUST be updated only when the command is successful. The process MUST be
+  interrupted at the first failed command.
+| Throws
+| `ReaderCommunicationException` -- if a communication error with the reader occurs. +
+  `CardCommunicationException` -- if a communication error with the card occurs. +
+  `InvalidCardResponseException` -- if a command returns an unexpected status.
+|===
+
+[[type_IsoCardTransactionManager]]
+==== ISO Card Transaction Manager
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Kind     | Interface (SPI)
+| Namespace  | `reader.transaction.spi`
+| Extends  | <<type_CardTransactionManager,`CardTransactionManager`>>
+| Since    | 3.0
+| Purpose  | Intermediate contract for ISO/IEC 7816-4 cards. Exposes the on-demand cast to multi-channel.
+|===
+
+===== As Multichannel Card Transaction Manager
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature   | `asMultichannelCardTransactionManager() -> MultichannelCardTransactionManager`
+| Since       | 3.0
+| Description
+| Returns a view of this manager as a <<type_MultichannelCardTransactionManager,
+  `MultichannelCardTransactionManager`>>, granting access to the multi-channel operations.
+
+  *Prerequisite:* the underlying ISO/IEC 7816-4 card MUST support multi-channel. Implementations MUST raise
+  `InvalidCardResponseException` if the cast is requested on a card that does not support multi-channel.
+| Returns     | A <<type_MultichannelCardTransactionManager,`MultichannelCardTransactionManager`>>.
+| Throws      | `InvalidCardResponseException` -- if the card does not support multi-channel.
+|===
+
+[[type_IsoSmartCard]]
+==== ISO Smart Card
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Kind     | Interface (SPI)
+| Namespace  | `reader.selection.spi`
+| Extends  | <<type_SmartCard,`SmartCard`>>
+| Since    | 2.0
+| Purpose  | ISO/IEC 7816-4 smart card whose communication has been established after a successful selection.
+|===
+
+In addition to the inherited power-on data, an `IsoSmartCard` exposes the response to the *Select Application*
+command. Both the power-on data and the *Select Application* response are OPTIONAL but they MUST NOT both be
+absent at the same time.
+
+===== Get Select Application Response
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature   | `getSelectApplicationResponse() -> byte array`
+| Since       | 1.0
+| Description | Returns the data received from the card in response to the *Select Application* command, including the status word.
+| Returns     | The response bytes, or `null` if no *Select Application* command has been performed.
+| Throws      | None.
+|===
+
+===== Is Basic Channel
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature   | `isBasicChannel() -> boolean`
+| Since       | 3.0
+| Description
+| Indicates whether this smart card is attached to the basic channel (channel `0`) of the underlying ISO/IEC 7816-4
+  card, or to an additional logical channel.
+| Returns     | `true` if attached to the basic channel, `false` if attached to an additional logical channel.
+| Throws      | None.
+|===
+
+[[type_MultichannelCardTransactionManager]]
+==== Multichannel Card Transaction Manager
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Kind     | Interface (SPI)
+| Namespace  | `reader.transaction.spi`
+| Extends  | <<type_CardTransactionManager,`CardTransactionManager`>>
+| Since    | 3.0
+| Purpose  | Multi-channel contract. Exposes the operations to close a logical channel explicitly.
+|===
+
+This contract MAY be obtained either:
+
+* through <<type_IsoCardTransactionManager,`IsoCardTransactionManager.asMultichannelCardTransactionManager`>>, for
+  ISO/IEC 7816-4 cards on which multi-channel is an optional capability;
+* directly as the declared stereotype of a card extension targeting intrinsically multi-channel cards.
+
+===== Close Channel
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature   | `closeChannel() -> void`
+| Since       | 3.0
+| Description | Closes the underlying logical channel without processing any pending command.
+| Throws
+| `ReaderCommunicationException` -- if a communication error with the reader occurs. +
+  `CardCommunicationException` -- if a communication error with the card occurs.
+|===
+
+===== Process Commands And Close Channel
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature   | `processCommandsAndCloseChannel() -> void`
+| Since       | 3.0
+| Description | Processes all previously prepared commands and, upon success, closes the underlying logical channel.
+| Throws
+| `ReaderCommunicationException` -- if a communication error with the reader occurs. +
+  `CardCommunicationException` -- if a communication error with the card occurs. +
+  `InvalidCardResponseException` -- if a command returns an unexpected status.
+|===
+
 [[type_SmartCard]]
 ==== Smart Card
 
@@ -1500,6 +1360,148 @@ selection.
   occurrence of any event that causes the reader to deactivate it (see <<sec_smartcard_lifecycle>>).
 | Returns     | `true` if the smart card is active, `false` otherwise.
 | Throws      | None.
+|===
+
+=== Enumerations
+
+[[type_CardPresenceNotificationPolicy]]
+==== Card Presence Notification Policy
+
+Nested inside <<type_CardSelectionManager,`CardSelectionManager`>>. Options applied when a card is detected, used
+to decide which cards trigger event-handler notifications. _Since 3.0._
+
+[cols="1,1,4", options="header"]
+|===
+| Value          | Since | Description
+
+| `ALWAYS`       | 3.0 | All cards presented to the reader are notified, regardless of the result of the selection.
+| `MATCHED_ONLY` | 3.0 | Only cards that have been successfully selected are notified. The others MUST be ignored.
+|===
+
+[[type_CardReaderEventType]]
+==== Card Reader Event Type
+
+Nested inside <<type_CardReaderEvent,`CardReaderEvent`>>. Possible card reader events. _Since 1.0._
+
+[cols="1,1,4", options="header"]
+|===
+| Value                  | Since | Description
+
+| `CARD_INSERTED`        | 1.0 | A card has been inserted, with or without a specific selection.
+| `CARD_MATCHED`         | 1.0 | A card has been inserted that matches the selection criteria.
+| `CARD_REMOVED`         | 1.0 | The card has been removed from the reader.
+| `READER_UNREGISTERED`  | 3.0 | The reader has been unregistered and is no longer usable.
+|===
+
+[[type_ChannelSelectionPolicy]]
+==== Channel Selection Policy
+
+Nested inside <<type_CardSelectionManager,`CardSelectionManager`>>. Policy governing the use of the basic channel
+in a multi-channel selection scenario. _Since 3.0._
+
+[cols="1,1,4", options="header"]
+|===
+| Value                  | Since | Description
+
+| `ALLOW_BASIC_CHANNEL`  | 3.0 | The basic channel (channel `0`) MAY host selection cases in addition to the additional logical channels.
+| `LOGICAL_CHANNEL_ONLY` | 3.0 | Selection cases MUST be placed only on additional logical channels; the basic channel is not used.
+|===
+
+[[type_DetectionMode]]
+==== Detection Mode
+
+Nested inside <<type_CardDetectionSettings,`CardDetectionSettings`>>. Defines the behaviour to apply after a card
+processing cycle has terminated. _Since 3.0._
+
+[cols="1,1,4", options="header"]
+|===
+| Value          | Since | Description
+
+| `REPEATING`    | 3.0 | The reader continues waiting for the next card insertion.
+| `SINGLE_SHOT`  | 3.0 | The reader stops detection and waits for an explicit restart signal.
+|===
+
+[[type_FileControlInformation]]
+==== File Control Information
+
+Nested inside `IsoCardSelector`. Types of templates returned in response to the *Select Application* command,
+according to ISO/IEC 7816-4. _Since 2.0._
+
+[cols="1,1,4", options="header"]
+|===
+| Value          | Since | Description
+| `FCI`          | 2.0 | File Control Information.
+| `FCP`          | 2.0 | File Control Parameters.
+| `FMD`          | 2.0 | File Management Data.
+| `NO_RESPONSE`  | 2.0 | No response expected.
+|===
+
+[[type_FileOccurrence]]
+==== File Occurrence
+
+Nested inside `IsoCardSelector`. Navigation options through the applications contained on the card according to
+ISO/IEC 7816-4. _Since 2.0._
+
+[cols="1,1,4", options="header"]
+|===
+| Value      | Since | Description
+| `FIRST`    | 2.0 | First occurrence.
+| `LAST`     | 2.0 | Last occurrence.
+| `NEXT`     | 2.0 | Next occurrence.
+| `PREVIOUS` | 2.0 | Previous occurrence.
+|===
+
+[[type_SelectionExecutionPolicy]]
+==== Selection Execution Policy
+
+Nested inside <<type_CardSelectionManager,`CardSelectionManager`>>. Policy governing the iteration over the
+selection cases of a scenario. _Since 3.0._
+
+[cols="1,1,4", options="header"]
+|===
+| Value                  | Since | Description
+
+| `STOP_ON_FIRST_MATCH`  | 3.0 | The manager MUST stop at the first successful selection case.
+| `PROCESS_ALL`          | 3.0 | The manager MUST process every selection case regardless of intermediate successes.
+|===
+
+[[sec_exceptions]]
+=== Exceptions
+
+[[type_CardCommunicationException]]
+==== Card Communication Exception
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Kind     | Runtime exception
+| Namespace  | `reader`
+| Since    | 1.0
+| Purpose  | Indicates that the communication with the card has failed.
+|===
+
+[[type_InvalidCardResponseException]]
+==== Invalid Card Response Exception
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Kind     | Runtime exception
+| Namespace  | `reader`
+| Since    | 2.1
+| Purpose
+| Indicates that a response received from the card was invalid, either during a selection process or during the
+  processing of a transaction. This exception is also raised when an ISO/IEC 7816-4 card does not support a
+  requested multi-channel operation.
+|===
+
+[[type_ReaderCommunicationException]]
+==== Reader Communication Exception
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Kind     | Runtime exception
+| Namespace  | `reader`
+| Since    | 1.0
+| Purpose  | Indicates that the communication with the reader has failed. The most likely cause is a physical disconnection of the reader, but other technical problems MAY also be at the origin of the failure.
 |===
 
 [[sec_behaviours]]
