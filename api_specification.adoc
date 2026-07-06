@@ -54,7 +54,7 @@ terminal applications discover card readers, observe card events, select cards a
 |===
 
 NOTE: The present document specifies the {spec-version} of the {spec-name} as an *initial release*, without
-historical reference to earlier informal drafts. It defines a single, coherent baseline against which conforming
+historical reference to earlier drafts. It defines a single, coherent baseline against which conforming
 implementations are evaluated.
 
 // =============================================================================
