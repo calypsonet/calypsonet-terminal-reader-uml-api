@@ -175,7 +175,7 @@ not restated for each operation:
 | RFC 8174
 | _Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words_, B. Leiba, May 2017.
 
-| [[ref_iso7816]] [ISO/IEC 7816-4]
+| [[ref_iso7816_4]] [ISO/IEC 7816-4]
 | ISO/IEC 7816-4
 | _Identification cards -- Integrated circuit cards -- Part 4: Organization, security and commands for interchange_.
 
@@ -183,17 +183,17 @@ not restated for each operation:
 | ISO/IEC 14443
 | _Identification cards -- Contactless integrated circuit cards -- Proximity cards_.
 
-| [[ref_cna_card]] [CNA-TC-API]
+| [[ref_cna_tc]] [CNA-TC-API]
 | CNA-TC-API
-| _Calypsonet Terminal Card API Specification_, {organization}.
+| _Terminal Card API Specification_, {organization}.
 
-| [[ref_cna_def]] [CNA-TD-API]
+| [[ref_cna_td]] [CNA-TD-API]
 | CNA-TD-API
-| _Calypsonet Terminal Definitions API Specification_, {organization}. Provides the `RfTechnology` and `CardType`
+| _Terminal Definitions API Specification_, {organization}. Provides the `RfTechnology` and `CardType`
   enumerations referenced by this specification.
 |===
 
-The reference <<ref_cna_def,CNA-TD-API>> is *normative*: implementations of this specification MUST depend on a
+The reference <<ref_cna_td,CNA-TD-API>> is *normative*: implementations of this specification MUST depend on a
 conforming implementation of the Terminal Definitions API to expose the typed enumerations used in the public
 signatures of <<type_CardSelector,`CardSelector`>>, <<type_CardDetectionSettings,`CardDetectionSettings`>> and
 <<type_CardSelectionResult,`CardSelectionResult`>>.
@@ -430,7 +430,7 @@ fluent composition. Setters that are not invoked default to the values specified
 [cols="1h,4", grid=rows, frame=all]
 |===
 | Default detection mode       | `REPEATING`
-| Default RF technologies      | `{ ISO_14443_AB }` (single-element set, see <<ref_cna_def>>)
+| Default RF technologies      | `{ ISO_14443_AB }` (single-element set, see <<ref_cna_td>>)
 | Default ECP frame            | _none_
 |===
 
@@ -474,7 +474,7 @@ fluent composition. Setters that are not invoked default to the values specified
 | Since       | 3.0
 | Description
 | Declares the set of RF technologies the reader MUST activate during polling. The `RfTechnology` enumeration is
-  defined in the Terminal Definitions API (see <<ref_cna_def>>).
+  defined in the Terminal Definitions API (see <<ref_cna_td>>).
 
   Not relevant for contact readers; on such readers, this setter MUST be accepted without effect.
 | Parameters  | `rfTechnologies` -- the non-empty set of RF technologies to activate.
@@ -829,7 +829,7 @@ to the active selected card. In multi-channel mode, several active selections ma
 | Since       | 3.0
 | Description
 | Returns the type of the detected card, as defined by the `CardType` enumeration of the Terminal Definitions API
-  (see <<ref_cna_def>>). The returned value is intrinsically tied to the lifecycle of this `CardSelectionResult`.
+  (see <<ref_cna_td>>). The returned value is intrinsically tied to the lifecycle of this `CardSelectionResult`.
 | Returns     | A `CardType`. `UNKNOWN` is returned when the implementation could not identify the type.
 | Throws      | None.
 |===
@@ -870,7 +870,7 @@ card MUST NOT be selected if at least one of them rejects it.
 | Since       | 3.0
 | Description
 | Restricts the selection process to cards whose detected type matches the provided value.
-  The `CardType` enumeration is defined in the Terminal Definitions API (see <<ref_cna_def>>) and characterises the
+  The `CardType` enumeration is defined in the Terminal Definitions API (see <<ref_cna_td>>) and characterises the
   detected card as a combination of transport protocol family and, when applicable, product identity.
 
   The value `UNKNOWN` MAY be used to explicitly capture cards whose type could not be identified by the
