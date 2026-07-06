@@ -24,7 +24,8 @@ give a short *15-minute live demo* on slide S7.
 * For each topic: first the *why*, then the *what*, then ask a question.
 * After each question, *stop and wait*. Silence is fine.
 
-*Slide markers* `[S1] ... [S13]` follow the deck order (`Présentation.pdf`).
+*Slide markers* `[S1] ... [S18]` follow the deck order
+(`260625-MP-WG1_TCTerminal_Presentation_v1.pdf`).
 *Time* is in minutes. The full table is at the end.
 
 // =============================================================================
@@ -33,7 +34,7 @@ give a short *15-minute live demo* on slide S7.
 Hello everyone. Thank you for coming to this TC Terminal meeting. Today is
 June 25, 2026.
 
-We have three topics on the agenda.
+We have four topics on the agenda.
 
 A word on how this meeting works. *The TC does not validate the proposals
 in session today.* The goal of today is to *present* the proposals, share
@@ -55,32 +56,29 @@ One last thing. In the middle of the meeting, our friends from *Monetech*
 will show you a short presentation. About 15 minutes. We will give them the
 screen sharing at that point.
 
-Let me show you the three topics on screen.
+Let me show you the four topics on screen.
 
 // =============================================================================
 == Agenda -- [S3] Table of contents -- 2 min
 
-Three topics, in this order:
+Four topics, in this order:
 
-. *Reader Layer Requirements -- version 3.0P3.*
+. *Reader Layer Requirements -- version 3.0.*
+. *Compliance and Approved Terminals* -- the new CNA certification scheme.
 . *Relay attack -- presentation and countermeasure.*
 . *Terminal APIs -- version 3.0.*
 
 Let me start with the first one -- the Reader Layer Requirements.
 
 // =============================================================================
-== TOPIC 1 -- Reader Layer Requirements (v2.0 to v3.0P3) -- 15 min
+== TOPIC 1 -- Reader Layer Requirements (v2.0 to v3.0) -- 15 min
 
 === [S4] Section opener -- 1 min
 
-The version we look at today is *3.0 Patch 3*. The last version approved by
-the TC is *2.0*. That was on September 7, 2023. So I will show you what
-changed *between 2.0 and 3.0P3*. As one single set of changes. This is the
-package we submit to your review.
-
-A word on the "P3" name. The document is still under review. *P1*, *P2* and
-*P3* are just review rounds of the same major step. For today, you can
-ignore the "P3". What I will show you is the full 3.0 content as it stands now.
+The version we look at today is *3.0*. The last version approved by the TC
+is *2.0*. That was on September 7, 2023. So I will show you what changed
+*between 2.0 and 3.0*. As one single set of changes. This is the package
+we submit to your review.
 
 That said, let's look at what actually changed.
 
@@ -102,14 +100,15 @@ tests could even ask for opposite things.
 
 So the idea of 3.0 is bigger than a cleanup. It is a *change of scope*:
 
-* The Reader Layer Requirements is now *a software-only document*.
-* All the *RF requirements are dropped*. They belong to the certification
-  bodies, not to us.
-* RF compliance is still needed, of course. But the *guidance for operators*
-  on how to ask for it -- in a tender, in a spec sheet -- moves to the
-  *Tender Drafting Guide*.
+* *First,* the Reader Layer Requirements is now *a software-only document*.
+* *Then,* all the *RF requirements are dropped*. They belong to the
+  certification bodies, not to us.
+* *And finally,* RF compliance is still needed, of course. But the
+  *guidance for operators* on how to ask for it -- in a tender, in a spec
+  sheet -- moves to a dedicated companion document called the *Guide for
+  Calypso ticketing systems in calls for tenders*.
 
-==== What changes between v2.0 and v3.0P3
+==== What changes between v2.0 and v3.0
 
 Four points to remember:
 
@@ -122,51 +121,175 @@ Four points to remember:
   that *only Calypso defines* -- no external body covers them.
 . *No certification body is named anywhere.* We do not point to one body
   today and another tomorrow. The document stays neutral.
-. The *Tender Drafting Guide for
-  operators* will tell operators how to write their RF compliance needs in
-  their tenders -- which certifications to ask for, how to assess them.
-  That is a separate piece of work, with its own publication calendar.
+. The new *Guide for Calypso ticketing systems in calls for tenders* will
+  tell operators how to write their RF compliance needs in their tenders --
+  which certifications to ask for, how to assess them. That is a separate
+  piece of work, with its own publication calendar.
 
 No new software rule is added in this delta.
 
-==== Why this is the right time
+Let's now look at the seven requirements that are actually dropped.
 
-This change of scope was already being discussed during 3.0P2. The TC and
-the workgroup converged on the same answer: a software-only document is
-cleaner, easier to maintain, and avoids being tied to any single external
-body. So 3.0P3 turns that direction into the actual content.
+=== [S6] The seven removed requirements -- 4 min
+
+The table on the screen lists the seven requirements that disappear from
+the Reader Layer Requirements in 3.0. For each one, you see the original
+definition and where the same check is now covered.
+
+I will not read the full table out loud. Three quick points to highlight:
+
+* The main entry-level requirement -- `RL-CL-RFSTA.2`, about RF
+  STA certification -- is no longer kept here. From now on, the *terminal
+  approval* takes over for this check. We will see what that means in the
+  next topic.
+* *Six other requirements* -- shut-off, protocol management,
+  polling scenarios, and three presence-check rules -- are *already
+  covered by STA tests today*. So they leave our document with no loss
+  of cover.
+* Notice that *not a single check is lost*. Every removed
+  requirement still has a clear owner -- either the terminal approval, or
+  an STA test.
 
 ==== Open questions and points to think about
 
-We will share three points to think about. Live questions are welcome now.
+I will share three points to think about. Live questions are welcome now.
 For written feedback, please use the forum post linked to this topic --
 you have one month after today.
 
 . *The change of scope* -- software-only, no RF. Does this match the
   direction you want for the Reader Layer?
-. *The removed RF rules* -- is there any system where one of these rules
-  was still useful *on its own*, beyond what external certifications cover?
-. *The Tender Drafting Guide* -- is the workgroup the right place to write
-  it? What should be in scope of this companion document, beyond RF?
+. *The seven removed requirements* -- is there any system where one of
+  these was still useful *on its own*, beyond what external certifications
+  cover?
+. *The Guide for Calypso ticketing systems in calls for tenders* -- is
+  the workgroup the right place to write it? What should be in scope of
+  this companion document, beyond RF?
 
 [NOTE]
 ====
 Pause for discussion -- 3 to 5 minutes.
 ====
 
-That closes our first topic. Let's now move
-to the second one -- the relay attack.
+That closes our first topic. The natural next question is: *if RF
+requirements move out, how do we still certify a terminal?* That is
+exactly what the second topic is about.
 
 // =============================================================================
-== TOPIC 2 -- Relay Attack -- presentation and countermeasure -- 50 min
+== TOPIC 2 -- Compliance and Approved Terminals -- 15 min
 
-=== [S6] Section opener -- 1 min
+=== [S7] Section opener -- 1 min
+
+The second topic is the *certification scheme* that CNA is putting
+in place. The goal is simple: make it *clear and easy* for an operator to
+recognise a terminal that meets every CNA expectation. We call this an
+*approved terminal*.
+
+This topic has three short slides. We start with two key words.
+
+=== [S8] Definitions -- certification vs compliance -- 4 min
+
+Two words are often mixed up in our world: *certification* and
+*compliance*. Let me set them apart in plain language.
+
+*Certification* is a *formal recognition*. It is issued by an *independent
+body*. That body checks the product against a defined set of requirements
+and delivers a certificate. Think of it as a stamp from someone outside.
+
+*Compliance* is the *actual respect of a standard*. It can be checked by
+an audit, or simply by a self-declaration of the vendor. Compliance does
+not always go through an independent body.
+
+Why does the difference matter? Because the two together give the
+operator two real benefits:
+
+* *Continuous improvement* -- a defined target means vendors keep
+  improving their products to stay aligned.
+* *Competitive advantages* -- approved terminals stand out from the rest.
+  The operator can ask for them in a tender with no ambiguity.
+
+=== [S9] Compliance letters -- 5 min
+
+==== Why CNA is moving from registration to compliance letters
+
+Until now, CNA had a *registration* process for products. The wording
+caused confusion: _"registered"_ did not really say _"checked against a
+clear set of rules"_.
+
+So CNA is *renaming registration into compliance*. From now on, CNA will
+issue *compliance letters* -- one for the *Reader Layer*, one for the
+*Calypso Layer*. The letter is a clear statement: this product matches
+the CNA layer specification.
+
+In parallel, CNA continues to work on having these processes managed
+through a *Certification Body*. So in the future, the compliance letter
+issued by CNA could become a full third-party certificate.
+
+==== Why compliance letters need an end date
+
+A second important change: *compliance letters now have a validity
+period*. CNA proposes *two years*. After two years, the vendor must
+renew. This keeps the ecosystem fresh and prevents stale claims based on
+old product versions.
+
+=== [S10] Approved terminals -- 5 min
+
+==== What makes a terminal officially approved
+
+A terminal is *approved by CNA* when it carries three things together:
+
+* The *ISO/IEC TS 24192 certificate* -- formerly known as
+  CEN/TS 16794. This is the RF certificate that left our Reader Layer
+  document in Topic 1.
+* The *Reader Layer compliance letter* -- the new CNA letter
+  we just described.
+* The *Calypso Layer compliance letter* -- the same idea
+  applied to the Calypso application layer.
+
+The three together cover RF behaviour, reader-side software behaviour,
+and Calypso application behaviour. *All three layers of a Calypso
+terminal, in one approval package.*
+
+==== How operators will see this
+
+The CNA website will *highlight approved terminals* -- those that hold
+the full set. The site will keep listing terminals that hold only the
+basic certificates, but the approved ones will stand out.
+
+For operators, that means a *clear single source* to find terminals that
+match every CNA expectation -- no need to chase several certificates
+across several websites.
+
+==== Open questions and points to think about
+
+I will share three points to think about. Live questions are welcome
+now. For written feedback, please use the forum post linked to this
+topic -- you have one month after today.
+
+. *The compliance letter format* -- one letter per layer -- does it
+  match how your vendors and your tender process work today?
+. *The two-year validity* -- is two years the right balance between
+  keeping the data fresh and not overloading your vendors?
+. *The approved-terminal label* -- would you use this label in your own
+  tenders and procurement docs?
+
+[NOTE]
+====
+Pause for discussion -- 3 to 5 minutes.
+====
+
+That closes the second topic. We move to a very different subject --
+how to defend a Calypso terminal against a relay attack.
+
+// =============================================================================
+== TOPIC 3 -- Relay Attack -- presentation and countermeasure -- 50 min
+
+=== [S11] Section opener -- 1 min
 
 We now move to a security topic. The proposal was first posted on the forum
 by *Jean-Pierre Fortune*. Some of you replied -- *Stéphane Didier*,
 *Pierre Terrée*. Thank you. I will use your input as we go.
 
-=== [S7] Monetech demo -- ≈ 15 min
+=== [S12] Monetech demo -- ≈ 15 min
 
 Before we talk about the fix, let's Monetech take the control of the screen.
 
@@ -185,7 +308,7 @@ Short reaction round -- 2 min: first feeling from the TC?
 
 Thank you again Monetech.
 
-=== [S8] What it is -- the threat and the fix idea -- 15 min
+=== [S13] What it is -- the threat and the fix idea -- 15 min
 
 ==== A word on the risk -- it depends on the use case
 
@@ -269,7 +392,7 @@ Discussion -- 5 min.
 The principle is now clear. The real question is: how do we actually set
 this up on terminals already in the field?
 
-=== [S9] Setup challenges -- how to identify each card -- 15 min
+=== [S14] Setup challenges -- how to identify each card -- 15 min
 
 ==== Why this slide matters
 
@@ -360,9 +483,9 @@ Welcome back. We now move to the third and last topic -- the new release
 of the Terminal APIs.
 
 // =============================================================================
-== TOPIC 3 -- Terminal APIs 3.0 -- 45 min
+== TOPIC 4 -- Terminal APIs 3.0 -- 45 min
 
-=== [S10] Section opener -- 3 min
+=== [S15] Section opener -- 3 min
 
 The third topic is the big new release of the Terminal APIs. Version 3.0.
 
@@ -394,7 +517,7 @@ document and the UML diagrams are linked from the forum.
 Let me start with the scope of this release and why we picked this moment
 for it.
 
-=== [S11] Scope, drivers, migration support -- 10 min
+=== [S16] Scope, drivers, migration support -- 10 min
 
 ==== Why a major version, and why now
 
@@ -458,7 +581,7 @@ rewrites. Nothing odd. *Your code structure does not have to change.*
 Short discussion -- 3 min.
 ====
 
-=== [S12] The seven themes -- 30 min (about 4 min each)
+=== [S17] The seven themes -- 30 min (about 4 min each)
 
 I will now go through the seven themes one by one. For each one, I will say:
 
@@ -498,7 +621,7 @@ earlier.
 
 ==== Theme 2 -- Relay-attack defence -- 4 min
 
-*Why.* This is the API side of the proposal from Topic 2. The framework
+*Why.* This is the API side of the proposal from Topic 3. The framework
 needs a way to *carry a max time with each request*, and *get back the
 real measured time with each response*.
 
@@ -517,7 +640,7 @@ real measured time with each response*.
   must use this stricter limit"_. So you can tighten the limit as newer, faster
   card generations come out, without hurting the older ones.
 
-*Question.* This puts the Topic 2 proposal straight into the API. Does the
+*Question.* This puts the Topic 3 proposal straight into the API. Does the
 TC agree on the three levels -- per-command, per-session, per-SV operation?
 
 Now Theme 3 -- a much simpler way to observe a reader.
@@ -644,7 +767,7 @@ in the batch failed. The responses come back in order, but with no key.
 *Question.* Any worry about this design -- a simple number, given by the
 application? Do you need another kind of id?
 
-Before I close Topic 3, two short minutes on the cross-cutting cleanup.
+Before I close Topic 4, two short minutes on the cross-cutting cleanup.
 
 ==== Cross-cutting cleanup -- 2 min
 
@@ -672,27 +795,31 @@ And that closes the seven themes. We are now at the end of today's agenda.
 Time to wrap up.
 
 // =============================================================================
-== Closing -- [S13] Thank you -- 5 min
+== Closing -- [S18] Thank you -- 5 min
 
-Two hours, three topics, many questions. Thank you all for the rich talk.
+Two hours, four topics, many questions. Thank you all for the rich talk.
 
 *A reminder on what happens next.* As I said at the start, the TC does not
 validate the proposals in session today. The *real review* happens after
 the meeting, *on the forum*.
 
-For each of the three topics, a dedicated forum post is open. You have
+For each of the four topics, a dedicated forum post is open. You have
 *one month* from today to share your written feedback:
 
-. *Reader Layer Requirements 3.0P3* -- forum post on the scope change to a
-  software-only document. Share any concern on the removed RF rules or on
-  the Tender Drafting Guide.
+. *Reader Layer Requirements 3.0* -- forum post on the scope change to a
+  software-only document. Share any concern on the seven removed
+  requirements or on the new *Guide for Calypso ticketing systems in
+  calls for tenders*.
+. *Compliance and Approved Terminals* -- forum post on the new
+  certification scheme. Share your view on the compliance letters, on
+  the two-year validity, and on the approved-terminal label.
 . *Relay attack defence* -- forum post on the timing-based detection.
   Share your view on the principle, on the card-profile identification
   methods (serial number ranges, startup information, or both), and on
   the use cases that matter to you.
-. *Terminal APIs 3.0* -- forum post on the seven themes. Share any concern
-  on a specific theme, on the new Definitions API, or on the migration
-  approach.
+. *Terminal APIs 3.0* -- forum post on the seven themes. Share any
+  concern on a specific theme, on the new Definitions API, or on the
+  migration approach.
 
 The workgroup will read every reply, answer on the post, and update the
 proposals if needed. Once the one-month window closes, the workgroup will
@@ -713,19 +840,27 @@ Thank you very much. Have a good rest of the day. See you on the forum.
 
 [cols="3,2,1,1", options="header"]
 |===
-| Block                          | Slides   | Time | Cumulated
+| Block                                  | Slides    | Time | Cumulated
 
-| Opening & agenda               | S1, S3   | 5    | 5
-| Reader Layer 3.0P3             | S4-S5    | 15   | 20
-| Relay -- opener + demo         | S6, S7   | 16   | 36
-| Relay -- principle             | S8       | 15   | 51
-| Relay -- setup challenges      | S9       | 15   | 66
-| *Break*                        | --       | 5    | 71
-| APIs -- opener + context        | S10      | 3    | 74
-| APIs -- scope + migration       | S11      | 10   | 84
-| APIs -- 7 themes                | S12      | 30   | 114
-| Closing                         | S13      | 5    | 119
+| Opening & agenda                       | S1, S3    | 5    | 5
+| Reader Layer 3.0 -- opener + changes   | S4-S5     | 11   | 16
+| Reader Layer 3.0 -- removed reqs table | S6        | 4    | 20
+| Compliance -- opener                   | S7        | 1    | 21
+| Compliance -- definitions              | S8        | 4    | 25
+| Compliance -- compliance letters       | S9        | 5    | 30
+| Compliance -- approved terminals       | S10       | 5    | 35
+| Relay -- opener + demo                 | S11, S12  | 16   | 51
+| Relay -- principle                     | S13       | 15   | 66
+| Relay -- setup challenges              | S14       | 15   | 81
+| *Break*                                | --        | 5    | 86
+| APIs -- opener + context               | S15       | 3    | 89
+| APIs -- scope + migration              | S16       | 10   | 99
+| APIs -- 7 themes                       | S17       | 30   | 129
+| Closing                                | S18       | 5    | 134
 |===
 
-≈ *2 hours total* (the 4 extra minutes absorb naturally into the discussion
-slots if needed).
+≈ *2 hours 15 minutes total*. The new Compliance topic adds 15 minutes
+to the original 2-hour slot. If the meeting must stay strictly within
+2 hours, the discussion windows after each topic can absorb part of it,
+or the API themes can be tightened (each theme takes about 4 minutes
+today).
