@@ -1428,7 +1428,7 @@ processing cycle has terminated. _Since 3.0._
 | Value          | Since | Description
 
 | `REPEATING`    | 3.0 | The reader continues waiting for the next card insertion.
-| `SINGLE_SHOT`  | 3.0 | The reader stops detection and waits for an explicit restart signal.
+| `SINGLE_SHOT`  | 3.0 | The reader stops detection after the current card-processing cycle; a new call to `startCardDetection` is required to detect further cards.
 |===
 
 [[type_FileControlInformation]]
