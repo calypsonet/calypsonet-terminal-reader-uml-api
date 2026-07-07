@@ -440,7 +440,7 @@ fluent composition. Setters that are not invoked default to the values specified
 [cols="1h,4", grid=rows, frame=all]
 |===
 | Default detection mode       | `REPEATING`
-| Default RF technologies      | `{ ISO_14443_AB }` (single-element set, see <<ref_cna_td>>)
+| Default RF technologies      | `{ ISO_14443_AB }` (single-element set, see <<ref_cna_td,CNA-TD-API>>)
 | Default ECP frame            | _none_
 |===
 
@@ -484,7 +484,7 @@ fluent composition. Setters that are not invoked default to the values specified
 | Since       | 3.0
 | Description
 | Declares the set of RF technologies the reader MUST activate during polling. The `RfTechnology` enumeration is
-  defined in the Terminal Definitions API (see <<ref_cna_td>>).
+  defined in the Terminal Definitions API (see <<ref_cna_td,CNA-TD-API>>).
 
   Not relevant for contact readers; on such readers, this setter MUST be accepted without effect.
 | Parameters  | `rfTechnologies` -- the non-empty set of RF technologies to activate.
@@ -839,7 +839,7 @@ to the active selected card. In multi-channel mode, several active selections ma
 | Since       | 3.0
 | Description
 | Returns the type of the detected card, as defined by the `CardType` enumeration of the Terminal Definitions API
-  (see <<ref_cna_td>>). The returned value is intrinsically tied to the lifecycle of this `CardSelectionResult`.
+  (see <<ref_cna_td,CNA-TD-API>>). The returned value is intrinsically tied to the lifecycle of this `CardSelectionResult`.
 | Returns     | A `CardType`. `UNKNOWN` is returned when the implementation could not identify the type.
 | Throws      | None.
 |===
@@ -880,7 +880,7 @@ card MUST NOT be selected if at least one of them rejects it.
 | Since       | 3.0
 | Description
 | Restricts the selection process to cards whose detected type matches the provided value.
-  The `CardType` enumeration is defined in the Terminal Definitions API (see <<ref_cna_td>>) and characterises the
+  The `CardType` enumeration is defined in the Terminal Definitions API (see <<ref_cna_td,CNA-TD-API>>) and characterises the
   detected card as a combination of transport protocol family and, when applicable, product identity.
 
   The value `UNKNOWN` MAY be used to explicitly capture cards whose type could not be identified by the
