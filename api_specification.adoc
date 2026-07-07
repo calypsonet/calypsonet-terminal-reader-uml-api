@@ -70,7 +70,7 @@ readers and the cards presented to them, independently of:
 
 Conforming implementations of this specification MUST allow extension modules (e.g. card-specific APIs such as the
 Calypso Card API) to plug in transparently through the Service Provider Interface (SPI) mechanism defined in
-<<sec_pkg_reader_selection_spi>> and <<sec_pkg_reader_transaction_spi>>.
+<<sec_pkg_reader_selection_spi,`reader.selection.spi`>> and <<sec_pkg_reader_transaction_spi,`reader.transaction.spi`>>.
 
 === Scope
 
