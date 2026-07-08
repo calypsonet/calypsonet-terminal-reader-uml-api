@@ -2,7 +2,7 @@
 title
     <img:assets/logo.svg{scale=0.2}>
 
-    Terminal Reader API 3.0.+ (2026-05-28)
+    Terminal Reader API 3.0.+ (2026-07-08)
 end title
 
 ' == THEME ==
@@ -75,14 +75,14 @@ package "reader" as reader {
     +{static} **final** String VERSION
 }
 +interface "ReaderApiFactory" as ReaderApiFactory <<blue>> {
+    +<color:blue>CardReaderProvider getCardReaderProvider ()
+
     +CardSelectionManager createCardSelectionManager ()
 
     +BasicCardSelector createBasicCardSelector ()
     +IsoCardSelector createIsoCardSelector ()
 
     +<color:blue>CardDetectionSettings createCardDetectionSettings ()
-
-    +<color:blue>CardReaderProvider getCardReaderProvider ()
 }
 
 +interface "<color:blue>CardReaderProvider" as CardReaderProvider <<blue>> {
@@ -279,7 +279,7 @@ IsoCardTransactionManager .right.> MultichannelCardTransactionManager #C_LINK : 
 
 ' == LAYOUT ==
 
-ReaderApiFactory -[hidden]- ApiProperties
+ReaderApiFactory -[hidden]right- ApiProperties
 ReaderCommunicationException -[hidden]- CardCommunicationException
 CardCommunicationException -[hidden]- InvalidCardResponseException
 DetectionMode -[hidden]- CardTransactionManager

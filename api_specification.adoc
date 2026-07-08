@@ -348,7 +348,8 @@ The API is organized into the following packages:
 
 [[sec_pkg_reader]]
 The `reader` package defines the entry points of the API and the abstractions used to manipulate readers and the
-events they produce.
+events they produce. It also exposes <<type_CardReaderProvider,`CardReaderProvider`>>, the standardised means of
+discovering and accessing the readers available in the execution environment.
 
 [[sec_pkg_reader_spi]]
 The `reader.spi` package gathers the contracts that are implemented by the *application* (as opposed to the reader
@@ -586,6 +587,71 @@ card selection response.
 | Since       | 1.0
 | Description | Returns the type of the event.
 | Returns     | A <<type_CardReaderEventType,`Type`>> value.
+| Throws      | None.
+|===
+
+[[type_CardReaderProvider]]
+==== Card Reader Provider
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Kind     | Interface
+| Namespace  | `reader`
+| Since    | 3.0
+| Purpose  | Standardised discovery and access surface for the card readers available in the execution environment.
+|===
+
+The `CardReaderProvider` is obtained from the <<type_ReaderApiFactory,`ReaderApiFactory`>>. It offers an
+implementation-agnostic view over the readers currently registered in the environment, aggregating those made
+available by every registered plugin and pool. Reader lifecycle (registration and un-registration) remains driven
+by the implementation; the provider is a *read-only* view reflecting the readers active at the moment of each call.
+
+===== Find Reader
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature   | `findReader(readerNameRegex: string) -> CardReader?`
+| Since       | 3.0
+| Description
+| Returns the first reader whose name matches the supplied regular expression. This lookup is convenient when reader
+  names embed variable elements (serial numbers, USB port index, etc.) that the application cannot
+  hard-code.
+| Parameters  | `readerNameRegex` -- the regular expression matched against the reader names.
+| Returns     | A <<type_CardReader,`CardReader`>> whose name matches the expression, or `null` if none matches.
+| Throws      | `IllegalArgumentException` -- if the supplied string is not a valid regular expression.
+|===
+
+===== Get Reader
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature   | `getReader(readerName: string) -> CardReader?`
+| Since       | 3.0
+| Description | Returns the reader whose name exactly matches the supplied string.
+| Parameters  | `readerName` -- the exact name of the reader to retrieve.
+| Returns     | A <<type_CardReader,`CardReader`>> whose name equals `readerName`, or `null` if no such reader is registered.
+| Throws      | None.
+|===
+
+===== Get Reader Names
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature   | `getReaderNames() -> set<string>`
+| Since       | 3.0
+| Description | Returns the names of all readers currently registered in the execution environment.
+| Returns     | A `set` of reader names; empty if no reader is registered.
+| Throws      | None.
+|===
+
+===== Get Readers
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature   | `getReaders() -> set<CardReader>`
+| Since       | 3.0
+| Description | Returns all readers currently registered in the execution environment.
+| Returns     | A `set` of <<type_CardReader,`CardReader`>> references; empty if no reader is registered.
 | Throws      | None.
 |===
 
@@ -1094,6 +1160,17 @@ that every invocation returns a fresh, fully initialised object.
 | Since       | 2.0
 | Description | Returns a new, freshly initialised <<type_IsoCardSelector,`IsoCardSelector`>>.
 | Returns     | A <<type_IsoCardSelector,`IsoCardSelector`>>.
+| Throws      | None.
+|===
+
+===== Get Card Reader Provider
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Signature   | `getCardReaderProvider() -> CardReaderProvider`
+| Since       | 3.0
+| Description | Returns the <<type_CardReaderProvider,`CardReaderProvider`>> exposed by the implementation, giving standardised access to the readers available in the execution environment.
+| Returns     | A <<type_CardReaderProvider,`CardReaderProvider`>>.
 | Throws      | None.
 |===
 
