@@ -209,7 +209,7 @@ signatures of <<type_CardSelector,`CardSelector`>>, <<type_CardDetectionSettings
 | Resource | Link
 
 | Calypso Networks Association | https://calypsonet.org
-| Terminal APIs website        | https://terminal-api.calypsonet.org/
+| Terminal APIs website        | https://terminal-api.calypsonet.org
 | Terminal APIs documentation  | https://docs.terminal-api.calypsonet.org
 |===
 
