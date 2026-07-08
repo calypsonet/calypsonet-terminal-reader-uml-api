@@ -66,7 +66,7 @@ The {spec-name} defines a standardised set of contracts allowing terminal applic
 readers and the cards presented to them, independently of:
 
 * the underlying reader hardware (contact, contactless, virtual, etc.),
-* the card technology family (ISO/IEC 7816-4, ISO/IEC 14443, proprietary),
+* the card technology family (<<ref_iso7816,ISO/IEC 7816-4>>, <<ref_iso14443,ISO/IEC 14443>>, proprietary),
 * the implementation technology of the application (programming language, runtime).
 
 Conforming implementations of this specification MUST allow extension modules (e.g. card-specific APIs such as the
@@ -186,8 +186,8 @@ is backward-compatible per that API's evolution policy.
 | [[ref_rfc8174]] [RFC 8174]
 | https://www.rfc-editor.org/rfc/rfc8174[_Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words_], B. Leiba, May 2017.
 
-| [[ref_iso7816_4]] [ISO/IEC 7816-4]
-| https://www.iso.org[_Identification cards -- Integrated circuit cards -- Part 4: Organization, security and commands for interchange_].
+| [[ref_iso7816]] [ISO/IEC 7816]
+| https://www.iso.org[_Identification cards -- Integrated circuit cards_].
 
 | [[ref_iso14443]] [ISO/IEC 14443]
 | https://www.iso.org[_Identification cards -- Contactless integrated circuit cards -- Proximity cards_].
