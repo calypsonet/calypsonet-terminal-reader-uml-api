@@ -29,13 +29,7 @@ v3.0.0-SNAPSHOT, {docdate}
 :spec-name: Terminal Reader API
 :spec-id: CNA-TR-API
 :spec-version: 3.0.0-SNAPSHOT
-:ver-cna-tr: 3.0
-:ver-cna-tc: 3.0
 :ver-cna-td: 1.0
-:ver-cna-tcc: 3.0
-:ver-cna-tccs: 0.1
-:ver-cna-tcca: 0.2
-:ver-cna-tccl: 2.0
 
 [abstract]
 == Abstract
@@ -198,9 +192,6 @@ is backward-compatible per that API's evolution policy.
 | [[ref_iso14443]] [ISO/IEC 14443]
 | https://www.iso.org[_Identification cards -- Contactless integrated circuit cards -- Proximity cards_].
 
-| [[ref_cna_tc]] [CNA-TC-API]
-| https://docs.terminal-api.calypsonet.org/calypsonet-terminal-card-uml-api/[_Terminal Card API Specification_], version {ver-cna-tc}, {organization}.
-
 | [[ref_cna_td]] [CNA-TD-API]
 | https://docs.terminal-api.calypsonet.org/calypsonet-terminal-definitions-uml-api/[_Terminal Definitions API Specification_], version {ver-cna-td}, {organization}. Provides the `RfTechnology` and `CardType` enumerations referenced by this specification.
 |===
@@ -216,9 +207,9 @@ signatures of <<type_CardSelector,`CardSelector`>>, <<type_CardDetectionSettings
 |===
 | Resource | Link
 
-| Calypso Networks Association | https://calypsonet.org[calypsonet.org]
-| Terminal APIs website        | https://terminal-api.calypsonet.org/[terminal-api.calypsonet.org]
-| Terminal APIs documentation  | https://docs.terminal-api.calypsonet.org[docs.terminal-api.calypsonet.org]
+| Calypso Networks Association | https://calypsonet.org
+| Terminal APIs website        | https://terminal-api.calypsonet.org/
+| Terminal APIs documentation  | https://docs.terminal-api.calypsonet.org
 |===
 
 // =============================================================================
