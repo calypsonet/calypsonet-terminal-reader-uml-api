@@ -222,9 +222,9 @@ signatures of <<type_CardSelector,`CardSelector`>>, <<type_CardDetectionSettings
 |===
 | Term              | Definition
 
-| Card              | Any physical or virtual smart card that can be presented to a reader for selection and dialogue.
+| Card              | Any physical or virtual smart card that can be presented to a reader for selection and dialog.
 | Card Reader       | Hardware or software component capable of detecting cards and exchanging data with them.
-| Card Selection    | Sequence of operations used to identify, filter and prepare a card for application-level dialogue.
+| Card Selection    | Sequence of operations used to identify, filter and prepare a card for application-level dialog.
 | Logical Channel   | Software-level communication path established with a card after a successful selection.
 | Basic Channel     | The default logical channel (channel `0`) of an ISO/IEC 7816-4 card.
 | Multi-Channel     | Capability of an ISO/IEC 7816-4 card to host several active logical channels in parallel.
