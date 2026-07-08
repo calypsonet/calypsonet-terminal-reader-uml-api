@@ -81,6 +81,15 @@ package "reader" as reader {
     +IsoCardSelector createIsoCardSelector ()
 
     +<color:blue>CardDetectionSettings createCardDetectionSettings ()
+
+    +<color:blue>CardReaderProvider getCardReaderProvider ()
+}
+
++interface "<color:blue>CardReaderProvider" as CardReaderProvider <<blue>> {
+    +<color:blue>Set<String> getReaderNames ()
+    +<color:blue>Set<CardReader> getReaders ()
+    +<color:blue>CardReader getReader (String readerName)
+    +<color:blue>CardReader findReader (String readerNameRegex)
 }
 
 ' SERVICE
@@ -244,6 +253,8 @@ CardReaderEvent ..> CardReaderEventType #C_LINK : provide >
 CardReaderEvent .up.> ScheduledCardSelectionsResponse #C_LINK : provide >
 
 CardReaderEventHandler ..> CardReaderEvent #C_USE : use >
+
+CardReaderProvider ..> CardReader #C_LINK : provide >
 
 CardSelectionResult ..> SmartCard #C_LINK : provide >
 
