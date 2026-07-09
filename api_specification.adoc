@@ -614,7 +614,7 @@ card selection response.
   on the <<type_CardSelectionManager,`CardSelectionManager`>> instance that prepared the associated selection
   scenario, or on another `CardSelectionManager` sharing the same context -- that is, one that has previously
   prepared the same selection scenario.
-| Returns     | The scheduled card selections response, or `null` if no selection scenario has been scheduled.
+| Returns     | The scheduled card selections response (<<type_ScheduledCardSelectionsResponse,`ScheduledCardSelectionsResponse`>>), or `null` if no selection scenario has been scheduled.
 | Throws      | None.
 |===
 
