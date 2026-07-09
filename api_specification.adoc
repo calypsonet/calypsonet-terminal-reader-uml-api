@@ -832,9 +832,9 @@ scenario or its result for distributed architectures.
 | Returns     | A <<type_CardSelectionResult,`CardSelectionResult`>>.
 | Throws
 | `ReaderCommunicationException` -- if communication with the reader has failed. +
-  `CardCommunicationException` -- if communication with the card has failed, or if the status word check is
-  enabled in the card request and the card returned an unexpected code. +
-  `InvalidCardResponseException` -- if the card returned invalid data during the selection process.
+  `CardCommunicationException` -- if communication with the card has failed. +
+  `InvalidCardResponseException` -- if the card returned invalid data during the selection process, or if the
+  status word check is enabled in the card request and the card returned an unexpected code.
 |===
 
 [[op_processMultichannelCardSelectionScenario]]
@@ -1600,7 +1600,7 @@ selection cases of a scenario. _Since 3.0._
 | Kind     | Runtime exception
 | Namespace  | `reader`
 | Since    | 1.0
-| Purpose  | Indicates that the communication with the card has failed.
+| Purpose  | Indicates that the communication with the card has failed, typically because the card was removed from the reader before the exchange could complete.
 |===
 
 [[type_InvalidCardResponseException]]
@@ -1612,9 +1612,9 @@ selection cases of a scenario. _Since 3.0._
 | Namespace  | `reader`
 | Since    | 2.1
 | Purpose
-| Indicates that a response received from the card was invalid, either during a selection process or during the
-  processing of a transaction. This exception is also raised when an ISO/IEC 7816-4 card does not support a
-  requested multi-channel operation.
+| Indicates that a response received from the card was invalid -- typically when the returned status word does not
+  match any of those expected -- either during a selection process or during the processing of a transaction. This
+  exception is also raised when an ISO/IEC 7816-4 card does not support a requested multi-channel operation.
 |===
 
 [[type_ReaderCommunicationException]]
