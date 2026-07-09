@@ -1097,7 +1097,8 @@ both the <<type_CardDetectionSettings,`CardDetectionSettings`>> that govern the 
   notification, the reader MUST:
 
   - perform the *DESELECT* sequence on the card (when applicable to the underlying technology) so that the card
-    is brought to a clean idle state, and
+    is brought to a clean idle state,
+
   - transition to the *waiting-for-card-removal* phase, during which the observation cycle waits for the card to
     leave the reader's field before becoming able to detect a new card.
 
@@ -1347,8 +1348,7 @@ minimise network exchanges, which is especially valuable in distributed architec
 | Returns a view of this manager as a <<type_MultichannelCardTransactionManager,
   `MultichannelCardTransactionManager`>>, granting access to the multi-channel operations.
 
-  *Prerequisite:* the underlying ISO/IEC 7816-4 card MUST support multi-channel. Implementations MUST raise
-  `InvalidCardResponseException` if the cast is requested on a card that does not support multi-channel.
+  *Prerequisite:* The underlying ISO/IEC 7816-4 card MUST support multi-channel operation. Implementations MUST raise an `InvalidCardResponseException` during command processing if the card does not support multi-channel operation.
 | Returns     | A <<type_MultichannelCardTransactionManager,`MultichannelCardTransactionManager`>>.
 | Throws      | <<type_InvalidCardResponseException,`InvalidCardResponseException`>> -- if the card does not support multi-channel.
 |===
@@ -1460,6 +1460,7 @@ selection.
 | Returns the card's power-on data, as collected by the reader at the moment the card was inserted.
 
   - For a contact reader, this is the Answer To Reset (ATR) defined by ISO/IEC 7816.
+
   - For a contactless reader, the reader decides what this data is. Some contactless readers provide a virtual
     ATR (partially standardised by the PC/SC standard), while other devices may have their own definition,
     including for example elements from the anti-collision stage of ISO/IEC 14443 (ATQA, ATQB, ATS, SAK, etc.)
