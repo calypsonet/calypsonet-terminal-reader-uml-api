@@ -136,6 +136,20 @@ equivalent native type. Implementations MUST preserve the semantic intent rather
 | `void`          | Indicates that an operation returns no value.                    | `void`, `Unit`, `None`.
 |===
 
+==== Type tables
+
+Each interface, class, enumeration and exception defined in this document is described by a table of the form:
+
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Kind       | The category of the type (interface, class, enumeration, exception, etc.).
+| Namespace  | The package in which the type is defined.
+| Extends    | The type extended by this type, when applicable.
+| Implements | The interface implemented by this type, when applicable.
+| Since      | The version of the API in which the type was introduced.
+| Purpose    | A normative description of the type's responsibility.
+|===
+
 ==== Operation tables
 
 Each operation defined in this document is described by a table of the form:
@@ -230,12 +244,12 @@ signatures of <<type_CardSelector,`CardSelector`>>, <<type_CardDetectionSettings
 | Multi-Channel     | Capability of an ISO/IEC 7816-4 card to host several active logical channels in parallel.
 | Physical Channel  | Hardware-level communication path between the reader and the card.
 | Observable Reader | Reader implementation able to notify a registered event handler asynchronously of card-related events.
-| Power-on Data     | Data returned by the reader at the moment a card is detected (ATR, virtual ATR, anti-collision data).
+| Power-on Data     | Data returned by the reader at the moment a card is detected (e.g. ATR, virtual ATR, anti-collision data).
 | Card Application  | Application Dedicated File (DF) selected on a card, identified by its AID, as defined in ISO/IEC 7816-4.
-| AID               | Application Identifier as defined in ISO/IEC 7816-4 (5 to 16 bytes).
-| APDU              | Application Protocol Data Unit, the message format used between the terminal and the card.
+| AID               | Application IDentifier as defined in ISO/IEC 7816-4 (5 to 16 bytes).
+| APDU              | Application Protocol Data Unit, the message format used between the terminal and the card, as defined in ISO/IEC 7816-3.
 | ECP               | Enhanced Contactless Polling, an extended polling mechanism enabling fast card detection in mobile transit deployments.
-| RF Technology     | Radio-frequency communication technology used by a contactless reader to detect a card.
+| RF Technology     | Radio-frequency communication technology used by a contactless reader to detect a card, as defined in ISO/IEC 14443.
 | Card Type         | Identified product or transport-protocol family of a detected card.
 | SPI               | Service Provider Interface -- a set of interfaces designed to be implemented by an extension module.
 |===
@@ -280,7 +294,7 @@ skinparam ArrowColor #2C3E50
 
 component "Terminal Application" as App
 component "Card Extensions\n(e.g. Calypso Card API)" as Ext
-component "Terminal Reader API\n(this specification)" as TR
+component "Terminal Reader API\n(this specification)" as TR #LightYellow
 component "Terminal Definitions API\n(global constants)" as Def
 component "Reader Driver\nImplementation(s)" as Drv
 component "Card Reader\nHardware" as HW
@@ -1046,7 +1060,7 @@ card MUST NOT be selected if at least one of them rejects it.
 [cols="1h,4", grid=rows, frame=all]
 |===
 | Kind         | Interface
-| Package      | `reader`
+| Namespace    | `reader`
 | Extends      | <<type_CardReader,`CardReader`>>
 | Since        | 1.0
 | Purpose      | A `CardReader` capable of observing the insertion and removal of cards.
