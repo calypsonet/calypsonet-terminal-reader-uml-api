@@ -473,7 +473,15 @@ fluent composition. Setters that are not invoked default to the values specified
 |===
 | Signature   | `setDetectionMode(detectionMode: DetectionMode) -> CardDetectionSettings`
 | Since       | 3.0
-| Description | Sets the detection mode (`REPEATING` or `SINGLE_SHOT`).
+| Description
+| Sets the *detection mode*, which governs the reader's behaviour once a card-processing cycle has terminated.
+  With `REPEATING`, the reader automatically resumes polling and waits for the next card insertion, enabling
+  continuous, unattended operation. With `SINGLE_SHOT`, the reader stops detection after the current cycle and MUST
+  be restarted by a new call to <<op_ObservableCardReader_startCardDetection,`startCardDetection`>> before another
+  card can be detected.
+
+  When this setter is not invoked, the detection mode defaults to `REPEATING` (see the defaults above). The full
+  semantics of each value are given by the <<type_DetectionMode,`DetectionMode`>> enumeration.
 | Parameters  | `detectionMode` -- the desired detection mode.
 | Returns     | The current instance (`CardDetectionSettings`).
 |===
@@ -492,6 +500,8 @@ fluent composition. Setters that are not invoked default to the values specified
 
   Relevant only on readers supporting ECP. If the underlying reader does not support ECP, the provided frame MUST
   be silently ignored and a `WARN`-level message SHOULD be logged.
+
+  When this setter is not invoked, no ECP frame is emitted (default *none*; see the defaults above).
 | Parameters  | `ecpFrame` -- the non-empty ECP frame.
 | Returns     | The current instance (`CardDetectionSettings`).
 | Throws      | `IllegalArgumentException` -- if the provided array is empty.
@@ -509,6 +519,8 @@ fluent composition. Setters that are not invoked default to the values specified
   defined in the Terminal Definitions API (see <<ref_cna_td,CNA-TD-API>>).
 
   Not relevant for contact readers; on such readers, this setter MUST be accepted without effect.
+
+  When this setter is not invoked, the reader polls the default set `{ ISO_14443_AB }` (see the defaults above).
 | Parameters  | `rfTechnologies` -- the non-empty set of RF technologies to activate.
 | Returns     | The current instance (`CardDetectionSettings`).
 | Throws      | `IllegalArgumentException` -- if the provided set is empty.
@@ -542,8 +554,12 @@ fluent composition. Setters that are not invoked default to the values specified
 |===
 | Signature   | `isCardPresent() -> boolean`
 | Since       | 1.0
-| Description | Indicates whether a card is currently present in the reader.
-| Returns     | `true` if a card is inserted in the reader, `false` otherwise.
+| Description
+| Indicates whether a card is currently detected by the reader. What counts as *present* depends on the reader's
+  communication mode (see `isContactless`): on a *contact* reader, a card is present when it is physically inserted
+  in the slot; on a *contactless* reader, a card is present when it lies within range of the antenna (in the RF
+  field).
+| Returns     | `true` if a card is present -- inserted for a contact reader, or within the field for a contactless reader -- `false` otherwise.
 | Throws      | `ReaderCommunicationException` -- if the communication with the reader has failed.
 |===
 
@@ -590,14 +606,15 @@ card selection response.
 | Signature   | `getScheduledCardSelectionsResponse() -> ScheduledCardSelectionsResponse?`
 | Since       | 1.0
 | Description
-| Returns the card selection response when it is available and `null` in all other cases.
-  The response MAY be available when the event type is `CARD_INSERTED` and MUST be present when the event type
-  is `CARD_MATCHED`.
+| Returns the response of the selection scenario scheduled on the reader. It is `null` *only* when no selection
+  scenario has been scheduled; in every other case it is non-`null`.
 
-  The returned value MUST be passed to
-  <<op_parseScheduledCardSelectionsResponse,`CardSelectionManager.parseScheduledCardSelectionsResponse`>> to be
-  interpreted.
-| Returns     | The scheduled card selections response, or `null` if the event does not carry one.
+  When non-`null`, the returned value MUST be passed for interpretation to
+  <<op_parseScheduledCardSelectionsResponse,`CardSelectionManager.parseScheduledCardSelectionsResponse`>>, invoked
+  on the <<type_CardSelectionManager,`CardSelectionManager`>> instance that prepared the associated selection
+  scenario, or on another `CardSelectionManager` sharing the same context -- that is, one that has previously
+  prepared the same selection scenario.
+| Returns     | The scheduled card selections response, or `null` if no selection scenario has been scheduled.
 | Throws      | None.
 |===
 
@@ -624,8 +641,7 @@ card selection response.
 |===
 
 The `CardReaderProvider` is obtained from the <<type_ReaderApiFactory,`ReaderApiFactory`>>. It offers an
-implementation-agnostic view over the readers currently registered in the environment, aggregating those made
-available by every registered plugin and pool. Reader lifecycle (registration and un-registration) remains driven
+implementation-agnostic view over the readers currently registered in the environment. Reader lifecycle (registration and un-registration) remains driven
 by the implementation; the provider is a *read-only* view reflecting the readers active at the moment of each call.
 
 ===== Find Reader
