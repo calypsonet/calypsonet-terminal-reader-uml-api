@@ -1287,7 +1287,7 @@ minimise network exchanges, which is especially valuable in distributed architec
   All APDUs corresponding to the prepared commands MUST be sent to the card, their responses retrieved and used
   to update the <<type_SmartCard,`SmartCard`>> associated with the transaction.
   For write commands, the `SmartCard` MUST be updated only when the command is successful. The process MUST be
-  interrupted at the first failed command.
+  interrupted at the first failed command. The underlying logical channel is left open after processing.
 | Throws
 | <<type_ReaderCommunicationException,`ReaderCommunicationException`>> -- if a communication error with the reader occurs. +
   <<type_CardCommunicationException,`CardCommunicationException`>> -- if a communication error with the card occurs. +
@@ -1385,7 +1385,7 @@ This contract MAY be obtained either:
 |===
 | Signature   | `closeChannel() -> void`
 | Since       | 3.0
-| Description | Closes the underlying logical channel without processing any pending command.
+| Description | Closes the underlying logical channel without processing any pending command. This operation MUST be idempotent: calling it on an already-closed channel MUST be a no-op.
 | Throws
 | <<type_ReaderCommunicationException,`ReaderCommunicationException`>> -- if a communication error with the reader occurs. +
   <<type_CardCommunicationException,`CardCommunicationException`>> -- if a communication error with the card occurs.
@@ -1397,7 +1397,7 @@ This contract MAY be obtained either:
 |===
 | Signature   | `processCommandsAndCloseChannel() -> void`
 | Since       | 3.0
-| Description | Processes all previously prepared commands and, upon success, closes the underlying logical channel.
+| Description | Processes all previously prepared commands and, upon success, closes the underlying logical channel. If any command fails, the channel is left open, as with `processCommands`.
 | Throws
 | <<type_ReaderCommunicationException,`ReaderCommunicationException`>> -- if a communication error with the reader occurs. +
   <<type_CardCommunicationException,`CardCommunicationException`>> -- if a communication error with the card occurs. +
@@ -1604,7 +1604,6 @@ This section consolidates the cross-cutting behavioural requirements that confor
 
 === Reader lifecycle
 
-. A `CardReader` instance MUST expose a stable name for its entire lifetime.
 . A reader instance MUST signal communication failures by raising `ReaderCommunicationException` rather than
   returning a default value.
 . When a reader becomes permanently unusable, the implementation MUST emit a `READER_UNREGISTERED` event to the
@@ -1623,8 +1622,6 @@ This section consolidates the cross-cutting behavioural requirements that confor
 
 === Detection configuration
 
-. Setters on <<type_CardDetectionSettings,`CardDetectionSettings`>> that are not invoked MUST default to the values
-  documented in <<type_CardDetectionSettings>>.
 . Parameters that are not supported by the underlying reader (unsupported `RfTechnology`, ECP frame on a non-ECP
   reader) MUST be silently ignored at the call to `startCardDetection`. Implementations SHOULD log a `WARN`-level
   message in such cases. No exception MUST be raised.
@@ -1634,9 +1631,6 @@ This section consolidates the cross-cutting behavioural requirements that confor
 . A scenario is considered "prepared" once at least one selection case has been appended via `prepareSelection`.
 . A scenario MAY be executed multiple times, but each execution operates on the scenario as it stood at the time
   of the call.
-. `exportProcessedCardSelectionScenario` MUST raise `IllegalStateException` if no scenario has been processed yet.
-. <<op_processMultichannelCardSelectionScenario,`processMultichannelCardSelectionScenario`>> MUST raise
-  `InvalidCardResponseException` when the presented card does not support multi-channel.
 
 [[sec_smartcard_lifecycle]]
 === Smart card lifecycle
@@ -1655,14 +1649,6 @@ last successful selection until one of the following events occurs, at which poi
 
 Once a smart card has been deactivated, any further attempt to use it in a transaction MUST be detected by the
 implementation prior to any actual exchange with the card.
-
-=== Channel control
-
-. The default behaviour of `processCommands` is to leave the underlying logical channel open.
-. `processCommandsAndCloseChannel` MUST close the channel only when all prepared commands have completed
-  successfully; in case of failure the channel MUST be left in the same state as `processCommands`.
-. `closeChannel` MUST be idempotent (calling it on an already-closed channel MUST be a no-op).
-. `endCardProcessing` MUST be idempotent.
 
 // =============================================================================
 [appendix]
