@@ -1198,7 +1198,7 @@ that every invocation returns a fresh, fully initialised object.
 | Signature   | `createIsoCardSelector() -> IsoCardSelector`
 | Since       | 2.0
 | Description | Returns a new, freshly initialised <<type_IsoCardSelector,`IsoCardSelector`>>.
-| Returns     | A <<type_IsoCardSelector,`IsoCardSelector`>>.
+| Returns     | An <<type_IsoCardSelector,`IsoCardSelector`>>.
 | Throws      | None.
 |===
 
