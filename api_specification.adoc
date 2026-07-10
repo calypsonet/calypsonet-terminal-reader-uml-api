@@ -308,14 +308,11 @@ Drv  --> HW  : controls
 @enduml
 ....
 
-=== Logical packages
-
-The specification is organised in the following logical packages. Each package groups elements that share a common
-responsibility.
+=== Logical namespaces
 
 [cols="1,1,4", options="header"]
 |===
-| Package                       | Role     | Summary
+| Namespace                       | Role     | Summary
 
 | `reader`                      | Public API
 | Reader discovery, identification, observation and detection configuration.
