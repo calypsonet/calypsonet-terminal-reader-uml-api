@@ -1257,8 +1257,8 @@ This SPI unifies the reception of nominal events (`onReaderEvent`) and of fatal 
 | Invoked when a fatal error occurs on the observed reader. After the operation returns, the observation process
   MUST be considered stopped.
 | Parameters
-| `context`     -- contextual information describing the operation that failed. +
-  `readerName`  -- name of the reader on which the error occurred. +
+| `context`     -- the context describing the operation that failed. +
+  `readerName`  -- the name of the reader on which the error occurred. +
   `e`           -- the original exception that triggered the notification.
 | Throws       | None.
 |===
