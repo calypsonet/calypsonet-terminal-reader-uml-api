@@ -99,8 +99,7 @@ A software product conforms to this specification if and only if:
 . it implements every interface and class defined in <<sec_specification>> with the operations and semantics
   prescribed in this document,
 . it raises exceptions exclusively of the types defined in <<sec_exceptions>> for the situations described,
-. it preserves the structural and behavioural relationships described in <<sec_architecture>> and
-  <<sec_behaviours>>.
+. it preserves the structural relationships described in <<sec_architecture>>.
 
 Throughout this specification, the key words **MUST**, **MUST NOT**, **SHOULD**, **SHOULD NOT**, **RECOMMENDED**,
 **MAY** and **OPTIONAL** are to be interpreted as described in <<ref_rfc2119,RFC 2119>> and <<ref_rfc8174,RFC 8174>> when, and only when,
@@ -362,8 +361,6 @@ include::api_class_diagram.puml[Terminal Reader API class diagram, align=center]
 // =============================================================================
 [[sec_specification]]
 == API Specification
-
-Stateful operations are subject to the ordering and lifecycle constraints defined in <<sec_behaviours>>.
 
 === Classes
 
@@ -687,6 +684,10 @@ For ISO/IEC 7816-4 multi-channel cards, a dedicated execution method is provided
 The manager provides three flavours of execution: explicit (synchronous) single-channel selection, explicit
 multi-channel selection, and scheduled (event-driven) selection. It additionally supports *export/import* of the
 scenario or its result for distributed architectures.
+
+A scenario is considered *prepared* once at least one selection case has been appended via `prepareSelection`. A
+prepared scenario MAY be executed multiple times; each execution operates on the scenario as it stood at the time
+of the call.
 
 ===== Export Card Selection Scenario
 
@@ -1440,6 +1441,7 @@ selection.
 | Throws      | None.
 |===
 
+[[sec_smartcard_lifecycle]]
 ===== Is Active
 
 [cols="1h,4", grid=rows, frame=all]
@@ -1450,7 +1452,23 @@ selection.
 | Returns whether this smart card is currently active on its logical channel.
 
   A smart card is considered *active* between its creation (as the result of a successful selection case) and the
-  occurrence of any event that causes the reader to deactivate it (see <<sec_smartcard_lifecycle>>).
+  occurrence of any of the following events, at which point the reader MUST *deactivate* it (`isActive()` returns
+  `false`) and release its reference:
+
+  - a *new selection in single-channel mode* (the previous smart cards become obsolete);
+
+  - an *explicit channel closure request* through
+    <<type_MultichannelCardTransactionManager,`MultichannelCardTransactionManager.closeChannel`>> or
+    `processCommandsAndCloseChannel`;
+
+  - a call to <<type_ObservableCardReader,`ObservableCardReader.endCardProcessing`>>;
+
+  - an exception indicating that the card is no longer contactable (`CardCommunicationException` or
+    `ReaderCommunicationException`).
+
+  Until then, the reader MUST hold the references to the `SmartCard` instances produced by the last successful
+  selection. Once a smart card has been deactivated, any further attempt to use it MUST be detected by the
+  implementation prior to any actual exchange with the card.
 | Returns     | `true` if the smart card is active, `false` otherwise.
 | Throws      | None.
 |===
@@ -1596,59 +1614,6 @@ selection cases of a scenario. _Since 3.0._
 | Since    | 1.0
 | Purpose  | Indicates that the communication with the reader has failed. The most likely cause is a physical disconnection of the reader, but other technical problems MAY also be at the origin of the failure.
 |===
-
-[[sec_behaviours]]
-== Behavioural Requirements
-
-This section consolidates the cross-cutting behavioural requirements that conforming implementations MUST satisfy.
-
-=== Reader lifecycle
-
-. A reader instance MUST signal communication failures by raising `ReaderCommunicationException` rather than
-  returning a default value.
-. When a reader becomes permanently unusable, the implementation MUST emit a `READER_UNREGISTERED` event to the
-  registered <<type_CardReaderEventHandler,`CardReaderEventHandler`>>.
-
-=== Observation lifecycle
-
-. Card detection MUST be started by exactly one call to
-  <<type_ObservableCardReader,`startCardDetection(settings, eventHandler)`>>; the registered event handler is
-  considered the sole consumer until `stopCardDetection` is called.
-. Event-handler notifications MUST be delivered *sequentially* per reader; concurrent invocations of
-  `onReaderEvent` on the same reader MUST NOT occur.
-. After `stopCardDetection`, the registered event handler MUST NOT receive new events until `startCardDetection`
-  has been called again.
-. Any uncaught exception raised inside `onReaderEvent` MUST be relayed to `onReaderError` of the same handler.
-
-=== Detection configuration
-
-. Parameters that are not supported by the underlying reader (unsupported `RfTechnology`, ECP frame on a non-ECP
-  reader) MUST be silently ignored at the call to `startCardDetection`. Implementations SHOULD log a `WARN`-level
-  message in such cases. No exception MUST be raised.
-
-=== Selection scenario lifecycle
-
-. A scenario is considered "prepared" once at least one selection case has been appended via `prepareSelection`.
-. A scenario MAY be executed multiple times, but each execution operates on the scenario as it stood at the time
-  of the call.
-
-[[sec_smartcard_lifecycle]]
-=== Smart card lifecycle
-
-The reader implementation MUST hold the references to the <<type_SmartCard,`SmartCard`>> instances produced by the
-last successful selection until one of the following events occurs, at which point those instances MUST be
-*deactivated* (their `isActive()` MUST return `false`) and their references MUST be released by the reader:
-
-. a *new selection in single-channel mode* (the previous smart cards become obsolete);
-. an *explicit channel closure request* through
-  <<type_MultichannelCardTransactionManager,`MultichannelCardTransactionManager.closeChannel`>> or
-  `processCommandsAndCloseChannel`;
-. a call to <<type_ObservableCardReader,`ObservableCardReader.endCardProcessing`>>;
-. an exception indicating that the card is no longer contactable (`CardCommunicationException` or
-  `ReaderCommunicationException`).
-
-Once a smart card has been deactivated, any further attempt to use it in a transaction MUST be detected by the
-implementation prior to any actual exchange with the card.
 
 // =============================================================================
 [appendix]
