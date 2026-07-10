@@ -143,7 +143,7 @@ Each interface, class, enumeration and exception defined in this document is des
 [cols="1h,4", grid=rows, frame=all]
 |===
 | Kind       | The category of the type (interface, class, enumeration, exception, etc.).
-| Namespace  | The package in which the type is defined.
+| Namespace  | The namespace in which the type is defined.
 | Extends    | The type extended by this type, when applicable.
 | Implements | The interface implemented by this type, when applicable.
 | Since      | The version of the API in which the type was introduced.
@@ -315,27 +315,29 @@ Drv  --> HW  : controls
 | Namespace                       | Role     | Summary
 
 | `reader`                      | Public API
-| Reader discovery, identification, observation and detection configuration.
+| Entry points of the API and the abstractions used to manipulate readers and the events they produce; exposes
+  `CardReaderProvider` to discover and access the readers available in the execution environment.
 
 | `reader.spi`                  | SPI
-| Interfaces implemented by application code to consume reader events.
+| Contracts implemented by the application (as opposed to the reader implementation) when readers are observed.
 
 | `reader.selection`            | Public API
-| Definition, orchestration and parsing of card selection scenarios -- including the multi-channel scenario.
+| Orchestration of card selection scenarios: the central `CardSelectionManager`, the family of selectors, the
+  scenario-execution policies and the structures exposing selection results.
 
 | `reader.selection.spi`        | SPI
-| Interfaces implemented by card extension modules to enrich the selection process and expose the resulting
-  smart cards.
+| Contracts implemented by card extensions to plug into the selection machinery.
 
 | `reader.transaction.spi`      | SPI
-| Common contract shared by all card transaction managers exposed by card extensions, with a three-tier hierarchy
-  covering single-channel, optionally multi-channel and intrinsically multi-channel cards.
+| Common contract shared by all card transaction managers exposed by card extensions; its three interfaces form a
+  hierarchy letting each extension anchor its transaction manager at the capability level matching its card model
+  (non-ISO, optionally multi-channel, intrinsically multi-channel).
 |===
 
 === Multi-channel design
 
 The {spec-name} explicitly supports ISO/IEC 7816-4 cards that host several active logical channels in parallel.
-The design follows a three-tier hierarchy in the `reader.transaction.spi` package:
+The design follows a three-tier hierarchy in the `reader.transaction.spi` namespace:
 
 . <<type_CardTransactionManager,`CardTransactionManager`>> -- root contract common to every transaction manager,
   regardless of channel model.
@@ -362,37 +364,6 @@ include::api_class_diagram.puml[Terminal Reader API class diagram, align=center]
 == API Specification
 
 Stateful operations are subject to the ordering and lifecycle constraints defined in <<sec_behaviours>>.
-
-The API is organized into the following packages:
-
-[[sec_pkg_reader]]
-The `reader` package defines the entry points of the API and the abstractions used to manipulate readers and the
-events they produce. It also exposes <<type_CardReaderProvider,`CardReaderProvider`>>, the standardised means of
-discovering and accessing the readers available in the execution environment.
-
-[[sec_pkg_reader_spi]]
-The `reader.spi` package gathers the contracts that are implemented by the *application* (as opposed to the reader
-implementation) when readers are observed.
-
-[[sec_pkg_reader_selection]]
-The `reader.selection` package describes the orchestration of card selection scenarios. It introduces the central
-<<type_CardSelectionManager,`CardSelectionManager`>>, the family of selectors, the policies governing the scenario
-execution and the structures used to expose selection results.
-
-[[sec_pkg_reader_selection_spi]]
-The `reader.selection.spi` package gathers the contracts that *card extensions* implement to plug into the
-selection machinery defined above.
-
-[[sec_pkg_reader_transaction_spi]]
-The `reader.transaction.spi` package defines the common contract shared by all card transaction managers exposed
-by card extensions. The three interfaces of this package form a hierarchy that allows each card extension to
-anchor its own transaction manager at the capability level that matches its card model:
-
-* extensions for *non-ISO* cards stereotype directly on `CardTransactionManager`;
-* extensions for *ISO/IEC 7816-4 cards that are optionally multi-channel* stereotype on `IsoCardTransactionManager`
-  and expose multi-channel features on demand via the cast operation;
-* extensions for *intrinsically multi-channel ISO/IEC 7816-4 cards* stereotype directly on
-  `MultichannelCardTransactionManager`.
 
 === Classes
 
