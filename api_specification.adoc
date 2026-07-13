@@ -1206,7 +1206,7 @@ cases (selection step itself plus any subsequent commands). Its content MUST be 
 | Kind     | Interface (SPI)
 | Namespace  | `reader.spi`
 | Since    | 3.0
-| Purpose  | Implemented by the application to receive reader events and observation errors from an <<type_ObservableCardReader,`ObservableCardReader`>>.
+| Purpose  | Interface that the application MUST implement to receive reader events and observation errors from an <<type_ObservableCardReader,`ObservableCardReader`>>.
 |===
 
 This SPI unifies the reception of nominal events (`onReaderEvent`) and of fatal observation errors
@@ -1223,7 +1223,7 @@ This SPI unifies the reception of nominal events (`onReaderEvent`) and of fatal 
 | Since       | 3.0
 | Description
 | Invoked when a fatal error occurs on the observed reader. After the operation returns, the observation process
-  MUST be considered stopped.
+  is considered stopped.
 | Parameters
 | `context`     -- the context describing the operation that failed. +
   `readerName`  -- the name of the reader on which the error occurred. +
@@ -1239,10 +1239,10 @@ This SPI unifies the reception of nominal events (`onReaderEvent`) and of fatal 
 | Signature   | `onReaderEvent(cardReaderEvent: CardReaderEvent) -> void`
 | Since       | 3.0
 | Description
-| Invoked when a reader event occurs. The dispatch SHOULD be performed *sequentially* and *synchronously* unless
-  the implementation explicitly documents a different policy.
+| Invoked when a reader event occurs. Dispatch is *sequential* and *synchronous* unless a different policy is
+  explicitly documented.
 | Parameters  | `cardReaderEvent` (<<type_CardReaderEvent,`CardReaderEvent`>>) -- the event payload.
-| Throws      | None. Implementations MUST ensure that exceptions thrown by the handler are routed to `onReaderError`.
+| Throws      | None. Any exception thrown by the handler is routed to `onReaderError`.
 |===
 
 [[type_CardSelectionExtension]]
@@ -1270,10 +1270,10 @@ extension is defined by the card extension specification consuming this SPI.
 | Purpose  | Root contract common to every card transaction manager exposed by a card extension. Defines the single operation `processCommands`.
 |===
 
-To exchange data with a card, the application MUST first prepare the commands to transmit (via the operations of
-the consuming card extension) and then process them. The preparation step allows commands to be grouped to
+To exchange data with a card, the application first prepares the commands to transmit (via the operations of
+the consuming card extension) and then processes them. The preparation step allows commands to be grouped to
 minimise network exchanges, which is especially valuable in distributed architectures. The
-<<type_SmartCard,`SmartCard`>> registered with the manager MUST be updated after each data exchange with the card.
+<<type_SmartCard,`SmartCard`>> registered with the manager is updated after each data exchange with the card.
 
 ===== Process Commands
 
@@ -1284,9 +1284,9 @@ minimise network exchanges, which is especially valuable in distributed architec
 | Description
 | Processes all previously prepared commands.
 
-  All APDUs corresponding to the prepared commands MUST be sent to the card, their responses retrieved and used
+  All APDUs corresponding to the prepared commands are sent to the card, their responses retrieved and used
   to update the <<type_SmartCard,`SmartCard`>> associated with the transaction.
-  For write commands, the `SmartCard` MUST be updated only when the command is successful. The process MUST be
+  For write commands, the `SmartCard` is updated only when the command is successful. The process is
   interrupted at the first failed command. The underlying logical channel is left open after processing.
 | Throws
 | <<type_ReaderCommunicationException,`ReaderCommunicationException`>> -- if a communication error with the reader occurs. +
@@ -1316,7 +1316,7 @@ minimise network exchanges, which is especially valuable in distributed architec
 | Returns a view of this manager as a <<type_MultichannelCardTransactionManager,
   `MultichannelCardTransactionManager`>>, granting access to the multi-channel operations.
 
-  *Prerequisite:* The underlying ISO/IEC 7816-4 card MUST support multi-channel operation. Implementations MUST raise an `InvalidCardResponseException` during command processing if the card does not support multi-channel operation.
+  *Prerequisite:* the underlying ISO/IEC 7816-4 card MUST support multi-channel operation; otherwise an `InvalidCardResponseException` is raised during command processing.
 | Returns     | A <<type_MultichannelCardTransactionManager,`MultichannelCardTransactionManager`>>.
 | Throws      | <<type_InvalidCardResponseException,`InvalidCardResponseException`>> -- if the card does not support multi-channel.
 |===
@@ -1334,8 +1334,8 @@ minimise network exchanges, which is especially valuable in distributed architec
 |===
 
 In addition to the inherited power-on data, an `IsoSmartCard` exposes the response to the *Select Application*
-command. Both the power-on data and the *Select Application* response are OPTIONAL but they MUST NOT both be
-absent at the same time.
+command. Both the power-on data and the *Select Application* response are optional, but at least one of them is
+always present.
 
 ===== Get Select Application Response
 
@@ -1385,7 +1385,7 @@ This contract MAY be obtained either:
 |===
 | Signature   | `closeChannel() -> void`
 | Since       | 3.0
-| Description | Closes the underlying logical channel without processing any pending command. This operation MUST be idempotent: calling it on an already-closed channel MUST be a no-op.
+| Description | Closes the underlying logical channel without processing any pending command. This operation is idempotent: calling it on an already-closed channel has no effect.
 | Throws
 | <<type_ReaderCommunicationException,`ReaderCommunicationException`>> -- if a communication error with the reader occurs. +
   <<type_CardCommunicationException,`CardCommunicationException`>> -- if a communication error with the card occurs.
@@ -1415,7 +1415,7 @@ This contract MAY be obtained either:
 | Purpose  | Basic smart card whose communication has been established after a successful selection. The instance is ready to receive APDUs.
 |===
 
-Card extensions MUST implement (and MAY extend) this interface to expose the data they have collected during the
+Card extensions implement (and may extend) this interface to expose the data they collected during the
 selection.
 
 ===== Get Power On Data
@@ -1451,8 +1451,8 @@ selection.
 | Returns whether this smart card is currently active on its logical channel.
 
   A smart card is considered *active* between its creation (as the result of a successful selection case) and the
-  occurrence of any of the following events, at which point the reader MUST *deactivate* it (`isActive()` returns
-  `false`) and release its reference:
+  occurrence of any of the following events, at which point the reader *deactivates* it (`isActive()` returns
+  `false`) and releases its reference:
 
   - a *new selection in single-channel mode* (the previous smart cards become obsolete);
 
@@ -1465,9 +1465,9 @@ selection.
   - an exception indicating that the card is no longer contactable (`CardCommunicationException` or
     `ReaderCommunicationException`).
 
-  Until then, the reader MUST hold the references to the `SmartCard` instances produced by the last successful
-  selection. Once a smart card has been deactivated, any further attempt to use it MUST be detected by the
-  implementation prior to any actual exchange with the card.
+  Until then, the reader holds the references to the `SmartCard` instances produced by the last successful
+  selection. Once a smart card has been deactivated, any further attempt to use it is detected prior to any
+  actual exchange with the card.
 | Returns     | `true` if the smart card is active, `false` otherwise.
 | Throws      | None.
 |===
