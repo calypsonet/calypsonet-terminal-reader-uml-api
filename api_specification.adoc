@@ -422,7 +422,7 @@ absence of ISO/IEC 7816-4-specific filters at the type level.
 |===
 
 `CardDetectionSettings` exposes setters in *builder* form: each operation returns the current instance to allow
-fluent composition. Setters that are not invoked default to the values specified below.
+fluent composition. Setters that are not called default to the values specified below.
 
 [cols="1h,4", grid=rows, frame=all]
 |===
@@ -445,7 +445,7 @@ fluent composition. Setters that are not invoked default to the values specified
   call to <<op_ObservableCardReader_startCardDetection,`startCardDetection`>> is required before another card can
   be detected.
 
-  When this setter is not invoked, the detection mode defaults to `REPEATING` (see the defaults above). The full
+  When this setter is not called, the detection mode defaults to `REPEATING` (see the defaults above). The full
   semantics of each value are given by the <<type_DetectionMode,`DetectionMode`>> enumeration.
 | Parameters  | `detectionMode` (<<type_DetectionMode,`DetectionMode`>>) -- the desired detection mode.
 | Returns     | The current instance (<<type_CardDetectionSettings,`CardDetectionSettings`>>).
@@ -466,7 +466,7 @@ fluent composition. Setters that are not invoked default to the values specified
   Relevant only on readers supporting ECP. If the underlying reader does not support ECP, the provided frame is
   silently ignored and a `WARN`-level message is typically logged.
 
-  When this setter is not invoked, no ECP frame is emitted (default *none*; see the defaults above).
+  When this setter is not called, no ECP frame is emitted (default *none*; see the defaults above).
 | Parameters  | `ecpFrame` -- the non-empty ECP frame.
 | Returns     | The current instance (<<type_CardDetectionSettings,`CardDetectionSettings`>>).
 | Throws      | `IllegalArgumentException` -- if the provided array is empty.
@@ -485,7 +485,7 @@ fluent composition. Setters that are not invoked default to the values specified
 
   Not relevant for contact readers; on such readers, this setter is accepted without effect.
 
-  When this setter is not invoked, the reader polls the default set `{ ISO_14443_AB }` (see the defaults above).
+  When this setter is not called, the reader polls the default set `{ ISO_14443_AB }` (see the defaults above).
 | Parameters  | `rfTechnologies` -- the non-empty set of RF technologies to activate.
 | Returns     | The current instance (<<type_CardDetectionSettings,`CardDetectionSettings`>>).
 | Throws      | `IllegalArgumentException` -- if the provided set is empty.
@@ -575,7 +575,7 @@ card selection response.
   scenario has been scheduled; in every other case it is non-`null`.
 
   When non-`null`, the returned value MUST be passed for interpretation to
-  <<op_parseScheduledCardSelectionsResponse,`CardSelectionManager.parseScheduledCardSelectionsResponse`>>, invoked
+  <<op_parseScheduledCardSelectionsResponse,`CardSelectionManager.parseScheduledCardSelectionsResponse`>>, called
   on the <<type_CardSelectionManager,`CardSelectionManager`>> instance that prepared the associated selection
   scenario, or on another `CardSelectionManager` sharing the same context -- that is, one that has previously
   prepared the same selection scenario.
@@ -1075,7 +1075,7 @@ both the <<type_CardDetectionSettings,`CardDetectionSettings`>> that govern the 
   following the last selection (see <<sec_smartcard_lifecycle>>).
 
   This operation is idempotent: calling it twice on the same card processing cycle has no effect after the
-  first call. It is RECOMMENDED to invoke `endCardProcessing` systematically (e.g. inside a `finally` block) at
+  first call. It is RECOMMENDED to call `endCardProcessing` systematically (e.g. inside a `finally` block) at
   the end of a card processing whatever the outcome.
 | Throws      | None.
 |===
@@ -1222,7 +1222,7 @@ This SPI unifies the reception of nominal events (`onReaderEvent`) and of fatal 
 | `onReaderError(context: string, readerName: string, e: throwable) -> void`
 | Since       | 3.0
 | Description
-| Invoked when a fatal error occurs on the observed reader. After the operation returns, the observation process
+| Called when a fatal error occurs on the observed reader. After the operation returns, the observation process
   is considered stopped.
 | Parameters
 | `context`     -- the context describing the operation that failed. +
@@ -1239,7 +1239,7 @@ This SPI unifies the reception of nominal events (`onReaderEvent`) and of fatal 
 | Signature   | `onReaderEvent(cardReaderEvent: CardReaderEvent) -> void`
 | Since       | 3.0
 | Description
-| Invoked when a reader event occurs. Dispatch is *sequential* and *synchronous* unless a different policy is
+| Called when a reader event occurs. Dispatch is *sequential* and *synchronous* unless a different policy is
   explicitly documented.
 | Parameters  | `cardReaderEvent` (<<type_CardReaderEvent,`CardReaderEvent`>>) -- the event payload.
 | Throws      | None. Any exception thrown by the handler is routed to `onReaderError`.
