@@ -461,10 +461,10 @@ fluent composition. Setters that are not invoked default to the values specified
 | Description
 | Provides the ECP (Enhanced Contactless Polling) frame to emit at polling startup. The frame is treated by this
   specification as opaque binary data constructed by the application in accordance with the relevant ECP
-  specification and transmitted as-is by the implementation to the reader.
+  specification and transmitted as-is to the reader.
 
   Relevant only on readers supporting ECP. If the underlying reader does not support ECP, the provided frame is
-  silently ignored and a `WARN`-level message SHOULD be logged.
+  silently ignored and a `WARN`-level message is typically logged.
 
   When this setter is not invoked, no ECP frame is emitted (default *none*; see the defaults above).
 | Parameters  | `ecpFrame` -- the non-empty ECP frame.
@@ -606,8 +606,8 @@ card selection response.
 |===
 
 The `CardReaderProvider` is obtained from the <<type_ReaderApiFactory,`ReaderApiFactory`>>. It offers an
-implementation-agnostic view over the readers currently registered in the environment. Reader lifecycle (registration and un-registration) remains driven
-by the implementation; the provider is a *read-only* view reflecting the readers active at the moment of each call.
+implementation-agnostic view over the readers currently registered in the environment. Reader lifecycle (registration and un-registration) is handled by the runtime environment; the provider is a
+*read-only* view reflecting the readers active at the moment of each call.
 
 ===== Find Reader
 
@@ -1096,7 +1096,7 @@ both the <<type_CardDetectionSettings,`CardDetectionSettings`>> that govern the 
 
   Parameters carried by `CardDetectionSettings` that are not supported by the underlying reader (for example an
   unsupported `RfTechnology`, or an ECP frame on a reader that does not support ECP) are silently ignored.
-  The implementation SHOULD log a `WARN`-level message in such cases. No exception is thrown.
+  A `WARN`-level message is typically logged in such cases. No exception is thrown.
 | Parameters
 | `settings` (<<type_CardDetectionSettings,`CardDetectionSettings`>>)     -- the detection configuration. +
   `eventHandler` (<<type_CardReaderEventHandler,`CardReaderEventHandler`>>) -- the application-side handler that receives reader events and errors.
@@ -1176,7 +1176,7 @@ the API. It is provided as a single instance whose accessors each return a fresh
 |===
 | Signature   | `getCardReaderProvider() -> CardReaderProvider`
 | Since       | 3.0
-| Description | Returns the <<type_CardReaderProvider,`CardReaderProvider`>> exposed by the implementation, giving standardised access to the readers available in the execution environment.
+| Description | Returns the <<type_CardReaderProvider,`CardReaderProvider`>>, giving standardised access to the readers available in the execution environment.
 | Returns     | A <<type_CardReaderProvider,`CardReaderProvider`>>.
 | Throws      | None.
 |===
