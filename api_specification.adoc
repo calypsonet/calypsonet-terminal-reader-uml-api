@@ -385,12 +385,12 @@ include::api_class_diagram.puml[Terminal Reader API class diagram, align=center]
 | `string`
 | 1.0
 | String representation of the version of the API implemented by the conforming binding (e.g. `"3.0"`).
-  The value MUST be a dotted decimal of the form `MAJOR.MINOR`.
+  The value is a dotted decimal of the form `MAJOR.MINOR`.
 |===
 
 [NOTE]
 ====
-The `ReaderApiProperties` type MUST NOT be instantiated. Implementations MUST prevent external construction.
+The `ReaderApiProperties` type cannot be instantiated; it exposes only static properties.
 ====
 
 === API Interfaces
@@ -441,9 +441,9 @@ fluent composition. Setters that are not invoked default to the values specified
 | Description
 | Sets the *detection mode*, which governs the reader's behaviour once a card-processing cycle has terminated.
   With `REPEATING`, the reader automatically resumes polling and waits for the next card insertion, enabling
-  continuous, unattended operation. With `SINGLE_SHOT`, the reader stops detection after the current cycle and MUST
-  be restarted by a new call to <<op_ObservableCardReader_startCardDetection,`startCardDetection`>> before another
-  card can be detected.
+  continuous, unattended operation. With `SINGLE_SHOT`, the reader stops detection after the current cycle; a new
+  call to <<op_ObservableCardReader_startCardDetection,`startCardDetection`>> is required before another card can
+  be detected.
 
   When this setter is not invoked, the detection mode defaults to `REPEATING` (see the defaults above). The full
   semantics of each value are given by the <<type_DetectionMode,`DetectionMode`>> enumeration.
@@ -463,8 +463,8 @@ fluent composition. Setters that are not invoked default to the values specified
   specification as opaque binary data constructed by the application in accordance with the relevant ECP
   specification and transmitted as-is by the implementation to the reader.
 
-  Relevant only on readers supporting ECP. If the underlying reader does not support ECP, the provided frame MUST
-  be silently ignored and a `WARN`-level message SHOULD be logged.
+  Relevant only on readers supporting ECP. If the underlying reader does not support ECP, the provided frame is
+  silently ignored and a `WARN`-level message SHOULD be logged.
 
   When this setter is not invoked, no ECP frame is emitted (default *none*; see the defaults above).
 | Parameters  | `ecpFrame` -- the non-empty ECP frame.
@@ -480,10 +480,10 @@ fluent composition. Setters that are not invoked default to the values specified
 | Signature   | `setRfTechnologies(rfTechnologies: set<RfTechnology>) -> CardDetectionSettings`
 | Since       | 3.0
 | Description
-| Declares the set of RF technologies the reader MUST activate during polling. The `RfTechnology` enumeration is
+| Declares the set of RF technologies the reader activates during polling. The `RfTechnology` enumeration is
   defined in the Terminal Definitions API (see <<ref_cna_td,CNA-TD-API>>).
 
-  Not relevant for contact readers; on such readers, this setter MUST be accepted without effect.
+  Not relevant for contact readers; on such readers, this setter is accepted without effect.
 
   When this setter is not invoked, the reader polls the default set `{ ISO_14443_AB }` (see the defaults above).
 | Parameters  | `rfTechnologies` -- the non-empty set of RF technologies to activate.
@@ -509,7 +509,7 @@ fluent composition. Setters that are not invoked default to the values specified
 | Signature   | `getName() -> string`
 | Since       | 1.0
 | Description | Returns the name of the reader.
-| Returns     | A non-empty `string` identifying the reader. The value MUST be stable for the lifetime of the reader instance.
+| Returns     | A non-empty `string` identifying the reader. The value is stable for the lifetime of the reader instance.
 | Throws      | None.
 |===
 
@@ -674,8 +674,8 @@ A *card selection scenario* is composed of one or more *selection cases*, each b
 additional commands to be executed after the successful selection. The behaviour of the scenario is governed by
 the <<type_SelectionExecutionPolicy,`SelectionExecutionPolicy`>> passed at execution time:
 
-* with `STOP_ON_FIRST_MATCH`, the manager MUST stop at the first successful selection case;
-* with `PROCESS_ALL`, the manager MUST process every selection case regardless of intermediate successes.
+* with `STOP_ON_FIRST_MATCH`, the manager stops at the first successful selection case;
+* with `PROCESS_ALL`, the manager processes every selection case regardless of intermediate successes.
 
 For ISO/IEC 7816-4 multi-channel cards, a dedicated execution method is provided
 (<<op_processMultichannelCardSelectionScenario,`processMultichannelCardSelectionScenario`>>), parameterised by a
@@ -912,7 +912,7 @@ to the active selected card. In multi-channel mode, several active selections ma
 | Description
 | Returns the type of the detected card, as defined by the `CardType` enumeration of the Terminal Definitions API
   (see <<ref_cna_td,CNA-TD-API>>). The returned value is intrinsically tied to the lifecycle of this `CardSelectionResult`.
-| Returns     | A `CardType` (<<ref_cna_td,CNA-TD-API>>). `UNKNOWN` is returned when the implementation could not identify the type.
+| Returns     | A `CardType` (<<ref_cna_td,CNA-TD-API>>). `UNKNOWN` is returned when the card type could not be identified.
 | Throws      | None.
 |===
 
@@ -941,7 +941,7 @@ to the active selected card. In multi-channel mode, several active selections ma
 
 All filters defined by this interface are *optional* and MAY be combined. If no filter is specified, any card that
 responds when inserted in the reader is considered selected. Conversely, if one or more filters are defined, a
-card MUST NOT be selected if at least one of them rejects it.
+card is not selected if at least one of them rejects it.
 
 [[op_CardSelector_filterByCardType]]
 ===== Filter By Card Type
@@ -996,7 +996,7 @@ card MUST NOT be selected if at least one of them rejects it.
 | Description
 | Selects a card application DF by its name. The DF is selected only if its name starts with the provided AID,
   as defined by ISO/IEC 7816-4 § 4.2.
-  The provided AID MUST be used as a parameter of the *Select Application* ISO card command.
+  The provided AID is used as a parameter of the *Select Application* ISO card command.
 | Parameters  | `aid` -- the AID as a `byte array` containing 5 to 16 bytes.
 | Returns     | The current instance (<<type_IsoCardSelector,`IsoCardSelector`>>).
 | Throws      | `IllegalArgumentException` -- if the provided array is out of range.
@@ -1063,18 +1063,18 @@ both the <<type_CardDetectionSettings,`CardDetectionSettings`>> that govern the 
 | Since       | 3.0
 | Description
 | Notifies the reader that the *business processing* of the current card has been completed. Upon receiving this
-  notification, the reader MUST:
+  notification, the reader:
 
-  - perform the *DESELECT* sequence on the card (when applicable to the underlying technology) so that the card
+  - performs the *DESELECT* sequence on the card (when applicable to the underlying technology) so that the card
     is brought to a clean idle state,
 
-  - transition to the *waiting-for-card-removal* phase, during which the observation cycle waits for the card to
+  - transitions to the *waiting-for-card-removal* phase, during which the observation cycle waits for the card to
     leave the reader's field before becoming able to detect a new card.
 
-  In addition, the reader MUST release the references to the <<type_SmartCard,`SmartCard`>> instances held
+  In addition, the reader releases the references to the <<type_SmartCard,`SmartCard`>> instances held
   following the last selection (see <<sec_smartcard_lifecycle>>).
 
-  This operation MUST be idempotent: calling it twice on the same card processing cycle MUST be a no-op after the
+  This operation is idempotent: calling it twice on the same card processing cycle has no effect after the
   first call. It is RECOMMENDED to invoke `endCardProcessing` systematically (e.g. inside a `finally` block) at
   the end of a card processing whatever the outcome.
 | Throws      | None.
@@ -1095,7 +1095,7 @@ both the <<type_CardDetectionSettings,`CardDetectionSettings`>> that govern the 
   and, when applicable, the ECP frame to emit at polling startup.
 
   Parameters carried by `CardDetectionSettings` that are not supported by the underlying reader (for example an
-  unsupported `RfTechnology`, or an ECP frame on a reader that does not support ECP) MUST be silently ignored.
+  unsupported `RfTechnology`, or an ECP frame on a reader that does not support ECP) are silently ignored.
   The implementation SHOULD log a `WARN`-level message in such cases. No exception is thrown.
 | Parameters
 | `settings` (<<type_CardDetectionSettings,`CardDetectionSettings`>>)     -- the detection configuration. +
@@ -1108,7 +1108,7 @@ both the <<type_CardDetectionSettings,`CardDetectionSettings`>> that govern the 
 |===
 | Signature   | `stopCardDetection() -> void`
 | Since       | 1.0
-| Description | Stops card detection. After this operation has returned, the registered event handler MUST NOT receive card events until detection is restarted.
+| Description | Stops card detection. After this operation has returned, the registered event handler does not receive card events until detection is restarted.
 | Throws      | None.
 |===
 
@@ -1123,9 +1123,8 @@ both the <<type_CardDetectionSettings,`CardDetectionSettings`>> that govern the 
 | Purpose  | Factory used by the application to obtain instances of the public types provided by the API.
 |===
 
-The `ReaderApiFactory` is the *only* normative entry point through which the application is allowed to instantiate
-the public types of the API. Implementations MUST expose exactly one instance of this factory and MUST guarantee
-that every invocation returns a fresh, fully initialised object.
+The `ReaderApiFactory` is the single entry point through which the application instantiates the public types of
+the API. It is provided as a single instance whose accessors each return a fresh, fully initialised object.
 
 ===== Create Basic Card Selector
 
@@ -1491,7 +1490,7 @@ selection.
 | Value          | Since | Description
 
 | `ALWAYS`       | 3.0 | All cards presented to the reader are notified, regardless of the result of the selection.
-| `MATCHED_ONLY` | 3.0 | Only cards that have been successfully selected are notified. The others MUST be ignored.
+| `MATCHED_ONLY` | 3.0 | Only cards that have been successfully selected are notified. The others are ignored.
 |===
 
 [[type_CardReaderEventType]]
@@ -1531,7 +1530,7 @@ selection.
 | Value                  | Since | Description
 
 | `ALLOW_BASIC_CHANNEL`  | 3.0 | The basic channel (channel `0`) MAY host selection cases in addition to the additional logical channels.
-| `LOGICAL_CHANNEL_ONLY` | 3.0 | Selection cases MUST be placed only on additional logical channels; the basic channel is not used.
+| `LOGICAL_CHANNEL_ONLY` | 3.0 | Selection cases are placed only on additional logical channels; the basic channel is not used.
 |===
 
 [[type_DetectionMode]]
@@ -1608,8 +1607,8 @@ selection.
 |===
 | Value                  | Since | Description
 
-| `STOP_ON_FIRST_MATCH`  | 3.0 | The manager MUST stop at the first successful selection case.
-| `PROCESS_ALL`          | 3.0 | The manager MUST process every selection case regardless of intermediate successes.
+| `STOP_ON_FIRST_MATCH`  | 3.0 | The manager stops at the first successful selection case.
+| `PROCESS_ALL`          | 3.0 | The manager processes every selection case regardless of intermediate successes.
 |===
 
 [[sec_exceptions]]
