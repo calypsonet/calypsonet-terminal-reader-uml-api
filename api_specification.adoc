@@ -1478,8 +1478,13 @@ selection.
 [[type_CardPresenceNotificationPolicy]]
 ==== Card Presence Notification Policy
 
-Nested inside <<type_CardSelectionManager,`CardSelectionManager`>>. Options applied when a card is detected, used
-to decide which cards trigger event-handler notifications. _Since 3.0._
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Kind     | Enumeration
+| Namespace  | `reader.selection`.<<type_CardSelectionManager,`CardSelectionManager`>>
+| Since    | 3.0
+| Purpose  | Options applied when a card is detected, used to decide which cards trigger event-handler notifications.
+|===
 
 [cols="1,1,4", options="header"]
 |===
@@ -1492,7 +1497,13 @@ to decide which cards trigger event-handler notifications. _Since 3.0._
 [[type_CardReaderEventType]]
 ==== Card Reader Event Type
 
-Nested inside <<type_CardReaderEvent,`CardReaderEvent`>>. Possible card reader events. _Since 1.0._
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Kind     | Enumeration
+| Namespace  | `reader`.<<type_CardReaderEvent,`CardReaderEvent`>>
+| Since    | 1.0
+| Purpose  | Possible card reader events.
+|===
 
 [cols="1,1,4", options="header"]
 |===
@@ -1507,8 +1518,13 @@ Nested inside <<type_CardReaderEvent,`CardReaderEvent`>>. Possible card reader e
 [[type_ChannelSelectionPolicy]]
 ==== Channel Selection Policy
 
-Nested inside <<type_CardSelectionManager,`CardSelectionManager`>>. Policy governing the use of the basic channel
-in a multi-channel selection scenario. _Since 3.0._
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Kind     | Enumeration
+| Namespace  | `reader.selection`.<<type_CardSelectionManager,`CardSelectionManager`>>
+| Since    | 3.0
+| Purpose  | Policy governing the use of the basic channel in a multi-channel selection scenario.
+|===
 
 [cols="1,1,4", options="header"]
 |===
@@ -1521,8 +1537,13 @@ in a multi-channel selection scenario. _Since 3.0._
 [[type_DetectionMode]]
 ==== Detection Mode
 
-Nested inside <<type_CardDetectionSettings,`CardDetectionSettings`>>. Defines the behaviour to apply after a card
-processing cycle has terminated. _Since 3.0._
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Kind     | Enumeration
+| Namespace  | `reader`.<<type_CardDetectionSettings,`CardDetectionSettings`>>
+| Since    | 3.0
+| Purpose  | Defines the behaviour to apply after a card processing cycle has terminated.
+|===
 
 [cols="1,1,4", options="header"]
 |===
@@ -1535,8 +1556,13 @@ processing cycle has terminated. _Since 3.0._
 [[type_FileControlInformation]]
 ==== File Control Information
 
-Nested inside `IsoCardSelector`. Types of templates returned in response to the *Select Application* command,
-according to ISO/IEC 7816-4. _Since 2.0._
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Kind     | Enumeration
+| Namespace  | `reader.selection`.<<type_IsoCardSelector,`IsoCardSelector`>>
+| Since    | 2.0
+| Purpose  | Types of templates returned in response to the *Select Application* command, according to ISO/IEC 7816-4.
+|===
 
 [cols="1,1,4", options="header"]
 |===
@@ -1550,8 +1576,13 @@ according to ISO/IEC 7816-4. _Since 2.0._
 [[type_FileOccurrence]]
 ==== File Occurrence
 
-Nested inside `IsoCardSelector`. Navigation options through the applications contained on the card according to
-ISO/IEC 7816-4. _Since 2.0._
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Kind     | Enumeration
+| Namespace  | `reader.selection`.<<type_IsoCardSelector,`IsoCardSelector`>>
+| Since    | 2.0
+| Purpose  | Navigation options through the applications contained on the card according to ISO/IEC 7816-4.
+|===
 
 [cols="1,1,4", options="header"]
 |===
@@ -1565,8 +1596,13 @@ ISO/IEC 7816-4. _Since 2.0._
 [[type_SelectionExecutionPolicy]]
 ==== Selection Execution Policy
 
-Nested inside <<type_CardSelectionManager,`CardSelectionManager`>>. Policy governing the iteration over the
-selection cases of a scenario. _Since 3.0._
+[cols="1h,4", grid=rows, frame=all]
+|===
+| Kind     | Enumeration
+| Namespace  | `reader.selection`.<<type_CardSelectionManager,`CardSelectionManager`>>
+| Since    | 3.0
+| Purpose  | Policy governing the iteration over the selection cases of a scenario.
+|===
 
 [cols="1,1,4", options="header"]
 |===
