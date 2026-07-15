@@ -1101,7 +1101,7 @@ both the <<type_CardDetectionSettings,`CardDetectionSettings`>> that govern the 
     leave the reader's field before becoming able to detect a new card.
 
   In addition, the reader releases the references to the <<type_SmartCard,`SmartCard`>> instances held
-  following the last selection (see <<sec_smartcard_lifecycle>>).
+  following the last selection (see <<sec_smartcard_lifecycle,the `SmartCard` lifecycle>>).
 
   This operation is idempotent: calling it twice on the same card processing cycle has no effect after the
   first call. It is RECOMMENDED to call `endCardProcessing` systematically (e.g. inside a `finally` block) at
