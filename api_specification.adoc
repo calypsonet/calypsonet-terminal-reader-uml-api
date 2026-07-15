@@ -507,6 +507,7 @@ fluent composition. Setters that are not called default to the values specified 
 | Purpose  | Represents a card reader capable of driving the underlying hardware to manage card detection.
 |===
 
+[[op_CardReader_getName]]
 ===== Get Name
 
 [cols="1h,4", grid=rows, frame=all]
@@ -518,6 +519,7 @@ fluent composition. Setters that are not called default to the values specified 
 | Throws      | None.
 |===
 
+[[op_CardReader_isCardPresent]]
 ===== Is Card Present
 
 [cols="1h,4", grid=rows, frame=all]
@@ -533,6 +535,7 @@ fluent composition. Setters that are not called default to the values specified 
 | Throws      | <<type_ReaderCommunicationException,`ReaderCommunicationException`>> -- if the communication with the reader has failed.
 |===
 
+[[op_CardReader_isContactless]]
 ===== Is Contactless
 
 [cols="1h,4", grid=rows, frame=all]
@@ -559,6 +562,7 @@ fluent composition. Setters that are not called default to the values specified 
 A `CardReaderEvent` carries the origin of the event (the reader name), the event type and, when available, the
 card selection response.
 
+[[op_CardReaderEvent_getReaderName]]
 ===== Get Reader Name
 
 [cols="1h,4", grid=rows, frame=all]
@@ -570,6 +574,7 @@ card selection response.
 | Throws      | None.
 |===
 
+[[op_CardReaderEvent_getScheduledCardSelectionsResponse]]
 ===== Get Scheduled Card Selections Response
 
 [cols="1h,4", grid=rows, frame=all]
@@ -581,7 +586,7 @@ card selection response.
   scenario has been scheduled; in every other case it is non-`null`.
 
   When non-`null`, the returned value MUST be passed for interpretation to
-  <<op_parseScheduledCardSelectionsResponse,`CardSelectionManager.parseScheduledCardSelectionsResponse`>>, called
+  <<op_CardSelectionManager_parseScheduledCardSelectionsResponse,`CardSelectionManager.parseScheduledCardSelectionsResponse`>>, called
   on the <<type_CardSelectionManager,`CardSelectionManager`>> instance that prepared the associated selection
   scenario, or on another `CardSelectionManager` sharing the same context -- that is, one that has previously
   prepared the same selection scenario.
@@ -589,6 +594,7 @@ card selection response.
 | Throws      | None.
 |===
 
+[[op_CardReaderEvent_getType]]
 ===== Get Type
 
 [cols="1h,4", grid=rows, frame=all]
@@ -616,6 +622,7 @@ The `CardReaderProvider` is obtained from the <<type_ReaderApiFactory,`ReaderApi
 implementation-agnostic view over the readers currently registered in the environment. Reader lifecycle (registration and un-registration) is handled by the runtime environment; the provider is a
 *read-only* view reflecting the readers active at the moment of each call.
 
+[[op_CardReaderProvider_findReader]]
 ===== Find Reader
 
 [cols="1h,4", grid=rows, frame=all]
@@ -631,6 +638,7 @@ implementation-agnostic view over the readers currently registered in the enviro
 | Throws      | `IllegalArgumentException` -- if the supplied string is not a valid regular expression.
 |===
 
+[[op_CardReaderProvider_getReader]]
 ===== Get Reader
 
 [cols="1h,4", grid=rows, frame=all]
@@ -643,6 +651,7 @@ implementation-agnostic view over the readers currently registered in the enviro
 | Throws      | None.
 |===
 
+[[op_CardReaderProvider_getReaderNames]]
 ===== Get Reader Names
 
 [cols="1h,4", grid=rows, frame=all]
@@ -654,6 +663,7 @@ implementation-agnostic view over the readers currently registered in the enviro
 | Throws      | None.
 |===
 
+[[op_CardReaderProvider_getReaders]]
 ===== Get Readers
 
 [cols="1h,4", grid=rows, frame=all]
@@ -686,7 +696,7 @@ the <<type_SelectionExecutionPolicy,`SelectionExecutionPolicy`>> passed at execu
 * with `PROCESS_ALL`, the manager processes every selection case regardless of intermediate successes.
 
 For ISO/IEC 7816-4 multi-channel cards, a dedicated execution method is provided
-(<<op_processMultichannelCardSelectionScenario,`processMultichannelCardSelectionScenario`>>), parameterised by a
+(<<op_CardSelectionManager_processMultichannelCardSelectionScenario,`processMultichannelCardSelectionScenario`>>), parameterised by a
 <<type_ChannelSelectionPolicy,`ChannelSelectionPolicy`>>.
 
 The manager provides three flavours of execution: explicit (synchronous) single-channel selection, explicit
@@ -697,6 +707,7 @@ A scenario is considered *prepared* once at least one selection case has been ap
 prepared scenario MAY be executed multiple times; each execution operates on the scenario as it stood at the time
 of the call.
 
+[[op_CardSelectionManager_exportCardSelectionScenario]]
 ===== Export Card Selection Scenario
 
 [cols="1h,4", grid=rows, frame=all]
@@ -708,6 +719,7 @@ of the call.
 | Throws      | None.
 |===
 
+[[op_CardSelectionManager_exportProcessedCardSelectionScenario]]
 ===== Export Processed Card Selection Scenario
 
 [cols="1h,4", grid=rows, frame=all]
@@ -763,7 +775,7 @@ of the call.
   <<type_InvalidCardResponseException,`InvalidCardResponseException`>> -- if the data returned by the card could not be interpreted.
 |===
 
-[[op_parseScheduledCardSelectionsResponse]]
+[[op_CardSelectionManager_parseScheduledCardSelectionsResponse]]
 ===== Parse Scheduled Card Selections Response
 
 [cols="1h,4", grid=rows, frame=all]
@@ -814,7 +826,7 @@ of the call.
   status word check is enabled in the card request and the card returned an unexpected code.
 |===
 
-[[op_processMultichannelCardSelectionScenario]]
+[[op_CardSelectionManager_processMultichannelCardSelectionScenario]]
 ===== Process Multichannel Card Selection Scenario
 
 [cols="1h,4", grid=rows, frame=all]
@@ -849,7 +861,7 @@ of the call.
 | Schedules the execution of the prepared selection scenario as soon as a card is presented to the supplied
   observable reader. Events are pushed to the registered event handler according to the requested notification
   policy. The result of the execution MUST be parsed via
-  <<op_parseScheduledCardSelectionsResponse,`parseScheduledCardSelectionsResponse`>>.
+  <<op_CardSelectionManager_parseScheduledCardSelectionsResponse,`parseScheduledCardSelectionsResponse`>>.
 | Parameters
 | `observableCardReader` (<<type_ObservableCardReader,`ObservableCardReader`>>)           -- the reader through which the card is reached. +
   `cardPresenceNotificationPolicy` (<<type_CardPresenceNotificationPolicy,`CardPresenceNotificationPolicy`>>) -- the desired card-presence notification policy. +
@@ -871,8 +883,9 @@ of the call.
 Each selection case prepared with the manager is associated with the index returned by `prepareSelection`. The same
 index is used to retrieve the corresponding result here. In single-channel mode, at most one case will correspond
 to the active selected card. In multi-channel mode, several active selections may coexist; see
-<<op_getActiveSelectionIndexes,`getActiveSelectionIndexes`>>.
+<<op_CardSelectionResult_getActiveSelectionIndexes,`getActiveSelectionIndexes`>>.
 
+[[op_CardSelectionResult_getActiveSelectionIndex]]
 ===== Get Active Selection Index
 
 [cols="1h,4", grid=rows, frame=all]
@@ -884,7 +897,7 @@ to the active selected card. In multi-channel mode, several active selections ma
 | Throws      | None.
 |===
 
-[[op_getActiveSelectionIndexes]]
+[[op_CardSelectionResult_getActiveSelectionIndexes]]
 ===== Get Active Selection Indexes
 
 [cols="1h,4", grid=rows, frame=all]
@@ -896,6 +909,7 @@ to the active selected card. In multi-channel mode, several active selections ma
 | Throws      | None.
 |===
 
+[[op_CardSelectionResult_getActiveSmartCard]]
 ===== Get Active Smart Card
 
 [cols="1h,4", grid=rows, frame=all]
@@ -906,12 +920,13 @@ to the active selected card. In multi-channel mode, several active selections ma
 | Returns the active matching card, i.e. the card that has been selected.
 
   In case of multiple active smart cards (multi-channel mode), the active smart card placed on channel `0` is
-  returned. Use <<op_getActiveSelectionIndexes,`getActiveSelectionIndexes`>> to obtain the full set of active
+  returned. Use <<op_CardSelectionResult_getActiveSelectionIndexes,`getActiveSelectionIndexes`>> to obtain the full set of active
   selection indexes.
 | Returns     | The active <<type_SmartCard,`SmartCard`>>, or `null` if there is no active card.
 | Throws      | None.
 |===
 
+[[op_CardSelectionResult_getCardType]]
 ===== Get Card Type
 
 [cols="1h,4", grid=rows, frame=all]
@@ -925,6 +940,7 @@ to the active selected card. In multi-channel mode, several active selections ma
 | Throws      | None.
 |===
 
+[[op_CardSelectionResult_getSmartCards]]
 ===== Get Smart Cards
 
 [cols="1h,4", grid=rows, frame=all]
@@ -1067,6 +1083,7 @@ The observation contract is co-located with the start of detection: a single cal
 both the <<type_CardDetectionSettings,`CardDetectionSettings`>> that govern the polling behaviour and the
 <<type_CardReaderEventHandler,`CardReaderEventHandler`>> that receives the resulting events.
 
+[[op_ObservableCardReader_endCardProcessing]]
 ===== End Card Processing
 
 [cols="1h,4", grid=rows, frame=all]
@@ -1114,6 +1131,7 @@ both the <<type_CardDetectionSettings,`CardDetectionSettings`>> that govern the 
   `eventHandler` (<<type_CardReaderEventHandler,`CardReaderEventHandler`>>) -- the application-side handler that receives reader events and errors.
 |===
 
+[[op_ObservableCardReader_stopCardDetection]]
 ===== Stop Card Detection
 
 [cols="1h,4", grid=rows, frame=all]
@@ -1139,6 +1157,7 @@ both the <<type_CardDetectionSettings,`CardDetectionSettings`>> that govern the 
 The `ReaderApiFactory` is the single entry point through which the application instantiates the public types of
 the API. It is provided as a single instance whose accessors each return a fresh, fully initialised object.
 
+[[op_ReaderApiFactory_createBasicCardSelector]]
 ===== Create Basic Card Selector
 
 [cols="1h,4", grid=rows, frame=all]
@@ -1150,6 +1169,7 @@ the API. It is provided as a single instance whose accessors each return a fresh
 | Throws      | None.
 |===
 
+[[op_ReaderApiFactory_createCardDetectionSettings]]
 ===== Create Card Detection Settings
 
 [cols="1h,4", grid=rows, frame=all]
@@ -1161,6 +1181,7 @@ the API. It is provided as a single instance whose accessors each return a fresh
 | Throws      | None.
 |===
 
+[[op_ReaderApiFactory_createCardSelectionManager]]
 ===== Create Card Selection Manager
 
 [cols="1h,4", grid=rows, frame=all]
@@ -1172,6 +1193,7 @@ the API. It is provided as a single instance whose accessors each return a fresh
 | Throws      | None.
 |===
 
+[[op_ReaderApiFactory_createIsoCardSelector]]
 ===== Create ISO Card Selector
 
 [cols="1h,4", grid=rows, frame=all]
@@ -1183,6 +1205,7 @@ the API. It is provided as a single instance whose accessors each return a fresh
 | Throws      | None.
 |===
 
+[[op_ReaderApiFactory_getCardReaderProvider]]
 ===== Get Card Reader Provider
 
 [cols="1h,4", grid=rows, frame=all]
@@ -1208,7 +1231,7 @@ the API. It is provided as a single instance whose accessors each return a fresh
 
 This interface declares no operation. It conveys the card responses to one or more of the scenario's selection
 cases (selection step itself plus any subsequent commands). Its content MUST be interpreted through
-<<op_parseScheduledCardSelectionsResponse,`CardSelectionManager.parseScheduledCardSelectionsResponse`>>.
+<<op_CardSelectionManager_parseScheduledCardSelectionsResponse,`CardSelectionManager.parseScheduledCardSelectionsResponse`>>.
 
 === SPI Interfaces
 
@@ -1292,6 +1315,7 @@ the consuming card extension) and then processes them. The preparation step allo
 minimise network exchanges, which is especially valuable in distributed architectures. The
 <<type_SmartCard,`SmartCard`>> registered with the manager is updated after each data exchange with the card.
 
+[[op_CardTransactionManager_processCommands]]
 ===== Process Commands
 
 [cols="1h,4", grid=rows, frame=all]
@@ -1324,6 +1348,7 @@ minimise network exchanges, which is especially valuable in distributed architec
 | Purpose  | Intermediate contract for ISO/IEC 7816-4 cards. Exposes the on-demand cast to multi-channel.
 |===
 
+[[op_IsoCardTransactionManager_asMultichannelCardTransactionManager]]
 ===== As Multichannel Card Transaction Manager
 
 [cols="1h,4", grid=rows, frame=all]
@@ -1356,6 +1381,7 @@ In addition to the inherited power-on data, an `IsoSmartCard` exposes the respon
 command. Both the power-on data and the *Select Application* response are optional, but at least one of them is
 always present.
 
+[[op_IsoSmartCard_getSelectApplicationResponse]]
 ===== Get Select Application Response
 
 [cols="1h,4", grid=rows, frame=all]
@@ -1367,6 +1393,7 @@ always present.
 | Throws      | None.
 |===
 
+[[op_IsoSmartCard_isBasicChannel]]
 ===== Is Basic Channel
 
 [cols="1h,4", grid=rows, frame=all]
@@ -1399,6 +1426,7 @@ This contract MAY be obtained either:
   ISO/IEC 7816-4 cards on which multi-channel is an optional capability;
 * directly as the declared stereotype of a card extension targeting intrinsically multi-channel cards.
 
+[[op_MultichannelCardTransactionManager_closeChannel]]
 ===== Close Channel
 
 [cols="1h,4", grid=rows, frame=all]
@@ -1411,6 +1439,7 @@ This contract MAY be obtained either:
   <<type_CardCommunicationException,`CardCommunicationException`>> -- if a communication error with the card occurs.
 |===
 
+[[op_MultichannelCardTransactionManager_processCommandsAndCloseChannel]]
 ===== Process Commands And Close Channel
 
 [cols="1h,4", grid=rows, frame=all]
@@ -1439,6 +1468,7 @@ This contract MAY be obtained either:
 Card extensions implement (and may extend) this interface to expose the data they collected during the
 selection.
 
+[[op_SmartCard_getPowerOnData]]
 ===== Get Power On Data
 
 [cols="1h,4", grid=rows, frame=all]
@@ -1462,6 +1492,8 @@ selection.
 |===
 
 [[sec_smartcard_lifecycle]]
+
+[[op_SmartCard_isActive]]
 ===== Is Active
 
 [cols="1h,4", grid=rows, frame=all]
