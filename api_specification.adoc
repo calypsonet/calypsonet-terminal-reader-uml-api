@@ -141,6 +141,7 @@ Each interface, class, enumeration and exception defined in this document is des
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name       | The type's normalized name.
 | Kind       | The category of the type (interface, class, enumeration, exception, etc.).
 | Namespace  | The namespace in which the type is defined.
 | Extends    | The type extended by this type, when applicable.
@@ -369,6 +370,7 @@ include::api_class_diagram.puml[Terminal Reader API class diagram, align=center]
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name     | `ReaderApiProperties`
 | Kind     | Final class
 | Namespace  | `reader`
 | Since    | 1.0
@@ -400,6 +402,7 @@ The `ReaderApiProperties` type cannot be instantiated; it exposes only static pr
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name     | `BasicCardSelector`
 | Kind     | Interface
 | Namespace  | `reader.selection`
 | Extends  | `CardSelector<BasicCardSelector>`
@@ -415,6 +418,7 @@ absence of ISO/IEC 7816-4-specific filters at the type level.
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name     | `CardDetectionSettings`
 | Kind     | Interface (builder)
 | Namespace  | `reader`
 | Since    | 3.0
@@ -496,6 +500,7 @@ fluent composition. Setters that are not called default to the values specified 
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name     | `CardReader`
 | Kind     | Interface
 | Namespace  | `reader`
 | Since    | 1.0
@@ -544,6 +549,7 @@ fluent composition. Setters that are not called default to the values specified 
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name     | `CardReaderEvent`
 | Kind     | Interface
 | Namespace  | `reader`
 | Since    | 1.0
@@ -599,6 +605,7 @@ card selection response.
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name     | `CardReaderProvider`
 | Kind     | Interface
 | Namespace  | `reader`
 | Since    | 3.0
@@ -663,6 +670,7 @@ implementation-agnostic view over the readers currently registered in the enviro
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name     | `CardSelectionManager`
 | Kind     | Interface
 | Namespace  | `reader.selection`
 | Since    | 1.0
@@ -853,6 +861,7 @@ of the call.
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name     | `CardSelectionResult`
 | Kind     | Interface
 | Namespace  | `reader.selection`
 | Since    | 1.0
@@ -932,6 +941,7 @@ to the active selected card. In multi-channel mode, several active selections ma
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name     | `CardSelector`
 | Kind     | Interface
 | Namespace  | `reader.selection`
 | Generics | `<T extends CardSelector<T>>`
@@ -979,6 +989,7 @@ card is not selected if at least one of them rejects it.
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name     | `IsoCardSelector`
 | Kind     | Interface
 | Namespace  | `reader.selection`
 | Extends  | `CardSelector<IsoCardSelector>`
@@ -1044,6 +1055,7 @@ card is not selected if at least one of them rejects it.
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name     | `ObservableCardReader`
 | Kind         | Interface
 | Namespace    | `reader`
 | Extends      | <<type_CardReader,`CardReader`>>
@@ -1117,6 +1129,7 @@ both the <<type_CardDetectionSettings,`CardDetectionSettings`>> that govern the 
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name     | `ReaderApiFactory`
 | Kind     | Interface
 | Namespace  | `reader`
 | Since    | 2.0
@@ -1186,6 +1199,7 @@ the API. It is provided as a single instance whose accessors each return a fresh
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name     | `ScheduledCardSelectionsResponse`
 | Kind     | Interface (marker)
 | Namespace  | `reader.selection`
 | Since    | 1.0
@@ -1203,6 +1217,7 @@ cases (selection step itself plus any subsequent commands). Its content MUST be 
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name     | `CardReaderEventHandler`
 | Kind     | Interface (SPI)
 | Namespace  | `reader.spi`
 | Since    | 3.0
@@ -1250,6 +1265,7 @@ This SPI unifies the reception of nominal events (`onReaderEvent`) and of fatal 
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name     | `CardSelectionExtension`
 | Kind     | Interface (SPI, marker)
 | Namespace  | `reader.selection.spi`
 | Since    | 2.0
@@ -1264,6 +1280,7 @@ extension is defined by the card extension specification consuming this SPI.
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name     | `CardTransactionManager`
 | Kind     | Interface (SPI)
 | Namespace  | `reader.transaction.spi`
 | Since    | 2.1
@@ -1299,6 +1316,7 @@ minimise network exchanges, which is especially valuable in distributed architec
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name     | `IsoCardTransactionManager`
 | Kind     | Interface (SPI)
 | Namespace  | `reader.transaction.spi`
 | Extends  | <<type_CardTransactionManager,`CardTransactionManager`>>
@@ -1326,6 +1344,7 @@ minimise network exchanges, which is especially valuable in distributed architec
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name     | `IsoSmartCard`
 | Kind     | Interface (SPI)
 | Namespace  | `reader.selection.spi`
 | Extends  | <<type_SmartCard,`SmartCard`>>
@@ -1366,6 +1385,7 @@ always present.
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name     | `MultichannelCardTransactionManager`
 | Kind     | Interface (SPI)
 | Namespace  | `reader.transaction.spi`
 | Extends  | <<type_CardTransactionManager,`CardTransactionManager`>>
@@ -1409,6 +1429,7 @@ This contract MAY be obtained either:
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name     | `SmartCard`
 | Kind     | Interface (SPI)
 | Namespace  | `reader.selection.spi`
 | Since    | 1.0
@@ -1479,6 +1500,7 @@ selection.
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name     | `CardPresenceNotificationPolicy`
 | Kind     | Enumeration
 | Namespace  | `reader.selection`.<<type_CardSelectionManager,`CardSelectionManager`>>
 | Since    | 3.0
@@ -1498,6 +1520,7 @@ selection.
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name     | `Type`
 | Kind     | Enumeration
 | Namespace  | `reader`.<<type_CardReaderEvent,`CardReaderEvent`>>
 | Since    | 1.0
@@ -1519,6 +1542,7 @@ selection.
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name     | `ChannelSelectionPolicy`
 | Kind     | Enumeration
 | Namespace  | `reader.selection`.<<type_CardSelectionManager,`CardSelectionManager`>>
 | Since    | 3.0
@@ -1538,6 +1562,7 @@ selection.
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name     | `DetectionMode`
 | Kind     | Enumeration
 | Namespace  | `reader`.<<type_CardDetectionSettings,`CardDetectionSettings`>>
 | Since    | 3.0
@@ -1557,6 +1582,7 @@ selection.
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name     | `FileControlInformation`
 | Kind     | Enumeration
 | Namespace  | `reader.selection`.<<type_IsoCardSelector,`IsoCardSelector`>>
 | Since    | 2.0
@@ -1577,6 +1603,7 @@ selection.
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name     | `FileOccurrence`
 | Kind     | Enumeration
 | Namespace  | `reader.selection`.<<type_IsoCardSelector,`IsoCardSelector`>>
 | Since    | 2.0
@@ -1597,6 +1624,7 @@ selection.
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name     | `SelectionExecutionPolicy`
 | Kind     | Enumeration
 | Namespace  | `reader.selection`.<<type_CardSelectionManager,`CardSelectionManager`>>
 | Since    | 3.0
@@ -1619,6 +1647,7 @@ selection.
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name     | `CardCommunicationException`
 | Kind     | Runtime exception
 | Namespace  | `reader`
 | Since    | 1.0
@@ -1630,6 +1659,7 @@ selection.
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name     | `InvalidCardResponseException`
 | Kind     | Runtime exception
 | Namespace  | `reader`
 | Since    | 2.1
@@ -1644,6 +1674,7 @@ selection.
 
 [cols="1h,4", grid=rows, frame=all]
 |===
+| Name     | `ReaderCommunicationException`
 | Kind     | Runtime exception
 | Namespace  | `reader`
 | Since    | 1.0
