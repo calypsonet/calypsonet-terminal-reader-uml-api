@@ -407,7 +407,7 @@ The `ReaderApiProperties` type cannot be instantiated; it exposes only static pr
 | Namespace  | `reader.selection`
 | Extends  | `CardSelector<BasicCardSelector>`
 | Since    | 2.0
-| Purpose  | Basic, technology-agnostic card selector. An instance is obtained via <<type_ReaderApiFactory,`ReaderApiFactory.createBasicCardSelector`>>.
+| Purpose  | Basic, technology-agnostic card selector. An instance is obtained via <<op_ReaderApiFactory_createBasicCardSelector,`ReaderApiFactory.createBasicCardSelector`>>.
 |===
 
 `BasicCardSelector` does not add any operation to <<type_CardSelector,`CardSelector`>>. It exists to express the
@@ -422,7 +422,7 @@ absence of ISO/IEC 7816-4-specific filters at the type level.
 | Kind     | Interface (builder)
 | Namespace  | `reader`
 | Since    | 3.0
-| Purpose  | Carries the configuration of a card detection cycle. An instance is obtained via <<type_ReaderApiFactory,`ReaderApiFactory.createCardDetectionSettings`>>.
+| Purpose  | Carries the configuration of a card detection cycle. An instance is obtained via <<op_ReaderApiFactory_createCardDetectionSettings,`ReaderApiFactory.createCardDetectionSettings`>>.
 |===
 
 `CardDetectionSettings` exposes setters in *builder* form: each operation returns the current instance to allow
@@ -684,7 +684,7 @@ implementation-agnostic view over the readers currently registered in the enviro
 | Kind     | Interface
 | Namespace  | `reader.selection`
 | Since    | 1.0
-| Purpose  | Service responsible for preparing and executing card selection scenarios. An instance is obtained via <<type_ReaderApiFactory,`ReaderApiFactory.createCardSelectionManager`>>.
+| Purpose  | Service responsible for preparing and executing card selection scenarios. An instance is obtained via <<op_ReaderApiFactory_createCardSelectionManager,`ReaderApiFactory.createCardSelectionManager`>>.
 |===
 
 A *card selection scenario* is composed of one or more *selection cases*, each backed by a
@@ -1010,7 +1010,7 @@ card is not selected if at least one of them rejects it.
 | Namespace  | `reader.selection`
 | Extends  | `CardSelector<IsoCardSelector>`
 | Since    | 2.0
-| Purpose  | ISO/IEC 7816-4 card selector. An instance is obtained via <<type_ReaderApiFactory,`ReaderApiFactory.createIsoCardSelector`>>.
+| Purpose  | ISO/IEC 7816-4 card selector. An instance is obtained via <<op_ReaderApiFactory_createIsoCardSelector,`ReaderApiFactory.createIsoCardSelector`>>.
 |===
 
 [[op_IsoCardSelector_filterByDfName_byteArray]]
