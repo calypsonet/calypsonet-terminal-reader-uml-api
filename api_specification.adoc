@@ -596,7 +596,7 @@ card selection response.
 | Signature   | `getType() -> Type`
 | Since       | 1.0
 | Description | Returns the type of the event.
-| Returns     | A <<type_CardReaderEventType,`Type`>> value.
+| Returns     | A <<type_Type,`Type`>> value.
 | Throws      | None.
 |===
 
@@ -1515,7 +1515,7 @@ selection.
 | `MATCHED_ONLY` | 3.0 | Only cards that have been successfully selected are notified. The others are ignored.
 |===
 
-[[type_CardReaderEventType]]
+[[type_Type]]
 ==== Card Reader Event Type
 
 [cols="1h,4", grid=rows, frame=all]
