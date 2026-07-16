@@ -148,6 +148,7 @@ Each interface, class, enumeration and exception defined in this document is des
 | Implements | The interface implemented by this type, when applicable.
 | Since      | The version of the API in which the type was introduced.
 | Purpose    | A normative description of the type's responsibility.
+| See also   | Cross-references to related operations or types, each a hyperlink to the corresponding table. Present only when applicable.
 |===
 
 ==== Operation tables
@@ -162,6 +163,7 @@ Each operation defined in this document is described by a table of the form:
 | Parameters  | A description of each input parameter.
 | Returns     | A description of the returned value, if any.
 | Throws      | A list of exceptional conditions, each mapped to a specific exception type.
+| See also    | Cross-references to related operations or types, each a hyperlink to the corresponding table. Present only when applicable.
 |===
 
 ==== Operation contracts
@@ -717,6 +719,7 @@ of the call.
 | Description | Exports the content of the current prepared selection scenario as a `string`. The result MAY be imported into the same or another `CardSelectionManager` via `importCardSelectionScenario`.
 | Returns     | A non-empty `string`.
 | Throws      | None.
+| See also    | <<op_CardSelectionManager_importCardSelectionScenario,`importCardSelectionScenario`>>
 |===
 
 [[op_CardSelectionManager_exportProcessedCardSelectionScenario]]
@@ -739,6 +742,7 @@ of the call.
   card extensions.
 | Returns     | A non-empty `string`.
 | Throws      | `IllegalStateException` -- if the scenario has not yet been processed or has failed.
+| See also    | <<op_CardSelectionManager_importProcessedCardSelectionScenario,`importProcessedCardSelectionScenario`>>
 |===
 
 [[op_CardSelectionManager_importCardSelectionScenario]]
@@ -752,6 +756,7 @@ of the call.
 | Parameters  | `cardSelectionScenario` -- the `string` containing the exported card selection scenario.
 | Returns     | The index of the last imported selection in the scenario.
 | Throws      | `IllegalArgumentException` -- if the string is malformed.
+| See also    | <<op_CardSelectionManager_exportCardSelectionScenario,`exportCardSelectionScenario`>>
 |===
 
 [[op_CardSelectionManager_importProcessedCardSelectionScenario]]
@@ -773,6 +778,7 @@ of the call.
 | `IllegalArgumentException` -- if the string is malformed or contains more selection cases than the
   current scenario. +
   <<type_InvalidCardResponseException,`InvalidCardResponseException`>> -- if the data returned by the card could not be interpreted.
+| See also    | <<op_CardSelectionManager_exportProcessedCardSelectionScenario,`exportProcessedCardSelectionScenario`>>
 |===
 
 [[op_CardSelectionManager_parseScheduledCardSelectionsResponse]]
