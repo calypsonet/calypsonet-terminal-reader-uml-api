@@ -1170,7 +1170,10 @@ the API. It is provided as a single instance whose accessors each return a fresh
 |===
 | Signature   | `createBasicCardSelector() -> BasicCardSelector`
 | Since       | 2.0
-| Description | Returns a new, freshly initialised <<type_BasicCardSelector,`BasicCardSelector`>>.
+| Description
+| Creates a <<type_BasicCardSelector,`BasicCardSelector`>>, a technology-agnostic selector used to target a card in
+a selection scenario. Use <<op_ReaderApiFactory_createIsoCardSelector,`createIsoCardSelector`>> when ISO/IEC 7816-4
+(AID-based) selection is required.
 | Returns     | A <<type_BasicCardSelector,`BasicCardSelector`>>.
 | Throws      | None.
 |===
@@ -1182,7 +1185,9 @@ the API. It is provided as a single instance whose accessors each return a fresh
 |===
 | Signature   | `createCardDetectionSettings() -> CardDetectionSettings`
 | Since       | 3.0
-| Description | Returns a new, freshly initialised <<type_CardDetectionSettings,`CardDetectionSettings`>>.
+| Description
+| Creates a <<type_CardDetectionSettings,`CardDetectionSettings`>> carrying the configuration of a card detection
+cycle.
 | Returns     | A <<type_CardDetectionSettings,`CardDetectionSettings`>>.
 | Throws      | None.
 |===
@@ -1194,7 +1199,9 @@ the API. It is provided as a single instance whose accessors each return a fresh
 |===
 | Signature   | `createCardSelectionManager() -> CardSelectionManager`
 | Since       | 2.0
-| Description | Returns a new, freshly initialised <<type_CardSelectionManager,`CardSelectionManager`>>.
+| Description
+| Creates a <<type_CardSelectionManager,`CardSelectionManager`>>, the service used to prepare and execute a card
+selection scenario.
 | Returns     | A <<type_CardSelectionManager,`CardSelectionManager`>>.
 | Throws      | None.
 |===
@@ -1206,7 +1213,9 @@ the API. It is provided as a single instance whose accessors each return a fresh
 |===
 | Signature   | `createIsoCardSelector() -> IsoCardSelector`
 | Since       | 2.0
-| Description | Returns a new, freshly initialised <<type_IsoCardSelector,`IsoCardSelector`>>.
+| Description
+| Creates an <<type_IsoCardSelector,`IsoCardSelector`>> for ISO/IEC 7816-4 (AID-based) card selection. Use
+<<op_ReaderApiFactory_createBasicCardSelector,`createBasicCardSelector`>> for technology-agnostic selection.
 | Returns     | An <<type_IsoCardSelector,`IsoCardSelector`>>.
 | Throws      | None.
 |===
