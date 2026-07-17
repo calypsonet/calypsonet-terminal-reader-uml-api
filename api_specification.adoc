@@ -455,6 +455,7 @@ fluent composition. Setters that are not called default to the values specified 
   semantics of each value are given by the <<type_DetectionMode,`DetectionMode`>> enumeration.
 | Parameters  | `detectionMode` (<<type_DetectionMode,`DetectionMode`>>) -- the desired detection mode.
 | Returns     | The current instance (<<type_CardDetectionSettings,`CardDetectionSettings`>>).
+| Throws      | None.
 |===
 
 [[op_CardDetectionSettings_setEcpFrame]]
@@ -811,6 +812,7 @@ of the call.
 | `cardSelector` (<<type_CardSelector,`CardSelector`>>) -- the card selector containing the filters to be used to select the card. +
   `cardSelectionExtension` (<<type_CardSelectionExtension,`CardSelectionExtension`>>) -- the card selection extension to be used to parse the card selection response.
 | Returns      | A non-negative `integer` -- the index of the appended selection case.
+| Throws      | None.
 |===
 
 [[op_CardSelectionManager_processCardSelectionScenario]]
@@ -872,6 +874,7 @@ of the call.
 | `observableCardReader` (<<type_ObservableCardReader,`ObservableCardReader`>>)           -- the reader through which the card is reached. +
   `cardPresenceNotificationPolicy` (<<type_CardPresenceNotificationPolicy,`CardPresenceNotificationPolicy`>>) -- the desired card-presence notification policy. +
   `selectionExecutionPolicy` (<<type_SelectionExecutionPolicy,`SelectionExecutionPolicy`>>)       -- the policy governing the iteration over selection cases.
+| Throws      | None.
 |===
 
 [[type_CardSelectionResult]]
@@ -991,6 +994,7 @@ card is not selected if at least one of them rejects it.
   implementation.
 | Parameters  | `cardType` (`CardType` (<<ref_cna_td,CNA-TD-API>>)) -- the `CardType` (<<ref_cna_td,CNA-TD-API>>) to use as filter.
 | Returns     | The current instance (`T`).
+| Throws      | None.
 |===
 
 [[op_CardSelector_filterByPowerOnData]]
@@ -1058,6 +1062,7 @@ card is not selected if at least one of them rejects it.
 | Description | Sets the file control mode (see ISO/IEC 7816-4). The default value is `FCI`.
 | Parameters  | `fileControlInformation` (<<type_FileControlInformation,`FileControlInformation`>>) -- the file control mode to apply.
 | Returns     | The current instance (<<type_IsoCardSelector,`IsoCardSelector`>>).
+| Throws      | None.
 |===
 
 [[op_IsoCardSelector_setFileOccurrence]]
@@ -1070,6 +1075,7 @@ card is not selected if at least one of them rejects it.
 | Description | Sets the file occurrence mode (see ISO/IEC 7816-4). The default value is `FIRST`.
 | Parameters  | `fileOccurrence` (<<type_FileOccurrence,`FileOccurrence`>>) -- the navigation option to apply.
 | Returns     | The current instance (<<type_IsoCardSelector,`IsoCardSelector`>>).
+| Throws      | None.
 |===
 
 [[type_ObservableCardReader]]
@@ -1135,6 +1141,7 @@ both the <<type_CardDetectionSettings,`CardDetectionSettings`>> that govern the 
 | Parameters
 | `settings` (<<type_CardDetectionSettings,`CardDetectionSettings`>>)     -- the detection configuration. +
   `eventHandler` (<<type_CardReaderEventHandler,`CardReaderEventHandler`>>) -- the application-side handler that receives reader events and errors.
+| Throws      | None.
 |===
 
 [[op_ObservableCardReader_stopCardDetection]]
