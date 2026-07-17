@@ -28,6 +28,8 @@ v3.0.0-SNAPSHOT, {docdate}
 :short-name: CNA
 :spec-name: Terminal Reader API
 :spec-id: CNA-TR-API
+:release-date: <YYMMDD>
+:doc-ref: {release-date}-SP-CNATerminalAPI-Reader
 :spec-version: 3.0.0-SNAPSHOT
 :ver-cna-td: 1.0
 
@@ -47,7 +49,8 @@ terminal applications discover card readers, observe card events, select cards a
 
 [cols="1h,3", grid=rows, frame=all]
 |===
-| Specification ID    | {spec-id}
+| Reference           | {doc-ref}
+| Short name          | {spec-id}
 | Version             | {spec-version}
 | Editor              | {organization}
 | Reference license   | Eclipse Public License -- v 2.0 (EPL-2.0)
@@ -215,7 +218,7 @@ is backward-compatible per that API's evolution policy.
 | https://www.iso.org[_Identification cards -- Contactless integrated circuit cards -- Proximity cards_].
 
 | [[ref_cna_td]] [CNA-TD-API]
-| https://docs.terminal-api.calypsonet.org/calypsonet-terminal-definitions-uml-api/[_Terminal Definitions API Specification_], version {ver-cna-td}, {organization}. Provides the `RfTechnology` and `CardType` enumerations referenced by this specification.
+| https://docs.terminal-api.calypsonet.org/calypsonet-terminal-definitions-uml-api/[_Terminal Definitions API Specification_] (SP-CNATerminalAPI-Definitions), version {ver-cna-td}, {organization}. Provides the `RfTechnology` and `CardType` enumerations referenced by this specification.
 |===
 
 The reference <<ref_cna_td,CNA-TD-API>> is *normative*: implementations of this specification MUST depend on a
