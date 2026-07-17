@@ -1119,21 +1119,20 @@ both the <<type_CardDetectionSettings,`CardDetectionSettings`>> that govern the 
 | Signature   | `endCardProcessing() -> void`
 | Since       | 3.0
 | Description
-| Notifies the reader that the *business processing* of the current card has been completed. Upon receiving this
-  notification, the reader:
+a| Notifies the reader that the *business processing* of the current card has been completed. Upon receiving this
+notification, the reader:
 
-  - performs the *DESELECT* sequence on the card (when applicable to the underlying technology) so that the card
-    is brought to a clean idle state,
+* performs the *DESELECT* sequence on the card (when applicable to the underlying technology) so that the card
+  is brought to a clean idle state;
+* transitions to the *waiting-for-card-removal* phase, during which the observation cycle waits for the card to
+  leave the reader's field before becoming able to detect a new card.
 
-  - transitions to the *waiting-for-card-removal* phase, during which the observation cycle waits for the card to
-    leave the reader's field before becoming able to detect a new card.
+In addition, the reader releases the references to the <<type_SmartCard,`SmartCard`>> instances held
+following the last selection (see <<sec_smartcard_lifecycle,the `SmartCard` lifecycle>>).
 
-  In addition, the reader releases the references to the <<type_SmartCard,`SmartCard`>> instances held
-  following the last selection (see <<sec_smartcard_lifecycle,the `SmartCard` lifecycle>>).
-
-  This operation is idempotent: calling it twice on the same card processing cycle has no effect after the
-  first call. It is RECOMMENDED to call `endCardProcessing` systematically (e.g. inside a `finally` block) at
-  the end of a card processing whatever the outcome.
+This operation is idempotent: calling it twice on the same card processing cycle has no effect after the
+first call. It is RECOMMENDED to call `endCardProcessing` systematically (e.g. inside a `finally` block) at
+the end of a card processing whatever the outcome.
 | Throws      | None.
 |===
 
@@ -1514,17 +1513,16 @@ selection.
 | Signature   | `getPowerOnData() -> string?`
 | Since       | 1.0
 | Description
-| Returns the card's power-on data, as collected by the reader at the moment the card was inserted.
+a| Returns the card's power-on data, as collected by the reader at the moment the card was inserted.
 
-  - For a contact reader, this is the Answer To Reset (ATR) defined by ISO/IEC 7816.
+* For a contact reader, this is the Answer To Reset (ATR) defined by ISO/IEC 7816.
+* For a contactless reader, the reader decides what this data is. Some contactless readers provide a virtual
+  ATR (partially standardised by the PC/SC standard), while other devices may have their own definition,
+  including for example elements from the anti-collision stage of ISO/IEC 14443 (ATQA, ATQB, ATS, SAK, etc.)
+  or any proprietary definitions.
 
-  - For a contactless reader, the reader decides what this data is. Some contactless readers provide a virtual
-    ATR (partially standardised by the PC/SC standard), while other devices may have their own definition,
-    including for example elements from the anti-collision stage of ISO/IEC 14443 (ATQA, ATQB, ATS, SAK, etc.)
-    or any proprietary definitions.
-
-  Because this data varies from one reader to another, it is exposed here as a `string` that MAY be either a
-  hexadecimal string or any other relevant representation.
+Because this data varies from one reader to another, it is exposed here as a `string` that MAY be either a
+hexadecimal string or any other relevant representation.
 | Returns     | The non-empty power-on data, or `null` if no power-on data is available.
 | Throws      | None.
 |===
@@ -1539,26 +1537,23 @@ selection.
 | Signature   | `isActive() -> boolean`
 | Since       | 3.0
 | Description
-| Returns whether this smart card is currently active on its logical channel.
+a| Returns whether this smart card is currently active on its logical channel.
 
-  A smart card is considered *active* between its creation (as the result of a successful selection case) and the
-  occurrence of any of the following events, at which point the reader *deactivates* it (`isActive()` returns
-  `false`) and releases its reference:
+A smart card is considered *active* between its creation (as the result of a successful selection case) and the
+occurrence of any of the following events, at which point the reader *deactivates* it (`isActive()` returns
+`false`) and releases its reference:
 
-  - a *new selection in single-channel mode* (the previous smart cards become obsolete);
+* a *new selection in single-channel mode* (the previous smart cards become obsolete);
+* an *explicit channel closure request* through
+  <<type_MultichannelCardTransactionManager,`MultichannelCardTransactionManager.closeChannel`>> or
+  `processCommandsAndCloseChannel`;
+* a call to <<type_ObservableCardReader,`ObservableCardReader.endCardProcessing`>>;
+* an exception indicating that the card is no longer contactable (`CardCommunicationException` or
+  `ReaderCommunicationException`).
 
-  - an *explicit channel closure request* through
-    <<type_MultichannelCardTransactionManager,`MultichannelCardTransactionManager.closeChannel`>> or
-    `processCommandsAndCloseChannel`;
-
-  - a call to <<type_ObservableCardReader,`ObservableCardReader.endCardProcessing`>>;
-
-  - an exception indicating that the card is no longer contactable (`CardCommunicationException` or
-    `ReaderCommunicationException`).
-
-  Until then, the reader holds the references to the `SmartCard` instances produced by the last successful
-  selection. Once a smart card has been deactivated, any further attempt to use it is detected prior to any
-  actual exchange with the card.
+Until then, the reader holds the references to the `SmartCard` instances produced by the last successful
+selection. Once a smart card has been deactivated, any further attempt to use it is detected prior to any
+actual exchange with the card.
 | Returns     | `true` if the smart card is active, `false` otherwise.
 | Throws      | None.
 |===
