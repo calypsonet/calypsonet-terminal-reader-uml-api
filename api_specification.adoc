@@ -144,6 +144,7 @@ Each interface, class, enumeration and exception defined in this document is des
 | Name       | The type's normalized name.
 | Kind       | The category of the type (interface, class, enumeration, exception, etc.).
 | Namespace  | The namespace in which the type is defined.
+| Generics   | The generic type parameter of this type, when applicable.
 | Extends    | The type extended by this type, when applicable.
 | Implements | The interface implemented by this type, when applicable.
 | Since      | The version of the API in which the type was introduced.
