@@ -415,6 +415,11 @@ The `ReaderApiProperties` type cannot be instantiated; it exposes only static pr
 `BasicCardSelector` does not add any operation to <<type_CardSelector,`CardSelector`>>. It exists to express the
 absence of ISO/IEC 7816-4-specific filters at the type level.
 
+The filters carried by a selector restrict the selection process to certain cards. They are all *optional* and MAY
+be combined. If no filter is specified, any card that responds when presented to the reader is considered
+selected. Conversely, when one or more filters are defined, the card is not selected as soon as one of them
+rejects it.
+
 [[type_CardDetectionSettings]]
 ==== Card Detection Settings
 
@@ -692,8 +697,10 @@ implementation-agnostic view over the readers currently registered in the enviro
 
 A *card selection scenario* is composed of one or more *selection cases*, each backed by a
 <<type_CardSelectionExtension,`CardSelectionExtension`>>. A selection case targets a specific card and MAY define
-additional commands to be executed after the successful selection. The behaviour of the scenario is governed by
-the <<type_SelectionExecutionPolicy,`SelectionExecutionPolicy`>> passed at execution time:
+additional commands to be executed after the successful selection. When a selection case fails, the manager tries
+the next selection case defined in the scenario, until no further selection case is available. The behaviour of
+the scenario is governed by the <<type_SelectionExecutionPolicy,`SelectionExecutionPolicy`>> passed at execution
+time:
 
 * with `STOP_ON_FIRST_MATCH`, the manager stops at the first successful selection case;
 * with `PROCESS_ALL`, the manager processes every selection case regardless of intermediate successes.
@@ -1022,6 +1029,11 @@ card is not selected if at least one of them rejects it.
 | Since    | 2.0
 | Purpose  | ISO/IEC 7816-4 card selector. An instance is obtained via <<op_ReaderApiFactory_createIsoCardSelector,`ReaderApiFactory.createIsoCardSelector`>>.
 |===
+
+`IsoCardSelector` adds the ISO/IEC 7816-4-specific filters used to restrict the selection process to certain
+cards. Like every selector filter, they are all *optional* and MAY be combined. If no filter is specified, any
+card that responds when presented to the reader is considered selected. Conversely, when one or more filters are
+defined, the card is not selected as soon as one of them rejects it.
 
 [[op_IsoCardSelector_filterByDfName_byteArray]]
 ===== Filter By DF Name (Byte Array)
