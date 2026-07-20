@@ -230,7 +230,7 @@ is backward-compatible per that API's evolution policy.
 | Reference | Document
 
 | [[ref_cna_td]] [CNA-TD-API]
-| https://docs.terminal-api.calypsonet.org/calypsonet-terminal-definitions-uml-api/[_Terminal Definitions API Specification_] (SP-CNATerminalAPI-Definitions), version {ver-cna-td}, {organization}. Provides the `RfTechnology` and `CardType` enumerations referenced by this specification.
+| https://docs.terminal-api.calypsonet.org/calypsonet-terminal-definitions-uml-api/[_CNA Terminal API -- Definitions_] (SP-CNATerminalAPI-Definitions), version {ver-cna-td}, {organization}. Provides the `RfTechnology` and `CardType` enumerations referenced by this specification.
 |===
 
 ==== Normative References
