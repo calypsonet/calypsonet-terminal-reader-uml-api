@@ -25,11 +25,9 @@ v3.0.0-SNAPSHOT, {docdate}
 :example-caption: Example
 :appendix-caption: Appendix
 :organization: Calypso Networks Association
-:short-name: CNA
 :spec-name: Terminal Reader API
 :spec-id: CNA-TR-API
-:release-date: <YYMMDD>
-:doc-ref: {release-date}-SP-CNATerminalAPI-Reader
+:doc-ref: YYMMDD-SP-CNATerminalAPI-Reader
 :spec-version: 3.0.0-SNAPSHOT
 :ver-cna-td: 1.0
 
@@ -37,7 +35,7 @@ v3.0.0-SNAPSHOT, {docdate}
 == Abstract
 
 This document is the official technical specification of the **{spec-name}** standardised
-by the **{organization}** ({short-name}).
+by the **{organization}** (CNA).
 It defines, in a language-agnostic way, the interfaces, classes, enumerations, exceptions, structural
 relationships and behavioural requirements that any conforming implementation of the {spec-name} MUST satisfy.
 
