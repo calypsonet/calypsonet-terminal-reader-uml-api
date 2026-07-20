@@ -39,7 +39,7 @@ Calypso Networks Association <https://calypsonet.org>
 :pdf-fontsdir: {docdir}/assets/fonts
 //
 // Captions
-:appendix-caption: Appendix
+:appendix-caption: Annex
 :example-caption: Example
 :figure-caption: Figure
 :table-caption: Table
@@ -220,10 +220,20 @@ synchronisation results in undefined behaviour. Distinct instances MAY be used c
 
 === References and Resources
 
+==== Calypso References
+
 References to CNA Terminal APIs designate the indicated *major* version; any later release within the same major
 is backward-compatible per that API's evolution policy.
 
-==== Normative references
+[cols="1,4", options="header"]
+|===
+| Reference | Document
+
+| [[ref_cna_td]] [CNA-TD-API]
+| https://docs.terminal-api.calypsonet.org/calypsonet-terminal-definitions-uml-api/[_Terminal Definitions API Specification_] (SP-CNATerminalAPI-Definitions), version {ver-cna-td}, {organization}. Provides the `RfTechnology` and `CardType` enumerations referenced by this specification.
+|===
+
+==== Normative References
 
 [cols="1,4", options="header"]
 |===
@@ -240,17 +250,9 @@ is backward-compatible per that API's evolution policy.
 
 | [[ref_iso14443]] [ISO/IEC 14443]
 | https://www.iso.org[_Identification cards -- Contactless integrated circuit cards -- Proximity cards_].
-
-| [[ref_cna_td]] [CNA-TD-API]
-| https://docs.terminal-api.calypsonet.org/calypsonet-terminal-definitions-uml-api/[_Terminal Definitions API Specification_] (SP-CNATerminalAPI-Definitions), version {ver-cna-td}, {organization}. Provides the `RfTechnology` and `CardType` enumerations referenced by this specification.
 |===
 
-The reference <<ref_cna_td,CNA-TD-API>> is *normative*: implementations of this specification MUST depend on a
-conforming implementation of the Terminal Definitions API to expose the typed enumerations used in the public
-signatures of <<type_CardSelector,`CardSelector`>>, <<type_CardDetectionSettings,`CardDetectionSettings`>> and
-<<type_CardSelectionResult,`CardSelectionResult`>>.
-
-==== External resources
+==== External Resources
 
 [cols="1,3", options="header"]
 |===
@@ -262,9 +264,9 @@ signatures of <<type_CardSelector,`CardSelector`>>, <<type_CardDetectionSettings
 |===
 
 // =============================================================================
-== Terms, Definitions and Abbreviations
+== Glossary and Acronyms
 
-=== Terms and Definitions
+=== Glossary
 
 [cols="1,4", options="header"]
 |===
@@ -288,7 +290,7 @@ signatures of <<type_CardSelector,`CardSelector`>>, <<type_CardDetectionSettings
 | SPI               | Service Provider Interface -- a set of interfaces designed to be implemented by an extension module.
 |===
 
-=== Abbreviations
+=== Acronyms
 
 [cols="1,4", options="header"]
 |===
