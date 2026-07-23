@@ -347,7 +347,7 @@ Drv  --> HW  : controls
 
 === Logical namespaces
 
-[cols="1,1,4", options="header"]
+[cols=".^3,^.^1,.^5", options="header"]
 |===
 | Namespace                       | Role     | Summary
 
@@ -1603,7 +1603,7 @@ actual exchange with the card.
 | Purpose  | Options applied when a card is detected, used to decide which cards trigger event-handler notifications.
 |===
 
-[cols="1,1,4", options="header"]
+[cols=".^2,^.^1,.^6", options="header"]
 |===
 | Value          | Since | Description
 
@@ -1623,7 +1623,7 @@ actual exchange with the card.
 | Purpose  | Possible card reader events.
 |===
 
-[cols="1,1,4", options="header"]
+[cols=".^2,^.^1,.^6", options="header"]
 |===
 | Value                  | Since | Description
 
@@ -1645,7 +1645,7 @@ actual exchange with the card.
 | Purpose  | Policy governing the use of the basic channel in a multi-channel selection scenario.
 |===
 
-[cols="1,1,4", options="header"]
+[cols=".^2,^.^1,.^6", options="header"]
 |===
 | Value                  | Since | Description
 
@@ -1665,7 +1665,7 @@ actual exchange with the card.
 | Purpose  | Defines the behaviour to apply after a card processing cycle has terminated.
 |===
 
-[cols="1,1,4", options="header"]
+[cols=".^2,^.^1,.^6", options="header"]
 |===
 | Value          | Since | Description
 
@@ -1685,7 +1685,7 @@ actual exchange with the card.
 | Purpose  | Types of templates returned in response to the *Select Application* command, according to ISO/IEC 7816-4.
 |===
 
-[cols="1,1,4", options="header"]
+[cols=".^2,^.^1,.^6", options="header"]
 |===
 | Value          | Since | Description
 | `FCI`          | 2.0 | File Control Information.
@@ -1706,7 +1706,7 @@ actual exchange with the card.
 | Purpose  | Navigation options through the applications contained on the card according to ISO/IEC 7816-4.
 |===
 
-[cols="1,1,4", options="header"]
+[cols=".^2,^.^1,.^6", options="header"]
 |===
 | Value      | Since | Description
 | `FIRST`    | 2.0 | First occurrence.
@@ -1727,7 +1727,7 @@ actual exchange with the card.
 | Purpose  | Policy governing the iteration over the selection cases of a scenario.
 |===
 
-[cols="1,1,4", options="header"]
+[cols=".^2,^.^1,.^6", options="header"]
 |===
 | Value                  | Since | Description
 
