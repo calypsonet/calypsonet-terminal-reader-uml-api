@@ -188,7 +188,7 @@ notes, value tables or examples -- is placed as prose below the table.
 
 Each operation defined in this document is described by a table of the form:
 
-[cols="1h,4", grid=rows, frame=all]
+[cols="^.^1h,.^5", grid=rows, frame=all]
 |===
 | Signature   | The operation's language-agnostic signature.
 | Since       | The version of the API in which the operation was introduced.
@@ -416,7 +416,7 @@ include::api_class_diagram.puml[Terminal Reader API class diagram, align=center]
 
 ===== Constants
 
-[cols="1,1,1,4", options="header"]
+[cols=".^1,^.^1,^.^1,.^4", options="header"]
 |===
 | Name      | Type     | Since | Description
 
