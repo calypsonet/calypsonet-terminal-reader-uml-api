@@ -59,7 +59,7 @@ terminal applications discover card readers, observe card events, select cards a
 [discrete]
 == Document Status
 
-[cols="1h,3", grid=rows, frame=all]
+[cols="^.^1h,.^3", grid=rows, frame=all]
 |===
 | Reference           | {spec-ref}
 | Short name          | {spec-id}
@@ -76,7 +76,7 @@ which each member was introduced.
 [discrete]
 == Revision List
 
-[cols="^.^1,4", options="header"]
+[cols="^.^1,.^4", options="header"]
 |===
 | Version / Date | Modifications
 
@@ -149,7 +149,7 @@ as-is in the UML class diagram (<<sec_class_diagram>>).
 The following symbolic type names are used in operation signatures and are mapped, in each binding, to the closest
 equivalent native type. Implementations MUST preserve the semantic intent rather than the syntactic form.
 
-[cols="1,3,3", options="header"]
+[cols="^.^1,.^3,.^3", options="header"]
 |===
 | Symbolic type   | Description                                                     | Typical bindings
 | `string`        | Sequence of characters, UTF-8 encoded by default.                | `String`, `string`, `str`.
@@ -226,7 +226,7 @@ synchronisation results in undefined behaviour. Distinct instances MAY be used c
 References to CNA Terminal APIs designate the indicated *major* version; any later release within the same major
 is backward-compatible per that API's evolution policy.
 
-[cols="1,4", options="header"]
+[cols="^.^1,.^4", options="header"]
 |===
 | Reference | Document
 
@@ -236,7 +236,7 @@ is backward-compatible per that API's evolution policy.
 
 ==== Normative References
 
-[cols="1,4", options="header"]
+[cols="^.^1,.^4", options="header"]
 |===
 | Reference | Document
 
@@ -255,7 +255,7 @@ is backward-compatible per that API's evolution policy.
 
 ==== External Resources
 
-[cols="1,3", options="header"]
+[cols="^.^1,.^2", options="header"]
 |===
 | Resource | Link
 
@@ -269,7 +269,7 @@ is backward-compatible per that API's evolution policy.
 
 === Glossary
 
-[cols="1,4", options="header"]
+[cols="^.^1,.^4", options="header"]
 |===
 | Term              | Definition
 
@@ -293,7 +293,7 @@ is backward-compatible per that API's evolution policy.
 
 === Acronyms
 
-[cols="1,4", options="header"]
+[cols="^.^1,.^4", options="header"]
 |===
 | Abbreviation | Expansion
 
