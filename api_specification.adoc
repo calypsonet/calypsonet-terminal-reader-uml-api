@@ -844,7 +844,10 @@ of the call.
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
 | Signature
-| `prepareSelection(cardSelector: CardSelector<?>, cardSelectionExtension: CardSelectionExtension) -> integer`
+| `prepareSelection(` +
+`{nbsp}{nbsp}cardSelector: CardSelector<?>,` +
+`{nbsp}{nbsp}cardSelectionExtension: CardSelectionExtension` +
+`) -> integer`
 | Since       | 2.0
 | Description
 | Appends a selection case to the scenario. The returned index gives the position of the selection in the
@@ -862,7 +865,11 @@ of the call.
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `processCardSelectionScenario(reader: CardReader, selectionExecutionPolicy: SelectionExecutionPolicy) -> CardSelectionResult`
+| Signature
+| `processCardSelectionScenario(` +
+`{nbsp}{nbsp}reader: CardReader,` +
+`{nbsp}{nbsp}selectionExecutionPolicy: SelectionExecutionPolicy` +
+`) -> CardSelectionResult`
 | Since       | 3.0
 | Description | Explicitly executes the previously prepared selection scenario against the provided reader, with the requested execution policy, and returns the result.
 | Parameters
@@ -881,7 +888,11 @@ of the call.
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `processMultichannelCardSelectionScenario(reader: CardReader, channelSelectionPolicy: ChannelSelectionPolicy) -> CardSelectionResult`
+| Signature
+| `processMultichannelCardSelectionScenario(` +
+`{nbsp}{nbsp}reader: CardReader,` +
+`{nbsp}{nbsp}channelSelectionPolicy: ChannelSelectionPolicy` +
+`) -> CardSelectionResult`
 | Since       | 3.0
 | Description
 | Explicitly executes the previously prepared selection scenario in *multi-channel* mode against the provided
@@ -905,7 +916,11 @@ of the call.
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
 | Signature
-| `scheduleCardSelectionScenario(observableCardReader: ObservableCardReader, cardPresenceNotificationPolicy: CardPresenceNotificationPolicy, selectionExecutionPolicy: SelectionExecutionPolicy) -> void`
+| `scheduleCardSelectionScenario(` +
+`{nbsp}{nbsp}observableCardReader: ObservableCardReader,` +
+`{nbsp}{nbsp}cardPresenceNotificationPolicy: CardPresenceNotificationPolicy,` +
+`{nbsp}{nbsp}selectionExecutionPolicy: SelectionExecutionPolicy` +
+`) -> void`
 | Since       | 3.0
 | Description
 | Schedules the execution of the prepared selection scenario as soon as a card is presented to the supplied
@@ -1173,7 +1188,10 @@ the end of a card processing whatever the outcome.
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
 | Signature
-| `startCardDetection(settings: CardDetectionSettings, eventHandler: CardReaderEventHandler) -> void`
+| `startCardDetection(` +
+`{nbsp}{nbsp}settings: CardDetectionSettings,` +
+`{nbsp}{nbsp}eventHandler: CardReaderEventHandler` +
+`) -> void`
 | Since       | 3.0
 | Description
 | Activates card detection. Once activated, the application is notified of card events through the registered
@@ -1325,7 +1343,11 @@ This SPI unifies the reception of nominal events (`onReaderEvent`) and of fatal 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
 | Signature
-| `onReaderError(context: string, readerName: string, e: throwable) -> void`
+| `onReaderError(` +
+`{nbsp}{nbsp}context: string,` +
+`{nbsp}{nbsp}readerName: string,` +
+`{nbsp}{nbsp}e: throwable` +
+`) -> void`
 | Since       | 3.0
 | Description
 | Called when a fatal error occurs on the observed reader. After the operation returns, the observation process
