@@ -34,7 +34,7 @@ title_page:
   background-image: image:title-page-rules.svg[]
   logo:
     align: center
-    image: image:logo-terminal-api.svg[pdfwidth=4.0in]
+    image: image:logo-product.svg[pdfwidth=4.0in]
     top: 45%
   title:
     align: center
