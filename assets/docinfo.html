@@ -1,44 +1,145 @@
-<!-- Web fonts from Google Fonts: Montserrat (body & headings), JetBrains Mono (code). -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<!-- =========================================================================
+  Calypso Networks Association — docinfo (Asciidoctor HTML output)
+  ---------------------------------------------------------------------------
+  Maintenance notes:
+  * All brand colors and layout dimensions are defined once as CSS custom
+    properties in :root below. Edit them there only — never hardcode a hex
+    value further down. Keep the palette in sync with the `brand` key of
+    calypso-theme.yml (PDF output); ideally both files are generated from a
+    shared design-token file by the CI toolchain.
+  * Fonts are self-hosted so the rendered HTML looks identical offline and
+    no reader IP is sent to a third-party CDN. Ship the .woff2 files listed
+    in the @font-face section in a `fonts/` directory next to the published
+    HTML (provided by the toolchain repository), or inline them as base64
+    at build time for a fully self-contained document.
+  * This docinfo is injected AFTER Asciidoctor's default stylesheet, so
+    rules of equal specificity win without `!important`. It is kept only
+    where a default rule uses a more specific selector; each occurrence is
+    annotated. When upgrading Asciidoctor, re-check those spots against the
+    new default stylesheet.
+  * The logo is embedded as a base64 data URI to keep the published HTML
+    self-contained. The canonical asset is logo.svg in the toolchain
+    repository; regenerate the data URI from it (SVGO-optimized) rather
+    than editing the base64 string by hand.
+========================================================================== -->
 
 <style>
 /* ==========================================================================
-   Typography — force Montserrat on every textual element, overriding
-   Asciidoctor's default font stack.
+   Design tokens — single source of truth for the HTML output.
+   Mirror of the `brand` palette in calypso-theme.yml.
    ========================================================================== */
-body, #content, p, li, td, th, dt, dd, .admonitionblock td.content,
-h1, h2, h3, h4, h5, h6, #toctitle, .title {
-    font-family: 'Montserrat', sans-serif !important;
+:root {
+    --cna-primary: #039EFD;   /* Calypso blue        */
+    --cna-accent:  #EF8B3A;   /* orange (h3 levels)  */
+    --cna-muted:   #9D9D9D;   /* grey (h4 levels)    */
+    --cna-ink:     #333333;
+    --cna-black:   #000000;
+    --cna-white:   #FFFFFF;
+
+    --cna-font-body: 'Montserrat', sans-serif;
+    --cna-font-code: 'JetBrains Mono', monospace;
+
+    --cna-toc-width: 25em;    /* fixed sidebar TOC width               */
+    --cna-toc-gap: 1em;       /* safety gap between TOC and body text  */
 }
-/* Heading & TOC colour scale (CNA brand palette). Each level shares its colour
-   with the matching TOC entry: h1/h5 = brand blue, h2 = black, h3 = orange,
-   h4 = grey italic, deeper section levels = blue italic. */
+
+/* ==========================================================================
+   Self-hosted fonts.
+   Expected files in ./fonts/ (weights consistent with the PDF theme):
+     Montserrat-Regular.woff2, Montserrat-SemiBold.woff2,
+     Montserrat-Bold.woff2, Montserrat-Italic.woff2,
+     JetBrainsMono-Regular.woff2, JetBrainsMono-Bold.woff2,
+     JetBrainsMono-Italic.woff2
+   ========================================================================== */
+@font-face {
+    font-family: 'Montserrat';
+    src: url('fonts/Montserrat-Regular.woff2') format('woff2');
+    font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+    font-family: 'Montserrat';
+    src: url('fonts/Montserrat-Italic.woff2') format('woff2');
+    font-weight: 400; font-style: italic; font-display: swap;
+}
+@font-face {
+    font-family: 'Montserrat';
+    src: url('fonts/Montserrat-SemiBold.woff2') format('woff2');
+    font-weight: 600; font-style: normal; font-display: swap;
+}
+@font-face {
+    font-family: 'Montserrat';
+    src: url('fonts/Montserrat-Bold.woff2') format('woff2');
+    font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+    font-family: 'JetBrains Mono';
+    src: url('fonts/JetBrainsMono-Regular.woff2') format('woff2');
+    font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+    font-family: 'JetBrains Mono';
+    src: url('fonts/JetBrainsMono-Italic.woff2') format('woff2');
+    font-weight: 400; font-style: italic; font-display: swap;
+}
+@font-face {
+    font-family: 'JetBrains Mono';
+    src: url('fonts/JetBrainsMono-Bold.woff2') format('woff2');
+    font-weight: 700; font-style: normal; font-display: swap;
+}
+
+/* ==========================================================================
+   Typography — Montserrat on every textual element. Equal-specificity rules
+   override the default stylesheet without !important because this docinfo
+   loads after it. !important is only needed against the default's more
+   specific selectors (compound selector / #id), annotated below.
+   ========================================================================== */
+body, #content, p, li, td, th, dt, dd,
+h1, h2, h3, h4, h5, h6, .title {
+    font-family: var(--cna-font-body);
+}
+.admonitionblock td.content,   /* default: more specific compound selector */
+#toctitle {                    /* default: #id selector                    */
+    font-family: var(--cna-font-body) !important;
+}
+
+/* ==========================================================================
+   Heading & TOC color scale (CNA brand palette).
+   Each level shares its color with the matching TOC entry:
+   h1/h5 = brand blue, h2 = black, h3 = orange, h4 = grey italic,
+   deeper section levels = blue italic.
+   Mirror of the heading-h* / toc-h* rules in calypso-theme.yml — update
+   both files together when changing the scale.
+   !important required: the default stylesheet colors headings and TOC links
+   through more specific selectors (h1 > a.link, #toc a, ...).
+   ========================================================================== */
 h1, h1 a.link {
-    color: #039efd !important;
+    color: var(--cna-primary) !important;
 }
-h2, h2 a.link, .sectlevel1>li>a {
-    color: #000000 !important;
+h2, h2 a.link, .sectlevel1 > li > a {
+    color: var(--cna-black) !important;
 }
-h3, h3 a.link, .sectlevel2>li>a {
-    color: #EF8B3A !important;
+h3, h3 a.link, .sectlevel2 > li > a {
+    color: var(--cna-accent) !important;
 }
-h4, h4 a.link, .sectlevel3>li>a {
-    color: #9D9D9D !important;
-    font-style: italic !important;
+h4, h4 a.link, .sectlevel3 > li > a {
+    color: var(--cna-muted) !important;
+    font-style: italic;
 }
 h5, h5 a.link {
-    color: #039efd !important;
-    font-weight: bold !important;
-    font-style: italic !important;
+    color: var(--cna-primary) !important;
+    font-weight: bold;
+    font-style: italic;
 }
-.sectlevel4>li>a {
-    color: #039efd !important;
-    font-style: italic !important;
+.sectlevel4 > li > a {
+    color: var(--cna-primary) !important;
+    font-style: italic;
 }
-/* Document header — centred title with the CNA logo above it. The logo is an
-   inline base64 SVG so the rendered HTML stays self-contained (no external asset). */
+
+/* ==========================================================================
+   Document header — centred title with the CNA logo above it.
+   The data URI below is generated from logo.svg in the toolchain repo;
+   do not edit the base64 string manually.
+   ========================================================================== */
 #header h1, #header .details {
     display: block;
     text-align: center;
@@ -55,52 +156,77 @@ h5, h5 a.link {
 }
 /* Extra spacing below the author / revision details line. */
 #header .details {
-    padding-bottom: 4em !important;
+    padding-bottom: 4em;
 }
-/* Links & inline code. */
+
+/* ==========================================================================
+   Links & inline code.
+   ========================================================================== */
 a {
-    color: #039efd;
+    color: var(--cna-primary);
 }
 code {
-    color: #000000;
-    background: none !important;
+    color: var(--cna-black);
+    background: none !important; /* default: grey bg via compound selector */
 }
-/* Tables — smaller base font for the dense API tables. */
+
+/* ==========================================================================
+   Tables — smaller base font for the dense API tables.
+   ========================================================================== */
 table {
     font-size: 0.92em;
 }
-/* An AsciiDoc-style cell (a|) renders its content through the block converter, so its
-   <p>/<ul>/<ol> carry Asciidoctor's absolute font-size (1rem) and ignore the 0.92em set
-   on tables above. Realign them on the cell's own size so that a| and | cells match. */
+/* An AsciiDoc-style cell (a|) renders its content through the block
+   converter, so its <p>/<ul>/<ol> carry Asciidoctor's absolute font-size
+   (1rem) and ignore the 0.92em set on tables above. Realign them on the
+   cell's own size so that a| and | cells match. */
 table.tableblock td .content p,
 table.tableblock td .content ul,
 table.tableblock td .content ol,
 table.tableblock td .content li {
     font-size: inherit;
 }
-/* Header row: CNA brand-blue background with white text. */
+/* Header row: brand-blue background with white text (mirror of table.head
+   in the PDF theme). !important required against the default's
+   `table thead th` selector. */
 table.tableblock th, table.tableblock th p {
-    background-color: #039efd !important;
-    color: #ffffff !important;
+    background-color: var(--cna-primary) !important;
+    color: var(--cna-white) !important;
 }
-/* Code — monospace font and tighter size for listings and literal blocks. */
+
+/* ==========================================================================
+   Code — monospace font and tighter size for listings and literal blocks.
+   !important required: the default targets pre/code via compound selectors.
+   ========================================================================== */
 pre, code, .listingblock pre, .literalblock pre, .inlineblock code {
-    font-family: 'JetBrains Mono', monospace !important;
+    font-family: var(--cna-font-code) !important;
     font-size: 0.85em;
 }
-/* Footer — brand-blue band. */
+
+/* ==========================================================================
+   Footer — brand-blue band.
+   Note: white on --cna-primary sits around a 3:1 contrast ratio, below the
+   WCAG AA threshold (4.5:1) for small text. Revisit if accessibility of
+   published documents becomes a requirement.
+   ========================================================================== */
 #footer {
-    background-color: #039efd;
-    color: #ffffff;
+    background-color: var(--cna-primary);
+    color: var(--cna-white);
 }
-/* Wide screens (>= 768px): pin the TOC as a fixed 25em left sidebar, offset the
-   body accordingly, and let header / content / footer span the full width. */
+
+/* ==========================================================================
+   Wide screens (>= 768px): pin the TOC as a fixed left sidebar, offset the
+   body accordingly, and let header / content / footer span the full width.
+   The sidebar width is defined once (--cna-toc-width), so the TOC and the
+   body padding cannot drift apart.
+   !important required against the default's #id rules and media queries.
+   ========================================================================== */
 @media screen and (min-width: 768px) {
     #toc.toc2 {
-        width: 25em !important;
+        width: var(--cna-toc-width) !important;
     }
     body.toc2 {
-        padding-left: 26em !important; /* width of the TOC + 1em safety margin */
+        padding-left: calc(var(--cna-toc-width) + var(--cna-toc-gap)) !important;
     }
     #header, #content, #footnotes, #footer {
         max-width: 100% !important;
