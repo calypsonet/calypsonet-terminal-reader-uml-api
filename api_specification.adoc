@@ -2,9 +2,11 @@
 Calypso Networks Association <https://calypsonet.org>
 //
 // Document identity
-:spec-name: Terminal Reader API
-:spec-id: CNA-TR-API
-:spec-ref: YYMMDD-SP-CNATerminalAPI-Reader
+:doc-name: Terminal Reader API
+:doc-id: CNA-TR-API
+:doc-ref: YYMMDD-SP-CNATerminalAPI-Reader
+:doc-type: Specification
+:doc-classification: Public
 :organization: Calypso Networks Association
 //
 // Revision
@@ -29,6 +31,7 @@ Calypso Networks Association <https://calypsonet.org>
 :icons: font
 :experimental:
 :data-uri:
+:webfonts!:
 //
 // Assets & theming
 :docinfodir: {docdir}/assets
@@ -48,12 +51,12 @@ Calypso Networks Association <https://calypsonet.org>
 [abstract]
 == Abstract
 
-This document is the official technical specification of the **{spec-name}** standardised
+This document is the official technical specification of the **{doc-name}** standardised
 by the **{organization}** (CNA).
 It defines, in a language-agnostic way, the interfaces, classes, enumerations, exceptions, structural
-relationships and behavioural requirements that any conforming implementation of the {spec-name} MUST satisfy.
+relationships and behavioural requirements that any conforming implementation of the {doc-name} MUST satisfy.
 
-The {spec-name} is part of the broader CNA *Terminal API* family and acts as the contract through which
+The {doc-name} is part of the broader CNA *Terminal API* family and acts as the contract through which
 terminal applications discover card readers, observe card events, select cards and exchange data with them.
 
 [discrete]
@@ -61,15 +64,15 @@ terminal applications discover card readers, observe card events, select cards a
 
 [cols="^.^1h,.^3", grid=rows, frame=all]
 |===
-| Reference           | {spec-ref}
-| Short name          | {spec-id}
+| Reference           | {doc-ref}
+| Short name          | {doc-id}
 | Version             | {revnumber}
 | Revision date       | {revdate}
 | Editor              | {organization}
 | Reference license   | Eclipse Public License -- v 2.0 (EPL-2.0)
 |===
 
-NOTE: The present document specifies the {revnumber} of the {spec-name}. It defines a single, coherent
+NOTE: The present document specifies the {revnumber} of the {doc-name}. It defines a single, coherent
 baseline against which conforming implementations are evaluated; the *Since* column indicates the version in
 which each member was introduced.
 
@@ -90,7 +93,7 @@ which each member was introduced.
 
 === Purpose
 
-The {spec-name} defines a standardised set of contracts allowing terminal applications to interact with card
+The {doc-name} defines a standardised set of contracts allowing terminal applications to interact with card
 readers and the cards presented to them, independently of:
 
 * the underlying reader hardware (contact, contactless, virtual, etc.),
@@ -319,7 +322,7 @@ is backward-compatible per that API's evolution policy.
 
 === Functional positioning
 
-The {spec-name} sits between the terminal application and the reader drivers, exposing a stable contract on each
+The {doc-name} sits between the terminal application and the reader drivers, exposing a stable contract on each
 side:
 
 [plantuml, target=architecture-overview, format=svg]
@@ -373,7 +376,7 @@ Drv  --> HW  : controls
 
 === Multi-channel design
 
-The {spec-name} explicitly supports ISO/IEC 7816-4 cards that host several active logical channels in parallel.
+The {doc-name} explicitly supports ISO/IEC 7816-4 cards that host several active logical channels in parallel.
 The design follows a three-tier hierarchy in the `reader.transaction.spi` namespace:
 
 . <<type_CardTransactionManager,`CardTransactionManager`>> -- root contract common to every transaction manager,
@@ -411,7 +414,7 @@ include::api_class_diagram.puml[Terminal Reader API class diagram, align=center]
 | Kind     | Final class
 | Namespace  | `reader`
 | Since    | 1.0
-| Purpose  | Exposes the immutable properties of the {spec-name}.
+| Purpose  | Exposes the immutable properties of the {doc-name}.
 |===
 
 ===== Constants
