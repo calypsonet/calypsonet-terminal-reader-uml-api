@@ -148,12 +148,10 @@ heading-h5:
 # PDF. (In HTML, .literalblock has no background by default -- see docinfo.html.)
 code:
   font-family: JetBrains Mono
-  font-size: 8
   background-color: $brand_codebg
 
 literal:
   font-family: JetBrains Mono
-  font-size: 8
   font-color: $brand_black
   background-color: $brand_codebg
 

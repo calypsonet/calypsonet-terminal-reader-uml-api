@@ -170,23 +170,17 @@ h5 > a {
 }
 
 /* --- Code & literal ------------------------------------------------------ */
-/* Monospace font, ink color, code background, and a tighter size for inline
-   code and for listing / literal blocks. !important where the default styles
-   pre/code through more specific (compound) selectors. */
+/* Brand monospace font for all pre/code. Font sizes are intentionally left to
+   Asciidoctor's defaults: it sizes inline code and listing / literal blocks with
+   more-specific selectors that would override any font-size set here anyway. */
 pre,
 code {
-    font-family: var(--cna-font-code)
+    font-family: var(--cna-font-code);
 }
+/* Inline code: pure-black ink (the default is 90% black) and the brand background. */
 code {
     color: var(--cna-black);
-    background: var(--cna-code-bg) !important; /* !important: overrides the default stylesheet's more specific code-background selector */
-}
-pre,
-code,
-.listingblock pre,
-.literalblock pre,
-.inlineblock code {
-    font-size: 0.85em;
+    background: var(--cna-code-bg) !important; /* !important beats the default's p.tableblock>code:only-child{background:none}, which strips the background from code-only table cells */
 }
 
 /* --- Links --------------------------------------------------------------- */
