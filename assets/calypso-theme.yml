@@ -15,6 +15,7 @@
 #     design-token file by the CI toolchain.
 #   * Document attributes expected at build time (set in the .adoc header or
 #     injected by the CI workflow):
+#       :doc-type:           document type, upper-cased in the page header (e.g. "Specification")
 #       :doc-name:           document name (page header)
 #       :doc-ref:            document reference (page header)
 #       :doc-classification:  e.g. "Public" (page header; the reusable CI
@@ -69,16 +70,17 @@ base:
   font-size: 9
   font-color: $brand_ink
 
-#--- Custom roles -------------------------------------------------------------
-# Inline role for brand-colored text, e.g. [.color-primary]#text#.
-# Used by the footer page counter below.
+# --- Custom roles ------------------------------------------------------------
+# Custom inline roles, applied as [.role]#text#:
+#   color-primary  - brand-blue text; used by the footer page counter.
+#   text-uppercase - upper-cases text; used by the header document type.
 role:
   color-primary:
     font-color: $brand_primary
   text-uppercase:
     text-transform: uppercase
 
-#--- Title page ---------------------------------------------------------------
+# --- Title page --------------------------------------------------------------
 title_page:
   align: center
   background-image: image:title-page-rules.svg[]
@@ -141,6 +143,9 @@ heading-h5:
   font-style: bold_italic
 
 # --- Code and literal blocks -------------------------------------------------
+# asciidoctor-pdf styles literal blocks (....) like listing/source blocks (----):
+# both take the code background below, so verbatim content is consistent in the
+# PDF. (In HTML, .literalblock has no background by default -- see docinfo.html.)
 code:
   font-family: JetBrains Mono
   font-size: 8

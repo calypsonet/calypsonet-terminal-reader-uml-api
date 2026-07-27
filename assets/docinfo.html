@@ -11,7 +11,8 @@
     no reader IP is sent to a third-party CDN. Ship the .woff2 files listed
     in the @font-face section in a `fonts/` directory next to the published
     HTML (provided by the toolchain repository), or inline them as base64
-    at build time for a fully self-contained document.
+    at build time for a fully self-contained document. This file uses the
+    inlined-base64 variant (the data: URIs in the @font-face rules below).
   * This docinfo is injected AFTER Asciidoctor's default stylesheet, so
     rules of equal specificity win without `!important`. It is kept only
     where a default rule uses a more specific selector; each occurrence is
@@ -187,7 +188,7 @@ a {
 }
 code {
     color: var(--cna-black);
-    background: var(--cna-code-bg) !important; /* default: grey bg via compound selector */
+    background: var(--cna-code-bg) !important; /* !important: overrides the default stylesheet's more specific code-background selector */
 }
 
 /* ==========================================================================
