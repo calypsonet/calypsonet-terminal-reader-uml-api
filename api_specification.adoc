@@ -1,4 +1,4 @@
-= Specification: CNA Terminal API -- Reader
+= {doc-type}: Reader
 Calypso Networks Association <https://calypsonet.org>
 //
 // Document identity
