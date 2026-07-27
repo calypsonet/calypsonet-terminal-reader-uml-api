@@ -25,10 +25,9 @@
 ========================================================================== -->
 
 <style>
-/* ==========================================================================
-   Design tokens — single source of truth for the HTML output.
-   Mirror of the `brand` palette in calypso-theme.yml.
-   ========================================================================== */
+/* --- Design tokens ------------------------------------------------------- */
+/* Single source of truth for the HTML output.
+   Mirror of the `brand` palette in calypso-theme.yml. */
 :root {
     --cna-primary:   #039EFD;   /* Calypso blue    */
     --cna-secondary: #EF8B3A;   /* Calypso orange  */
@@ -45,9 +44,8 @@
     --cna-toc-gap: 1em;       /* safety gap between TOC and body text  */
 }
 
-/* ==========================================================================
-   Self-hosted fonts (weights consistent with the PDF theme)
-   ========================================================================== */
+/* --- Self-hosted fonts --------------------------------------------------- */
+/* Weights consistent with the PDF theme. */
 /* Montserrat-Regular.woff2 */
 @font-face {
     font-family: 'Montserrat';
@@ -97,12 +95,11 @@
     font-weight: 700; font-style: normal; font-display: swap;
 }
 
-/* ==========================================================================
-   Typography — Montserrat on every textual element. Equal-specificity rules
-   override the default stylesheet without !important because this docinfo
-   loads after it. !important is only needed against the default's more
-   specific selectors (compound selector / #id), annotated below.
-   ========================================================================== */
+/* --- Typography ---------------------------------------------------------- */
+/* Montserrat on every textual element. Equal-specificity rules override the
+   default stylesheet without !important because this docinfo loads after it.
+   !important is only needed against the default's more specific selectors
+   (compound selector / #id), annotated below. */
 body, h1, h2, h3, h4, h5, h6 {
     font-family: var(--cna-font-body);
 }
@@ -115,16 +112,14 @@ code {
     font-family: var(--cna-font-code)
 }
 
-/* ==========================================================================
-   Heading & TOC color scale (CNA brand palette).
-   Each level shares its color with the matching TOC entry:
+/* --- Heading & TOC color scale ------------------------------------------- */
+/* CNA brand palette. Each level shares its color with the matching TOC entry:
    h1/h5 = brand blue, h2 = black, h3 = orange, h4 = grey italic,
    deeper section levels = blue italic.
-   Mirror of the heading-h* / toc-h* rules in calypso-theme.yml — update
-   both files together when changing the scale.
+   Mirror of the heading-h* / toc-h* rules in calypso-theme.yml -- update both
+   files together when changing the scale.
    !important required: the default stylesheet colors headings and TOC links
-   through more specific selectors (h1 > a, #toc a, ...).
-   ========================================================================== */
+   through more specific selectors (h1 > a, #toc a, ...). */
 h1,
 h1 > a {
     color: var(--cna-primary) !important;
@@ -156,11 +151,9 @@ h5 > a {
     font-style: italic;
 }
 
-/* ==========================================================================
-   Document header — centred title with the CNA logo above it.
-   The data URI below is generated from logo.svg in the toolchain repo;
-   do not edit the base64 string manually.
-   ========================================================================== */
+/* --- Document header ----------------------------------------------------- */
+/* Centred title with the CNA logo above it. The data URI below is generated
+   from logo.svg in the toolchain repo; do not edit the base64 string manually. */
 #header h1, #header .details {
     display: block;
     text-align: center;
@@ -180,9 +173,7 @@ h5 > a {
     padding-bottom: 4em;
 }
 
-/* ==========================================================================
-   Links & inline code.
-   ========================================================================== */
+/* --- Links & inline code ------------------------------------------------- */
 a {
     color: var(--cna-primary);
 }
@@ -191,9 +182,8 @@ code {
     background: var(--cna-code-bg) !important; /* !important: overrides the default stylesheet's more specific code-background selector */
 }
 
-/* ==========================================================================
-   Tables — smaller base font for the dense API tables.
-   ========================================================================== */
+/* --- Tables -------------------------------------------------------------- */
+/* Smaller base font for the dense API tables. */
 table {
     font-size: 0.92em;
 }
@@ -216,10 +206,9 @@ table.tableblock th p {
     color: var(--cna-white) !important;
 }
 
-/* ==========================================================================
-   Code — monospace font and tighter size for listings and literal blocks.
-   !important required: the default targets pre/code via compound selectors.
-   ========================================================================== */
+/* --- Code ---------------------------------------------------------------- */
+/* Monospace font and tighter size for listings and literal blocks.
+   !important required: the default targets pre/code via compound selectors. */
 pre,
 code,
 .listingblock pre,
@@ -228,24 +217,21 @@ code,
     font-size: 0.85em;
 }
 
-/* ==========================================================================
-   Footer — brand-blue band.
+/* --- Footer -------------------------------------------------------------- */
+/* Brand-blue band.
    Note: white on --cna-primary sits around a 3:1 contrast ratio, below the
    WCAG AA threshold (4.5:1) for small text. Revisit if accessibility of
-   published documents becomes a requirement.
-   ========================================================================== */
+   published documents becomes a requirement. */
 #footer {
     background-color: var(--cna-primary);
     color: var(--cna-white);
 }
 
-/* ==========================================================================
-   Wide screens (>= 768px): pin the TOC as a fixed left sidebar, offset the
-   body accordingly, and let header / content / footer span the full width.
-   The sidebar width is defined once (--cna-toc-width), so the TOC and the
-   body padding cannot drift apart.
-   !important required against the default's #id rules and media queries.
-   ========================================================================== */
+/* --- Wide screens (>= 768px) --------------------------------------------- */
+/* Pin the TOC as a fixed left sidebar, offset the body accordingly, and let
+   header / content / footer span the full width. The sidebar width is defined
+   once (--cna-toc-width), so the TOC and the body padding cannot drift apart.
+   !important required against the default's #id rules and media queries. */
 @media screen and (min-width: 768px) {
     #toc.toc2 {
         width: var(--cna-toc-width) !important;
