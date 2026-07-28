@@ -11,6 +11,7 @@
 :doc-classification: Public
 :doc-id: CNA-TR-API
 :doc-ref: YYMMDD-SP-CNATerminalAPI-Reader
+:doc-repo: https://github.com/calypsonet/calypsonet-terminal-reader-uml-api
 //
 // Revision (bumped every edition)
 :revnumber: 3.0.0-SNAPSHOT
@@ -96,6 +97,7 @@ terminal applications discover card readers, observe card events, select cards a
 | Version             | {revnumber}
 | Revision date       | {revdate}
 | Editor              | {organization}
+| Source repository   | {doc-repo}
 | Reference license   | Eclipse Public License -- v 2.0 (EPL-2.0)
 |===
 
