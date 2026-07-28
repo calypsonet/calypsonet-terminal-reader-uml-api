@@ -837,7 +837,10 @@ of the call.
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `importProcessedCardSelectionScenario(processedCardSelectionScenario: string) -> CardSelectionResult`
+| Signature
+| `importProcessedCardSelectionScenario(` +
+`{nbsp}{nbsp}{nbsp}{nbsp}processedCardSelectionScenario: string` +
+`) -> CardSelectionResult`
 | Since       | 1.3
 | Description
 | Imports a previously exported *processed* selection scenario and returns the corresponding result.
@@ -860,7 +863,9 @@ of the call.
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
 | Signature
-| `parseScheduledCardSelectionsResponse(scheduledCardSelectionsResponse: ScheduledCardSelectionsResponse) -> CardSelectionResult`
+| `parseScheduledCardSelectionsResponse(` +
+`{nbsp}{nbsp}{nbsp}{nbsp}scheduledCardSelectionsResponse: ScheduledCardSelectionsResponse` +
+`) -> CardSelectionResult`
 | Since       | 1.0
 | Description | Analyses the responses provided by a <<type_CardReaderEvent,`CardReaderEvent`>> following the insertion of a card and the execution of the scheduled selection scenario.
 | Parameters  | `scheduledCardSelectionsResponse` (<<type_ScheduledCardSelectionsResponse,`ScheduledCardSelectionsResponse`>>) -- the card selection scenario execution response.
@@ -1149,7 +1154,10 @@ defined, the card is not selected as soon as one of them rejects it.
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `setFileControlInformation(fileControlInformation: FileControlInformation) -> IsoCardSelector`
+| Signature
+| `setFileControlInformation(` +
+`{nbsp}{nbsp}{nbsp}{nbsp}fileControlInformation: FileControlInformation` +
+`) -> IsoCardSelector`
 | Since       | 2.0
 | Description | Sets the file control mode (see ISO/IEC 7816-4). The default value is `FCI`.
 | Parameters  | `fileControlInformation` (<<type_FileControlInformation,`FileControlInformation`>>) -- the file control mode to apply.
