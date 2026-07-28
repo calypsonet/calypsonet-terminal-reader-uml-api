@@ -875,8 +875,8 @@ of the call.
 |===
 | Signature
 | `prepareSelection(` +
-`{nbsp}{nbsp}cardSelector: CardSelector<?>,` +
-`{nbsp}{nbsp}cardSelectionExtension: CardSelectionExtension` +
+`{nbsp}{nbsp}{nbsp}{nbsp}cardSelector: CardSelector<?>,` +
+`{nbsp}{nbsp}{nbsp}{nbsp}cardSelectionExtension: CardSelectionExtension` +
 `) -> integer`
 | Since       | 2.0
 | Description
@@ -897,8 +897,8 @@ of the call.
 |===
 | Signature
 | `processCardSelectionScenario(` +
-`{nbsp}{nbsp}reader: CardReader,` +
-`{nbsp}{nbsp}selectionExecutionPolicy: SelectionExecutionPolicy` +
+`{nbsp}{nbsp}{nbsp}{nbsp}reader: CardReader,` +
+`{nbsp}{nbsp}{nbsp}{nbsp}selectionExecutionPolicy: SelectionExecutionPolicy` +
 `) -> CardSelectionResult`
 | Since       | 3.0
 | Description | Explicitly executes the previously prepared selection scenario against the provided reader, with the requested execution policy, and returns the result.
@@ -920,8 +920,8 @@ of the call.
 |===
 | Signature
 | `processMultichannelCardSelectionScenario(` +
-`{nbsp}{nbsp}reader: CardReader,` +
-`{nbsp}{nbsp}channelSelectionPolicy: ChannelSelectionPolicy` +
+`{nbsp}{nbsp}{nbsp}{nbsp}reader: CardReader,` +
+`{nbsp}{nbsp}{nbsp}{nbsp}channelSelectionPolicy: ChannelSelectionPolicy` +
 `) -> CardSelectionResult`
 | Since       | 3.0
 | Description
@@ -947,9 +947,9 @@ of the call.
 |===
 | Signature
 | `scheduleCardSelectionScenario(` +
-`{nbsp}{nbsp}observableCardReader: ObservableCardReader,` +
-`{nbsp}{nbsp}cardPresenceNotificationPolicy: CardPresenceNotificationPolicy,` +
-`{nbsp}{nbsp}selectionExecutionPolicy: SelectionExecutionPolicy` +
+`{nbsp}{nbsp}{nbsp}{nbsp}observableCardReader: ObservableCardReader,` +
+`{nbsp}{nbsp}{nbsp}{nbsp}cardPresenceNotificationPolicy: CardPresenceNotificationPolicy,` +
+`{nbsp}{nbsp}{nbsp}{nbsp}selectionExecutionPolicy: SelectionExecutionPolicy` +
 `) -> void`
 | Since       | 3.0
 | Description
@@ -1219,8 +1219,8 @@ the end of a card processing whatever the outcome.
 |===
 | Signature
 | `startCardDetection(` +
-`{nbsp}{nbsp}settings: CardDetectionSettings,` +
-`{nbsp}{nbsp}eventHandler: CardReaderEventHandler` +
+`{nbsp}{nbsp}{nbsp}{nbsp}settings: CardDetectionSettings,` +
+`{nbsp}{nbsp}{nbsp}{nbsp}eventHandler: CardReaderEventHandler` +
 `) -> void`
 | Since       | 3.0
 | Description
@@ -1374,9 +1374,9 @@ This SPI unifies the reception of nominal events (`onReaderEvent`) and of fatal 
 |===
 | Signature
 | `onReaderError(` +
-`{nbsp}{nbsp}context: string,` +
-`{nbsp}{nbsp}readerName: string,` +
-`{nbsp}{nbsp}e: throwable` +
+`{nbsp}{nbsp}{nbsp}{nbsp}context: string,` +
+`{nbsp}{nbsp}{nbsp}{nbsp}readerName: string,` +
+`{nbsp}{nbsp}{nbsp}{nbsp}e: throwable` +
 `) -> void`
 | Since       | 3.0
 | Description
