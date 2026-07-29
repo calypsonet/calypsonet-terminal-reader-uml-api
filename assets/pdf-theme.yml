@@ -167,6 +167,9 @@ table:
     font-color: $brand_white
     border-bottom-width: 0.5
 
+example:
+  background-color: #ebebeb
+
 # --- Running content (headers, footers, page numbers) ------------------------
 running-content:
   start-at: title
