@@ -1,0 +1,296 @@
+@startuml
+title
+    <img:../assets/logos/calypso.svg{scale=0.2}>
+
+    Terminal Reader API 3.0.+ (2026-07-08)
+end title
+
+' == THEME ==
+
+'Couleurs issues de : https://htmlcolorcodes.com/fr/tableau-de-couleur/tableau-de-couleur-design-plat/
+!define C_GREY1 F8F9F9
+!define C_GREY2 F2F3F4
+!define C_GREY3 E5E7E9
+!define C_GREY4 D7DBDD
+!define C_GREY5 CACFD2
+!define C_GREY6 BDC3C7
+!define C_LINK 3498DB
+!define C_USE 27AE60
+!define C_THROW 2C3E50
+
+' -- Styles that don't work with new version of plantuml --
+skinparam stereotypeABorderColor #A9DCDF
+skinparam stereotypeIBorderColor #B4A7E5
+skinparam stereotypeCBorderColor #ADD1B2
+skinparam stereotypeEBorderColor #EB93DF
+' -- END --
+
+skinparam ClassBorderThickness 2
+skinparam ArrowThickness 2
+
+' Yellow
+skinparam ClassBackgroundColor #FEFECE
+skinparam ClassBorderColor #D4AC0D
+' Red
+skinparam ClassBackgroundColor<<red>> #FDEDEC
+skinparam ClassBorderColor<<red>> #E74C3C
+hide <<red>> stereotype
+' Purple
+skinparam ClassBackgroundColor<<purple>> #F4ECF7
+skinparam ClassBorderColor<<purple>> #8E44AD
+hide <<purple>> stereotype
+' blue
+skinparam ClassBackgroundColor<<blue>> #EBF5FB
+skinparam ClassBorderColor<<blue>> #3498DB
+hide <<blue>> stereotype
+' Green
+skinparam ClassBackgroundColor<<green>> #E9F7EF
+skinparam ClassBorderColor<<green>> #27AE60
+hide <<green>> stereotype
+' Grey
+skinparam ClassBackgroundColor<<grey>> #EAECEE
+skinparam ClassBorderColor<<grey>> #2C3E50
+hide <<grey>> stereotype
+
+' == CONTENT ==
+
+legend top
+    * __External public API references__
+    *** <back:yellow>**Calypsonet Terminal Definitions API**</back>
+    * __Text__
+    *** <color:blue><b>New element added since the last version
+    *** <color:red><s><b>Element marked as deprecated since the last version
+    *** <s><b>Element marked as deprecated
+    *** <color:grey><b>Work in progress...
+    * __Object__
+    *** <back:#EBF5FB><color:#3498DB><b>Factory or interface provided by the factory
+    *** <back:#FEFECE><color:#D4AC0D><b>Interface that cannot be instantiated directly by the factory
+    *** <back:#FDEDEC><color:#E74C3C><b>SPI (Service Provider Interface) to be provided by the end-user
+    *** <back:#E9F7EF><color:#27AE60><b>Class, enum or exception
+end legend
+
+package "reader" as reader {
+
++class "**final** ReaderApiProperties" as ApiProperties <<green>> {
+    +{static} **final** String VERSION
+}
++interface "ReaderApiFactory" as ReaderApiFactory <<blue>> {
+    +<color:blue>CardReaderProvider getCardReaderProvider ()
+
+    +CardSelectionManager createCardSelectionManager ()
+
+    +BasicCardSelector createBasicCardSelector ()
+    +IsoCardSelector createIsoCardSelector ()
+
+    +<color:blue>CardDetectionSettings createCardDetectionSettings ()
+}
+
++interface "<color:blue>CardReaderProvider" as CardReaderProvider <<blue>> {
+    +<color:blue>Set<String> getReaderNames ()
+    +<color:blue>Set<CardReader> getReaders ()
+    +<color:blue>CardReader getReader (String readerName)
+    +<color:blue>CardReader findReader (String readerNameRegex)
+}
+
+' SERVICE
++interface CardReader {
+    +String getName ()
+    +boolean isContactless ()
+
+    +boolean isCardPresent ()
+}
++interface "ObservableCardReader" as ObservableCardReader extends CardReader {
+    +<color:blue>void startCardDetection (CardDetectionSettings settings, CardReaderEventHandler eventHandler)
+    +void stopCardDetection ()
+
+    +<color:blue>void endCardProcessing ()
+}
++interface "<color:blue>CardDetectionSettings" as CardDetectionSettings <<blue>> {
+    +<color:blue>CardDetectionSettings setDetectionMode (DetectionMode detectionMode)
+    +<color:blue>CardDetectionSettings setRfTechnologies (Set<<back:yellow>RfTechnology</back>> rfTechnologies)
+    +<color:blue>CardDetectionSettings setEcpFrame (byte[] ecpFrame)
+}
++enum DetectionMode <<green>> {
+    REPEATING
+    <color:blue>SINGLE_SHOT
+}
++interface CardReaderEvent {
+    +String getReaderName ()
+    +Type getType ()
+    +ScheduledCardSelectionsResponse getScheduledCardSelectionsResponse ()
+}
++enum "Type" as CardReaderEventType <<green>> {
+    CARD_INSERTED
+    CARD_MATCHED
+    CARD_REMOVED
+    <color:blue>READER_UNREGISTERED
+}
+' SPI
+package "spi" as readerSpi {
+    +interface "<color:blue>CardReaderEventHandler" as CardReaderEventHandler <<red>> {
+        +<color:blue>void onReaderEvent (CardReaderEvent cardReaderEvent)
+        +<color:blue>void onReaderError (String context, String readerName, Throwable e)
+    }
+}
+
+' SELECTION
+package "selection" as selectionApi {
+    ' Selection
+    +interface CardSelectionManager <<blue>> {
+        +int prepareSelection (CardSelector<?> cardSelector, CardSelectionExtension cardSelectionExtension)
+
+        +String exportCardSelectionScenario ()
+        +int importCardSelectionScenario (String cardSelectionScenario)
+
+        +<color:blue>CardSelectionResult processCardSelectionScenario (CardReader cardReader, SelectionExecutionPolicy selectionExecutionPolicy)
+
+        +<color:blue>void scheduleCardSelectionScenario (ObservableCardReader observableCardReader, CardPresenceNotificationPolicy cardPresenceNotificationPolicy, SelectionExecutionPolicy selectionExecutionPolicy)
+        +CardSelectionResult parseScheduledCardSelectionsResponse (ScheduledCardSelectionsResponse scheduledCardSelectionsResponse)
+
+        +<color:blue>CardSelectionResult processMultichannelCardSelectionScenario (CardReader cardReader, ChannelSelectionPolicy channelSelectionPolicy)
+
+        +String exportProcessedCardSelectionScenario ()
+        +CardSelectionResult importProcessedCardSelectionScenario (String processedCardSelectionScenario)
+    }
+    +enum "<color:blue>CardPresenceNotificationPolicy" as CardPresenceNotificationPolicy <<green>> {
+        <color:blue>ALWAYS
+        <color:blue>MATCHED_ONLY
+    }
+    +enum "<color:blue>SelectionExecutionPolicy" as SelectionExecutionPolicy <<green>> {
+        <color:blue>STOP_ON_FIRST_MATCH
+        <color:blue>PROCESS_ALL
+    }
+    +enum "<color:blue>ChannelSelectionPolicy" as ChannelSelectionPolicy <<green>> {
+        <color:blue>ALLOW_BASIC_CHANNEL
+        <color:blue>LOGICAL_CHANNEL_ONLY
+    }
+    +interface "CardSelector<T extends CardSelector<T>>" as CardSelector {
+        +<color:blue>T filterByCardType (<back:yellow>CardType</back> cardType)
+        +T filterByPowerOnData (String powerOnDataRegex)
+    }
+    +interface "BasicCardSelector" as BasicCardSelector <<blue>> extends CardSelector {
+    }
+    +interface "IsoCardSelector" as IsoCardSelector <<blue>> extends CardSelector {
+        +IsoCardSelector filterByDfName (byte[] aid)
+        +IsoCardSelector filterByDfName (String aid)
+
+        +IsoCardSelector setFileOccurrence (FileOccurrence fileOccurrence)
+        +IsoCardSelector setFileControlInformation (FileControlInformation fileControlInformation)
+    }
+    +enum "FileOccurrence" as FileOccurrence <<green>> {
+        FIRST
+        LAST
+        NEXT
+        PREVIOUS
+    }
+    +enum "FileControlInformation" as FileControlInformation <<green>> {
+        FCI
+        FCP
+        FMD
+        NO_RESPONSE
+    }
+
+    ' Card Extension SPI
+    package "spi" as selectionSpi {
+        +interface "CardSelectionExtension" as CardSelectionExtension <<red>> {
+        }
+        +interface "SmartCard" as SmartCard <<red>> {
+            +String getPowerOnData ()
+            +<color:blue>boolean isActive ()
+        }
+        +interface "IsoSmartCard" as IsoSmartCard <<red>> extends SmartCard {
+            +byte[] getSelectApplicationResponse ()
+            +<color:blue>boolean isBasicChannel ()
+        }
+    }
+    +interface CardSelectionResult {
+        +<color:blue><back:yellow>CardType</back> getCardType ()
+        +Map<Integer, SmartCard> getSmartCards ()
+        +SmartCard getActiveSmartCard ()
+        +int getActiveSelectionIndex ()
+        +<color:blue>List<Integer> getActiveSelectionIndexes ()
+    }
+    +interface ScheduledCardSelectionsResponse {
+    }
+}
+
+' TRANSACTION
+package "transaction" as transactionApi {
+    package "spi" as transactionSpi {
+        +interface "CardTransactionManager" as CardTransactionManager <<red>> {
+            +<color:blue>void processCommands ()
+        }
+        +interface "<color:blue>IsoCardTransactionManager" as IsoCardTransactionManager <<red>> extends CardTransactionManager {
+            +<color:blue>MultichannelCardTransactionManager asMultichannelCardTransactionManager ()
+        }
+        +interface "<color:blue>MultichannelCardTransactionManager" as MultichannelCardTransactionManager <<red>> extends CardTransactionManager {
+            +<color:blue>void processCommandsAndCloseChannel ()
+            +<color:blue>void closeChannel ()
+        }
+    }
+}
+
+' EXCEPTIONS
++class "<<RuntimeException>>\nReaderCommunicationException" as ReaderCommunicationException <<green>> {
+}
++class "<<RuntimeException>>\nCardCommunicationException" as CardCommunicationException <<green>> {
+}
++class "<<RuntimeException>>\nInvalidCardResponseException" as InvalidCardResponseException <<green>> {
+}
+
+}
+
+' Associations
+
+ObservableCardReader ..> CardDetectionSettings #C_USE : use >
+ObservableCardReader ..> CardReaderEventHandler #C_USE : use >
+
+CardDetectionSettings +-- DetectionMode
+CardDetectionSettings ..> DetectionMode #C_USE : use >
+
+CardReaderEvent +-- CardReaderEventType
+CardReaderEvent ..> CardReaderEventType #C_LINK : provide >
+CardReaderEvent .up.> ScheduledCardSelectionsResponse #C_LINK : provide >
+
+CardReaderEventHandler ..> CardReaderEvent #C_USE : use >
+
+CardReaderProvider ..> CardReader #C_LINK : provide >
+
+CardSelectionResult ..> SmartCard #C_LINK : provide >
+
+IsoCardSelector +-- FileOccurrence
+IsoCardSelector ..> FileOccurrence #C_USE : use >
+IsoCardSelector +-- FileControlInformation
+IsoCardSelector ..> FileControlInformation #C_USE : use >
+
+CardSelectionManager ..> CardSelector #C_USE : use >
+CardSelectionManager ..> CardSelectionExtension #C_USE : use >
+CardSelectionManager ..> ScheduledCardSelectionsResponse #C_USE : use >
+CardSelectionManager ..> CardSelectionResult #C_LINK : provide >
+CardSelectionManager .left.> CardReader #C_USE : use >
+CardSelectionManager +-up- CardPresenceNotificationPolicy
+CardSelectionManager .up.> CardPresenceNotificationPolicy #C_USE : use >
+CardSelectionManager +-up- SelectionExecutionPolicy
+CardSelectionManager .up.> SelectionExecutionPolicy #C_USE : use >
+CardSelectionManager +-up- ChannelSelectionPolicy
+CardSelectionManager .up.> ChannelSelectionPolicy #C_USE : use >
+
+IsoCardTransactionManager .right.> MultichannelCardTransactionManager #C_LINK : cast to >
+
+' == LAYOUT ==
+
+ReaderApiFactory -[hidden]right- ApiProperties
+ReaderCommunicationException -[hidden]- CardCommunicationException
+CardCommunicationException -[hidden]- InvalidCardResponseException
+DetectionMode -[hidden]- CardTransactionManager
+
+' == STYLE ==
+
+package reader #C_GREY1 {}
+package reader.readerSpi #C_GREY2 {}
+package reader.selectionApi #C_GREY2 {}
+package reader.selectionApi.selectionSpi #C_GREY3 {}
+package reader.transactionApi #C_GREY2 {}
+package reader.transactionApi.transactionSpi #C_GREY3 {}
+
+@enduml

@@ -1,0 +1,19 @@
+@startuml
+skinparam shadowing false
+skinparam roundCorner 8
+skinparam ArrowColor #2C3E50
+
+component "Terminal Application" as App
+component "Card Extensions\n(e.g. Calypso Card API)" as Ext
+component "Terminal Reader API\n(this specification)" as TR #LightYellow
+component "Terminal Definitions API\n(global constants)" as Def
+component "Reader Driver\nImplementation(s)" as Drv
+component "Card Reader\nHardware" as HW
+
+App --> TR  : uses
+App --> Def : uses (transitive)
+Ext  --> TR : extends (SPI)
+TR   --> Def : depends on
+TR   --> Drv : delegated to
+Drv  --> HW  : controls
+@enduml
