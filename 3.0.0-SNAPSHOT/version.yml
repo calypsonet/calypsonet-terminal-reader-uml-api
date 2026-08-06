@@ -1,0 +1,12 @@
+  - version: "3.0.0-SNAPSHOT"
+    status: snapshot
+    files:
+      diagram:
+        name: "class-diagram.svg"
+        size: "106 kB"
+      html:
+        name: "YYMMDD-SP-CNATerminalAPI-Reader_v3.0.0-SNAPSHOT.html"
+        size: "1.6 MB"
+      pdf:
+        name: "YYMMDD-SP-CNATerminalAPI-Reader_v3.0.0-SNAPSHOT.pdf"
+        size: "1.9 MB"
