@@ -441,17 +441,19 @@ This section is _informative_. The state and trigger names shown are internal to
 of the normative API surface; they are provided only to explain the observed runtime behavior.
 
 .Card Reader Observation -- FSM State Diagram
-image::uml/card-reader-observation-fsm.svg[Card reader observation state machine,align=center]
+image::uml/card-reader-observation-fsm.svg[Card reader observation state machine]
 
-The diagram uses the following notation.
+The diagram uses the following notation:
 
 *Triggers* -- events that drive the transitions:
 
-* `CARD_DETECTION_START_REQUESTED` -- the application called <<op_ObservableCardReader_startCardDetection,`startCardDetection`>>.
-* `CARD_DETECTION_STOP_REQUESTED` -- the application called <<op_ObservableCardReader_stopCardDetection,`stopCardDetection`>> (factorized on the composite-state boundary).
-* `CARD_PROCESSING_ENDED` -- the application called <<op_ObservableCardReader_endCardProcessing,`endCardProcessing`>>.
-* `CARD_INSERTED` -- the monitoring job detected a card.
-* `CARD_REMOVED` -- the monitoring job detected card removal.
+* *Application* triggers:
+** `CARD_DETECTION_START_REQUESTED` -- the application called <<op_ObservableCardReader_startCardDetection,`startCardDetection`>>.
+** `CARD_DETECTION_STOP_REQUESTED` -- the application called <<op_ObservableCardReader_stopCardDetection,`stopCardDetection`>> (factorized on the composite-state boundary).
+** `CARD_PROCESSING_ENDED` -- the application called <<op_ObservableCardReader_endCardProcessing,`endCardProcessing`>>.
+* *Hardware* triggers:
+** `CARD_INSERTED` -- the monitoring job detected a card.
+** `CARD_REMOVED` -- the monitoring job detected card removal.
 
 *Reader capabilities*:
 
@@ -482,7 +484,7 @@ The following UML class diagram provides a visual representation of the types an
 .{doc-name} -- UML Class Diagram
 [plantuml, target="class-diagram", format="svg"]
 ----
-include::uml/class-diagram.puml[Terminal Reader API class diagram, align=center]
+include::uml/class-diagram.puml[Terminal Reader API class diagram]
 ----
 
 // =============================================================================
