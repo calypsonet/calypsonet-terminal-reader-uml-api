@@ -378,6 +378,7 @@ is backward-compatible per that API's evolution policy.
 The {doc-name} sits between the terminal application and the reader drivers, exposing a stable contract on each
 side:
 
+.{doc-name} -- Architecture Overview
 [plantuml, target=architecture-overview, format=svg]
 ----
 include::uml/architecture-overview.puml[]
@@ -424,11 +425,61 @@ The design follows a three-tier hierarchy in the `reader.transaction.spi` namesp
   *intrinsically multi-channel* by design. Consumer APIs whose target cards are always multi-channel SHOULD
   stereotype their transaction manager directly on this contract.
 
+[[sec_observation_lifecycle]]
+=== Reader observation lifecycle
+
+An <<type_ObservableCardReader,`ObservableCardReader`>> tracks card insertion and removal through an internal state
+machine. The diagram below gives the integrator a complete view of that lifecycle: how
+<<op_ObservableCardReader_startCardDetection,`startCardDetection`>> /
+<<op_ObservableCardReader_stopCardDetection,`stopCardDetection`>> and
+<<op_ObservableCardReader_endCardProcessing,`endCardProcessing`>> move the reader between states, when a
+<<type_CardReaderEvent,`CardReaderEvent`>> is produced, and how the <<type_DetectionMode,`DetectionMode`>> and
+<<type_CardPresenceNotificationPolicy,`CardPresenceNotificationPolicy`>> settings steer the flow.
+
+[NOTE]
+This section is _informative_. The state and trigger names shown are internal to the implementation and are not part
+of the normative API surface; they are provided only to explain the observed runtime behavior.
+
+.Card Reader Observation -- FSM State Diagram
+image::uml/card-reader-observation-fsm.svg[Card reader observation state machine,align=center]
+
+The diagram uses the following notation.
+
+*Triggers* -- events that drive the transitions:
+
+* `CARD_DETECTION_START_REQUESTED` -- the application called <<op_ObservableCardReader_startCardDetection,`startCardDetection`>>.
+* `CARD_DETECTION_STOP_REQUESTED` -- the application called <<op_ObservableCardReader_stopCardDetection,`stopCardDetection`>> (factorized on the composite-state boundary).
+* `CARD_PROCESSING_ENDED` -- the application called <<op_ObservableCardReader_endCardProcessing,`endCardProcessing`>>.
+* `CARD_INSERTED` -- the monitoring job detected a card.
+* `CARD_REMOVED` -- the monitoring job detected card removal.
+
+*Reader capabilities*:
+
+* `[MONITORING_DURING_PROCESSING]` -- the reader can detect card removal while processing is running, *AND* card processing is executed in a dedicated thread.
+
+*Card states*:
+
+* `[CARD_PROCESSABLE]` -- the inserted card is eligible for processing, *OR* card-presence notifications are enabled for all cards (`CardPresenceNotificationPolicy == ALWAYS`).
+* `[CARD_NON_PROCESSABLE]` -- the inserted card is not eligible for processing, *AND* card-presence notifications are restricted to matched cards (`CardPresenceNotificationPolicy == MATCHED_ONLY`).
+
+*Guards* -- <<type_DetectionMode,`DetectionMode`>> value in effect:
+
+* `[REPEATING]` -- `DetectionMode == REPEATING`: card detection remains active after each detection.
+* `[SINGLE_SHOT]` -- `DetectionMode == SINGLE_SHOT`: card detection stops after the first detection.
+
+*Actions* -- effect executed on a transition:
+
+* `/ facade.operation()` -- a public API call (event production or event-handler notification).
+* `/ driver.operation()` -- a low-level hardware call (hardware notification).
+* `/ start job` -- a monitoring job submitted to the background executor.
+
+
 [[sec_class_diagram]]
 === UML class diagram
 
 The following UML class diagram provides a visual representation of the types and relationships defined by this specification:
 
+.{doc-name} -- UML Class Diagram
 [plantuml, target="class-diagram", format="svg"]
 ----
 include::uml/class-diagram.puml[Terminal Reader API class diagram, align=center]
@@ -641,7 +692,7 @@ fluent composition. Setters that are not called default to the values specified 
 |===
 
 A `CardReaderEvent` carries the origin of the event (the reader name), the event type and, when available, the
-card selection response.
+card selection response. The circumstances under which each event type is emitted are described in <<sec_observation_lifecycle,Reader observation lifecycle>>.
 
 [[op_CardReaderEvent_getReaderName]]
 ===== Get Reader Name
@@ -1203,6 +1254,8 @@ The observation contract is co-located with the start of detection: a single cal
 both the <<type_CardDetectionSettings,`CardDetectionSettings`>> that govern the polling behaviour and the
 <<type_CardReaderEventHandler,`CardReaderEventHandler`>> that receives the resulting events.
 
+The reader's complete insertion/processing/removal lifecycle -- including when each observation event is produced -- is described in <<sec_observation_lifecycle,Reader observation lifecycle>>.
+
 [[op_ObservableCardReader_endCardProcessing]]
 ===== End Card Processing
 
@@ -1671,6 +1724,8 @@ actual exchange with the card.
 | Purpose  | Options applied when a card is detected, used to decide which cards trigger event-handler notifications.
 |===
 
+In the reader observation lifecycle, this policy determines whether a detected card is treated as processable -- see <<sec_observation_lifecycle,Reader observation lifecycle>>.
+
 [cols="^.^2,^.^1,.^6", options="header"]
 |===
 | Value          | Since | Description
@@ -1732,6 +1787,8 @@ actual exchange with the card.
 | Since    | 3.0
 | Purpose  | Defines the behaviour to apply after a card processing cycle has terminated.
 |===
+
+In the reader observation lifecycle, this setting is the guard that decides whether detection resumes after a card-processing cycle -- see <<sec_observation_lifecycle,Reader observation lifecycle>>.
 
 [cols="^.^2,^.^1,.^6", options="header"]
 |===
