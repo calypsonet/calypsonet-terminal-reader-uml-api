@@ -447,11 +447,11 @@ The diagram uses the following notation:
 
 *Triggers* -- events that drive the transitions:
 
-* *Application* triggers:
+* *Application* triggers (blue transitions in the diagram):
 ** `CARD_DETECTION_START_REQUESTED` -- the application called <<op_ObservableCardReader_startCardDetection,`startCardDetection`>>.
 ** `CARD_DETECTION_STOP_REQUESTED` -- the application called <<op_ObservableCardReader_stopCardDetection,`stopCardDetection`>> (factorized on the composite-state boundary).
 ** `CARD_PROCESSING_ENDED` -- the application called <<op_ObservableCardReader_endCardProcessing,`endCardProcessing`>>.
-* *Hardware* triggers:
+* *Hardware* triggers (red transitions in the diagram):
 ** `CARD_INSERTED` -- the monitoring job detected a card.
 ** `CARD_REMOVED` -- the monitoring job detected card removal.
 
@@ -459,15 +459,15 @@ The diagram uses the following notation:
 
 * `[MONITORING_DURING_PROCESSING]` -- the reader can detect card removal while processing is running, *AND* card processing is executed in a dedicated thread.
 
-*Card states*:
+*Card eligibility*:
 
-* `[CARD_PROCESSABLE]` -- the inserted card is eligible for processing, *OR* card-presence notifications are enabled for all cards (`CardPresenceNotificationPolicy == ALWAYS`).
-* `[CARD_NON_PROCESSABLE]` -- the inserted card is not eligible for processing, *AND* card-presence notifications are restricted to matched cards (`CardPresenceNotificationPolicy == MATCHED_ONLY`).
+* `[CARD_PROCESSABLE]` -- the inserted card matched at least one case of the card selection scenario, *OR* the notification policy covers every detected card regardless of selection (`CardPresenceNotificationPolicy == ALWAYS`).
+* `[CARD_NON_PROCESSABLE]` -- the inserted card matched no case of the card selection scenario, *AND* the notification policy is restricted to matched cards (`CardPresenceNotificationPolicy == MATCHED_ONLY`).
 
-*Guards* -- <<type_DetectionMode,`DetectionMode`>> value in effect:
+*Detection mode* -- the active <<type_DetectionMode,`DetectionMode`>>, evaluated when a card-processing cycle ends:
 
-* `[REPEATING]` -- `DetectionMode == REPEATING`: card detection remains active after each detection.
-* `[SINGLE_SHOT]` -- `DetectionMode == SINGLE_SHOT`: card detection stops after the first detection.
+* `[REPEATING]` -- detection resumes after each card-processing cycle, ready for the next card.
+* `[SINGLE_SHOT]` -- detection stops after the first card-processing cycle; a new call to <<op_ObservableCardReader_startCardDetection,`startCardDetection`>> is required to detect further cards.
 
 *Actions* -- effect executed on a transition:
 
