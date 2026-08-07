@@ -5,7 +5,7 @@ title
     Terminal Reader API 3.0.+ (2026-07-08)
 end title
 
-' == THEME ==
+' == THEME (class) ==
 
 'Couleurs issues de : https://htmlcolorcodes.com/fr/tableau-de-couleur/tableau-de-couleur-design-plat/
 !define C_GREY1 F8F9F9

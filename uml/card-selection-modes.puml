@@ -1,21 +1,31 @@
 @startuml
 ' Card selection modes -- synchronous vs. asynchronous (informative)
 
-' == THEME ==
+' == THEME (activity) ==
 
-!define C_GREY1 F8F9F9
+!define C_YELLOW FEFECE
+!define C_RED    FDEDEC
+!define C_PURPLE F4ECF7
+!define C_BLUE   EBF5FB
+!define C_GREEN  E9F7EF
+!define C_GREY   EAECEE
+!define C_GREY1  F8F9F9
+
 skinparam defaultTextAlignment center
+
 skinparam activity {
-    ' Activity
-    ' Default (no stereotype) => Yellow
-    BackgroundColor #FEFECE
-    ' Stereotype <<blue>> => Blue
-    BackgroundColor<<blue>> #EBF5FB
+    BackgroundColor #C_GREEN
+    BackgroundColor<<blue>>   #C_BLUE
+    BackgroundColor<<yellow>>  #C_YELLOW
+    BackgroundColor<<red>>    #C_RED
+    BackgroundColor<<purple>> #C_PURPLE
+    BackgroundColor<<grey>>   #C_GREY
     hide <<blue>> stereotype
-    ' Order is very important! Diamond styling must be last,
-    ' otherwise it will override the default activity style.
-    ' Diamond => Red
-    DiamondBackgroundColor #FDEDEC
+    hide <<yellow>> stereotype
+    hide <<red>> stereotype
+    hide <<purple>> stereotype
+    hide <<grey>> stereotype
+    DiamondBackgroundColor #C_YELLOW
 }
 
 ' == CONTENT ==
