@@ -4,10 +4,8 @@
 ' == THEME ==
 
 skinparam defaultTextAlignment center
-skinparam ArrowThickness 2
 skinparam activity {
     ' Activity
-    BorderThickness 2
     ' Default (no stereotype) => Yellow
     BackgroundColor #FEFECE
     BorderColor #D4AC0D
