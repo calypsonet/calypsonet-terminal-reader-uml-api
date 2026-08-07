@@ -15,7 +15,7 @@ versions:
         size: "1.6 MB"
       pdf:
         name: "YYMMDD-SP-CNATerminalAPI-Reader_v3.0.0-SNAPSHOT.pdf"
-        size: "1.9 MB"
+        size: "2.0 MB"
   - version: "2.1.0"
     status: stable
     files:
