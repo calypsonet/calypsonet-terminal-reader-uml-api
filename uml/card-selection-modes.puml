@@ -1,0 +1,67 @@
+@startuml
+' Card selection modes -- synchronous vs. asynchronous (informative)
+
+' == THEME (activity) ==
+
+!define C_YELLOW FEFECE
+!define C_RED    FDEDEC
+!define C_PURPLE F4ECF7
+!define C_BLUE   EBF5FB
+!define C_GREEN  E9F7EF
+!define C_GREY   EAECEE
+!define C_GREY1  F8F9F9
+
+skinparam defaultTextAlignment center
+
+skinparam activity {
+    BackgroundColor #C_GREEN
+    BackgroundColor<<blue>>   #C_BLUE
+    BackgroundColor<<yellow>>  #C_YELLOW
+    BackgroundColor<<red>>    #C_RED
+    BackgroundColor<<purple>> #C_PURPLE
+    BackgroundColor<<grey>>   #C_GREY
+    hide <<blue>> stereotype
+    hide <<yellow>> stereotype
+    hide <<red>> stereotype
+    hide <<purple>> stereotype
+    hide <<grey>> stereotype
+    DiamondBackgroundColor #C_YELLOW
+}
+
+' == CONTENT ==
+
+|#C_GREY1|Card reader|
+|Application|
+|#C_GREY1|Observable card reader|
+|Event handler|
+|Application|
+start
+:**prepareSelection()**
+build the card selection scenario;
+if (selection mode?) then (synchronous)
+  :**processCardSelectionScenario()**
+  or
+  **processMultichannelCardSelectionScenario()**;
+  |Card reader|
+  :execute the scenario
+  on the already-present card;
+  |Application|
+  :receive **CardSelectionResult**;
+  :process the card;
+  stop
+else (asynchronous)
+  :**scheduleCardSelectionScenario()**;
+  :**startCardDetection()**;
+  |Observable card reader|
+  :wait for a card, then execute
+  the scheduled scenario on insertion;
+  :notify **CardReaderEvent**
+  **CARD_MATCHED** / **CARD_INSERTED**
+  (per **CardPresenceNotificationPolicy**);
+  |Event handler|
+  :**parseScheduledCardSelectionsResponse()**;
+  :process the card;
+  :**endCardProcessing()**;
+  stop
+endif
+@enduml
