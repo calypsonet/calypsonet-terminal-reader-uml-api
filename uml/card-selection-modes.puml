@@ -30,9 +30,9 @@ skinparam activity {
 
 ' == CONTENT ==
 
-|#C_GREY1|Card reader A| Card Reader
+|#C_GREY1|Card reader|
 |Application|
-|#C_GREY1|Card reader B| Card Reader
+|#C_GREY1|Observable card reader|
 |Event handler|
 |Application|
 start
@@ -42,7 +42,7 @@ if (selection mode?) then (synchronous)
   :**processCardSelectionScenario()**
   or
   **processMultichannelCardSelectionScenario()**;
-  |Card reader A|
+  |Card reader|
   :execute the scenario
   on the already-present card;
   |Application|
@@ -52,7 +52,7 @@ if (selection mode?) then (synchronous)
 else (asynchronous)
   :**scheduleCardSelectionScenario()**;
   :**startCardDetection()**;
-  |Card reader B|
+  |Observable card reader|
   :wait for a card, then execute
   the scheduled scenario on insertion;
   :notify **CardReaderEvent**
