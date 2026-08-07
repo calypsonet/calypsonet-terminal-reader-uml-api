@@ -425,6 +425,41 @@ The design follows a three-tier hierarchy in the `reader.transaction.spi` namesp
   *intrinsically multi-channel* by design. Consumer APIs whose target cards are always multi-channel SHOULD
   stereotype their transaction manager directly on this contract.
 
+[[sec_card_selection_modes]]
+=== Card selection modes
+
+A card selection scenario -- prepared through the <<type_CardSelectionManager,`CardSelectionManager`>> -- can be
+operated in two ways, chosen according to the reader capability and the use case.
+
+[NOTE]
+This section is _informative_. It gives an end-to-end view of the two modes; the normative behaviour of each
+operation is defined in the <<type_CardSelectionManager,`CardSelectionManager`>> section.
+
+Synchronous (explicit)::
+The card is already present on a <<type_CardReader,`CardReader`>>. The application runs the scenario itself with
+<<op_CardSelectionManager_processCardSelectionScenario,`processCardSelectionScenario`>> (or
+<<op_CardSelectionManager_processMultichannelCardSelectionScenario,`processMultichannelCardSelectionScenario`>> for
+multi-channel cards) and obtains the <<type_CardSelectionResult,`CardSelectionResult`>> immediately. The *same entity*
+manages both the selection and the subsequent card processing.
+
+Asynchronous (scheduled / event-driven)::
+On an <<type_ObservableCardReader,`ObservableCardReader`>>, the scenario is registered ahead of time with
+<<op_CardSelectionManager_scheduleCardSelectionScenario,`scheduleCardSelectionScenario`>> and executed automatically by
+the reader upon card insertion. The outcome is delivered as a <<type_CardReaderEvent,`CardReaderEvent`>> to the
+<<type_CardReaderEventHandler,`CardReaderEventHandler`>> -- its type (`CARD_MATCHED` or `CARD_INSERTED`) depending on
+the <<type_CardPresenceNotificationPolicy,`CardPresenceNotificationPolicy`>> -- and decoded with
+<<op_CardSelectionManager_parseScheduledCardSelectionsResponse,`parseScheduledCardSelectionsResponse`>>. Here the
+*reader* drives the selection while the *event handler* performs the card processing.
+
+.{doc-name} -- Card Selection Modes Activity Diagram
+[plantuml, target="card-selection-modes", format="svg"]
+----
+include::uml/card-selection-modes.puml[{doc-name} card selection modes activity diagram]
+----
+
+The runtime execution of the asynchronous mode -- the reader states and transitions -- is detailed in
+<<sec_observation_lifecycle,Reader observation lifecycle>>.
+
 [[sec_observation_lifecycle]]
 === Reader observation lifecycle
 
@@ -837,7 +872,8 @@ For ISO/IEC 7816-4 multi-channel cards, a dedicated execution method is provided
 
 The manager provides three flavours of execution: explicit (synchronous) single-channel selection, explicit
 multi-channel selection, and scheduled (event-driven) selection. It additionally supports *export/import* of the
-scenario or its result for distributed architectures.
+scenario or its result for distributed architectures. See <<sec_card_selection_modes,Card selection modes>> for an end-to-end view of the
+synchronous and asynchronous flows.
 
 A scenario is considered *prepared* once at least one selection case has been appended via `prepareSelection`. A
 prepared scenario MAY be executed multiple times; each execution operates on the scenario as it stood at the time

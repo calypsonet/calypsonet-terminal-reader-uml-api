@@ -1,0 +1,58 @@
+@startuml
+' Card selection modes -- synchronous vs. asynchronous (informative)
+
+' == THEME ==
+
+skinparam defaultTextAlignment center
+skinparam ArrowThickness 2
+skinparam activity {
+    ' Activity
+    BorderThickness 2
+    ' Default (no stereotype) => Yellow
+    BackgroundColor #FEFECE
+    BorderColor #D4AC0D
+    ' Stereotype <<blue>> => Blue
+    BackgroundColor<<blue>> #EBF5FB
+    BorderColor<<blue>> #3498DB
+    hide <<blue>> stereotype
+    ' Order is very important! Diamond styling must be last,
+    ' otherwise it will override the default activity style.
+    ' Diamond => Red
+    DiamondBackgroundColor #FDEDEC
+    DiamondBorderColor #E74C3C
+    DiamondBorderThickness 2
+}
+
+' == CONTENT ==
+
+|Application|
+start
+:**prepareSelection()**
+build the card selection scenario; <<blue>>
+if (selection mode?) then (synchronous)
+  :**processCardSelectionScenario()**
+  or
+  **processMultichannelCardSelectionScenario()**; <<blue>>
+  |Card reader|
+  :execute the scenario
+  on the already-present card;
+  |Application|
+  :receive **CardSelectionResult**;
+  :process the card;
+  stop
+else (asynchronous)
+  :**scheduleCardSelectionScenario()**; <<blue>>
+  :**startCardDetection()**; <<blue>>
+  |Card reader|
+  :wait for a card, then execute
+  the scheduled scenario on insertion;
+  :notify **CardReaderEvent**
+  **CARD_MATCHED** / **CARD_INSERTED**
+  (per **CardPresenceNotificationPolicy**);
+  |Event handler|
+  :**parseScheduledCardSelectionsResponse()**; <<blue>>
+  :process the card;
+  :**endCardProcessing()**; <<blue>>
+  stop
+endif
+@enduml
