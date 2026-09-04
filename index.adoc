@@ -216,7 +216,7 @@ equivalent native type. Implementations MUST preserve the semantic intent rather
 | `list<T>`       | Ordered collection of `T` values, may contain duplicates.        | `List<T>`, `Vec<T>`.
 | `set<T>`        | Unordered collection of unique `T` values.                       | `Set<T>`, `HashSet<T>`.
 | `map<K,V>`      | Associative array binding keys of type `K` to values of type `V`.| `Map<K,V>`, `Dictionary<K,V>`.
-| `void`          | Indicates that an operation returns no value.                    | `void`, `Unit`, `None`.
+| `unit`          | Indicates that an operation returns no value.                    | `void`, `Unit`, `None`.
 |===
 
 ==== Type tables
@@ -228,7 +228,7 @@ Each interface, class, enumeration and exception defined in this document is des
 | Name       | The type's normalized name.
 | Kind       | The category of the type (interface, class, enumeration, exception, etc.).
 | Namespace  | The namespace in which the type is defined.
-| Generics   | The generic type parameter of this type, when applicable.
+| Generics   | The generic type parameter of this type, when applicable. A constraint on that parameter is written `<T : Bound>`.
 | Extends    | The type extended by this type, when applicable.
 | Implements | The interface implemented by this type, when applicable.
 | Since      | The version of the API in which the type was introduced.
@@ -1052,7 +1052,7 @@ of the call.
 `{nbsp}{nbsp}{nbsp}{nbsp}observableCardReader: ObservableCardReader,` +
 `{nbsp}{nbsp}{nbsp}{nbsp}cardPresenceNotificationPolicy: CardPresenceNotificationPolicy,` +
 `{nbsp}{nbsp}{nbsp}{nbsp}selectionExecutionPolicy: SelectionExecutionPolicy` +
-`) -> void`
+`) -> unit`
 | Since       | 3.0
 | Description
 | Schedules the execution of the prepared selection scenario as soon as a card is presented to the supplied
@@ -1158,7 +1158,7 @@ to the active selected card. In multi-channel mode, several active selections ma
 | Name     | `CardSelector`
 | Kind     | Interface
 | Namespace  | `reader.selection`
-| Generics | `<T extends CardSelector<T>>`
+| Generics | `<T : CardSelector<T>>`
 | Since    | 2.0
 | Purpose  | Base contract for all card selectors. Defines filters used to restrict the selection process to a subset of cards.
 |===
@@ -1299,7 +1299,7 @@ The reader's complete insertion/processing/removal lifecycle -- including when e
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `endCardProcessing() -> void`
+| Signature   | `endCardProcessing() -> unit`
 | Since       | 3.0
 | Description
 a| Notifies the reader that the *business processing* of the current card has been completed. Upon receiving this
@@ -1328,7 +1328,7 @@ the end of a card processing whatever the outcome.
 | `startCardDetection(` +
 `{nbsp}{nbsp}{nbsp}{nbsp}settings: CardDetectionSettings,` +
 `{nbsp}{nbsp}{nbsp}{nbsp}eventHandler: CardReaderEventHandler` +
-`) -> void`
+`) -> unit`
 | Since       | 3.0
 | Description
 | Activates card detection. Once activated, the application is notified of card events through the registered
@@ -1350,7 +1350,7 @@ the end of a card processing whatever the outcome.
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `stopCardDetection() -> void`
+| Signature   | `stopCardDetection() -> unit`
 | Since       | 1.0
 | Description | Stops card detection. After this operation has returned, the registered event handler does not receive card events until detection is restarted.
 | Throws      | None.
@@ -1484,7 +1484,7 @@ This SPI unifies the reception of nominal events (`onReaderEvent`) and of fatal 
 `{nbsp}{nbsp}{nbsp}{nbsp}context: string,` +
 `{nbsp}{nbsp}{nbsp}{nbsp}readerName: string,` +
 `{nbsp}{nbsp}{nbsp}{nbsp}e: throwable` +
-`) -> void`
+`) -> unit`
 | Since       | 3.0
 | Description
 | Called when a fatal error occurs on the observed reader. After the operation returns, the observation process
@@ -1501,7 +1501,7 @@ This SPI unifies the reception of nominal events (`onReaderEvent`) and of fatal 
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `onReaderEvent(cardReaderEvent: CardReaderEvent) -> void`
+| Signature   | `onReaderEvent(cardReaderEvent: CardReaderEvent) -> unit`
 | Since       | 3.0
 | Description
 | Called when a reader event occurs. Dispatch is *sequential* and *synchronous* unless a different policy is
@@ -1547,7 +1547,7 @@ minimise network exchanges, which is especially valuable in distributed architec
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `processCommands() -> void`
+| Signature   | `processCommands() -> unit`
 | Since       | 3.0
 | Description
 | Processes all previously prepared commands.
@@ -1658,7 +1658,7 @@ This contract MAY be obtained either:
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `closeChannel() -> void`
+| Signature   | `closeChannel() -> unit`
 | Since       | 3.0
 | Description | Closes the underlying logical channel without processing any pending command. This operation is idempotent: calling it on an already-closed channel has no effect.
 | Throws
@@ -1671,7 +1671,7 @@ This contract MAY be obtained either:
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `processCommandsAndCloseChannel() -> void`
+| Signature   | `processCommandsAndCloseChannel() -> unit`
 | Since       | 3.0
 | Description | Processes all previously prepared commands and, upon success, closes the underlying logical channel. If any command fails, the channel is left open, as with `processCommands`.
 | Throws
