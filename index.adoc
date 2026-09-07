@@ -98,8 +98,9 @@ include::assets/layout/_colophon.adoc[]
 
 This document is the official technical specification of the **{doc-name}** standardised
 by the **{organization}** (CNA).
-It defines, in a language-agnostic way, the interfaces, classes, enumerations, exceptions, structural
-relationships and behavioural requirements that any conforming implementation of the {doc-name} MUST satisfy.
+It defines, in a language-agnostic way (using a notation inspired by the Kotlin language), the interfaces,
+classes, enumerations, exceptions, structural relationships and behavioural requirements that any conforming
+implementation of the {doc-name} MUST satisfy.
 
 The {doc-name} is part of the broader CNA *Terminal API* family and acts as the contract through which
 terminal applications discover card readers, observe card events, select cards and exchange data with them.
@@ -200,23 +201,24 @@ Type names follow `UpperCamelCase`; operation, parameter and enumeration-member 
 except for enumeration values which use `UPPER_SNAKE_CASE`. Names defined by this specification are reproduced
 as-is in the UML class diagram (<<sec_class_diagram>>).
 
-==== Language-agnostic types
+==== Data types
 
-The following symbolic type names are used in operation signatures and are mapped, in each binding, to the closest
-equivalent native type. Implementations MUST preserve the semantic intent rather than the syntactic form.
+The following type names, whose notation is inspired by the Kotlin language, are used in operation signatures
+and are mapped, in each binding, to the closest equivalent native type. Implementations MUST preserve the
+semantic intent rather than the syntactic form.
 
 [cols="^.^1,.^3,.^3", options="header"]
 |===
-| Symbolic type   | Description                                                     | Typical bindings
-| `string`        | Sequence of characters, UTF-8 encoded by default.                | `String`, `string`, `str`.
-| `boolean`       | Two-state truth value.                                           | `boolean`, `bool`.
-| `integer`       | Signed 32-bit integer.                                           | `int`, `Int32`.
-| `long`          | Signed 64-bit integer.                                           | `long`, `Int64`.
-| `byte array`    | Ordered sequence of octets.                                      | `byte[]`, `[u8]`, `bytes`.
-| `list<T>`       | Ordered collection of `T` values, may contain duplicates.        | `List<T>`, `Vec<T>`.
-| `set<T>`        | Unordered collection of unique `T` values.                       | `Set<T>`, `HashSet<T>`.
-| `map<K,V>`      | Associative array binding keys of type `K` to values of type `V`.| `Map<K,V>`, `Dictionary<K,V>`.
-| `unit`          | Indicates that an operation returns no value.                    | `void`, `Unit`, `None`.
+| Type            | Description                                                     | Typical bindings
+| `String`        | Sequence of characters, UTF-8 encoded by default.                | `String`, `string`, `str`.
+| `Boolean`       | Two-state truth value.                                           | `boolean`, `bool`.
+| `Int`           | Signed 32-bit integer.                                           | `int`, `Int32`, `i32`.
+| `Long`          | Signed 64-bit integer.                                           | `long`, `Int64`, `i64`.
+| `ByteArray`     | Ordered sequence of octets.                                      | `byte[]`, `[u8]`, `bytes`.
+| `List<T>`       | Ordered collection of `T` values, may contain duplicates.        | `List<T>`, `Vec<T>`.
+| `Set<T>`        | Unordered collection of unique `T` values.                       | `Set<T>`, `HashSet<T>`.
+| `Map<K,V>`      | Associative array binding keys of type `K` to values of type `V`.| `Map<K,V>`, `Dictionary<K,V>`, `HashMap<K,V>`.
+| `Unit`          | Indicates that an operation returns no value.                    | `void`, `Unit`, `None`, `()`.
 |===
 
 ==== Type tables
@@ -246,7 +248,7 @@ Each operation defined in this document is described by a table of the form:
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | The operation's language-agnostic signature.
+| Signature   | The operation's signature.
 | Since       | The version of the API in which the operation was introduced.
 | Description | A normative description of the operation's behaviour.
 | Parameters  | A description of each input parameter.
@@ -266,7 +268,7 @@ not restated for each operation:
 * *Non-`null` results.* Unless the return type is marked nullable (`T?`) or the *Returns* row states otherwise, an
   operation returns a non-`null` value.
 * *Collections.* Unless the return type is marked nullable (`T?`), an operation whose return type is a collection
-  (e.g. `list`, `set`, `map`) returns an empty collection rather than `null`.
+  (e.g. `List`, `Set`, `Map`) returns an empty collection rather than `null`.
 * *Fluent composition.* Builder-style operations return the current instance so that calls can be chained.
 
 ==== Concurrency
@@ -547,7 +549,7 @@ include::uml/class-diagram.puml[Terminal Reader API class diagram]
 | Name      | Type     | Since | Description
 
 | `VERSION`
-| `string`
+| `String`
 | 1.0
 | String representation of the version of the API implemented by the conforming binding (e.g. `"3.0"`).
   The value is a dotted decimal of the form `MAJOR.MINOR`.
@@ -629,7 +631,7 @@ fluent composition. Setters that are not called default to the values specified 
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `setEcpFrame(ecpFrame: byte array) -> CardDetectionSettings`
+| Signature   | `setEcpFrame(ecpFrame: ByteArray) -> CardDetectionSettings`
 | Since       | 3.0
 | Description
 | Provides the ECP (Enhanced Contactless Polling) frame to emit at polling startup. The frame is treated by this
@@ -650,7 +652,7 @@ fluent composition. Setters that are not called default to the values specified 
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `setRfTechnologies(rfTechnologies: set<RfTechnology>) -> CardDetectionSettings`
+| Signature   | `setRfTechnologies(rfTechnologies: Set<RfTechnology>) -> CardDetectionSettings`
 | Since       | 3.0
 | Description
 | Declares the set of RF technologies the reader activates during polling. The `RfTechnology` enumeration is
@@ -681,10 +683,10 @@ fluent composition. Setters that are not called default to the values specified 
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `getName() -> string`
+| Signature   | `getName() -> String`
 | Since       | 1.0
 | Description | Returns the name of the reader.
-| Returns     | A non-empty `string` identifying the reader. The value is stable for the lifetime of the reader instance.
+| Returns     | A non-empty `String` identifying the reader. The value is stable for the lifetime of the reader instance.
 | Throws      | None.
 |===
 
@@ -693,7 +695,7 @@ fluent composition. Setters that are not called default to the values specified 
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `isCardPresent() -> boolean`
+| Signature   | `isCardPresent() -> Boolean`
 | Since       | 1.0
 | Description
 | Indicates whether a card is currently detected by the reader. What counts as *present* depends on the reader's
@@ -709,7 +711,7 @@ fluent composition. Setters that are not called default to the values specified 
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `isContactless() -> boolean`
+| Signature   | `isContactless() -> Boolean`
 | Since       | 1.0
 | Description | Indicates whether the card communication mode is contactless.
 | Returns     | `true` if the communication mode is contactless, `false` otherwise.
@@ -736,10 +738,10 @@ card selection response. The circumstances under which each event type is emitte
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `getReaderName() -> string`
+| Signature   | `getReaderName() -> String`
 | Since       | 1.0
 | Description | Returns the name of the reader that generated the event.
-| Returns     | A non-empty `string`.
+| Returns     | A non-empty `String`.
 | Throws      | None.
 |===
 
@@ -796,7 +798,7 @@ implementation-agnostic view over the readers currently registered in the enviro
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `findReader(readerNameRegex: string) -> CardReader?`
+| Signature   | `findReader(readerNameRegex: String) -> CardReader?`
 | Since       | 3.0
 | Description
 | Returns the first reader whose name matches the supplied regular expression. This lookup is convenient when reader
@@ -812,7 +814,7 @@ implementation-agnostic view over the readers currently registered in the enviro
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `getReader(readerName: string) -> CardReader?`
+| Signature   | `getReader(readerName: String) -> CardReader?`
 | Since       | 3.0
 | Description | Returns the reader whose name exactly matches the supplied string.
 | Parameters  | `readerName` -- the exact name of the reader to retrieve.
@@ -825,10 +827,10 @@ implementation-agnostic view over the readers currently registered in the enviro
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `getReaderNames() -> set<string>`
+| Signature   | `getReaderNames() -> Set<String>`
 | Since       | 3.0
 | Description | Returns the names of all readers currently registered in the execution environment.
-| Returns     | A `set` of reader names; empty if no reader is registered.
+| Returns     | A `Set` of reader names; empty if no reader is registered.
 | Throws      | None.
 |===
 
@@ -837,10 +839,10 @@ implementation-agnostic view over the readers currently registered in the enviro
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `getReaders() -> set<CardReader>`
+| Signature   | `getReaders() -> Set<CardReader>`
 | Since       | 3.0
 | Description | Returns all readers currently registered in the execution environment.
-| Returns     | A `set` of <<type_CardReader,`CardReader`>> references; empty if no reader is registered.
+| Returns     | A `Set` of <<type_CardReader,`CardReader`>> references; empty if no reader is registered.
 | Throws      | None.
 |===
 
@@ -884,10 +886,10 @@ of the call.
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `exportCardSelectionScenario() -> string`
+| Signature   | `exportCardSelectionScenario() -> String`
 | Since       | 1.1
-| Description | Exports the content of the current prepared selection scenario as a `string`. The result MAY be imported into the same or another `CardSelectionManager` via `importCardSelectionScenario`.
-| Returns     | A non-empty `string`.
+| Description | Exports the content of the current prepared selection scenario as a `String`. The result MAY be imported into the same or another `CardSelectionManager` via `importCardSelectionScenario`.
+| Returns     | A non-empty `String`.
 | Throws      | None.
 | See also    | <<op_CardSelectionManager_importCardSelectionScenario,`importCardSelectionScenario`>>
 |===
@@ -897,10 +899,10 @@ of the call.
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `exportProcessedCardSelectionScenario() -> string`
+| Signature   | `exportProcessedCardSelectionScenario() -> String`
 | Since       | 1.3
 | Description
-| Exports the content of the previously processed selection scenario as a `string`. The result MAY be imported
+| Exports the content of the previously processed selection scenario as a `String`. The result MAY be imported
   through `importProcessedCardSelectionScenario`.
 
   *Prerequisite:* the selection scenario MUST have been processed previously via `processCardSelectionScenario`,
@@ -910,7 +912,7 @@ of the call.
   `CardSelectionResult` produced locally will not contain any active selection. In that case, the processed
   scenario MUST be exported so that it can be re-imported and interpreted on a manager which has the relevant
   card extensions.
-| Returns     | A non-empty `string`.
+| Returns     | A non-empty `String`.
 | Throws      | `IllegalStateException` -- if the scenario has not yet been processed or has failed.
 | See also    | <<op_CardSelectionManager_importProcessedCardSelectionScenario,`importProcessedCardSelectionScenario`>>
 |===
@@ -920,10 +922,10 @@ of the call.
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `importCardSelectionScenario(cardSelectionScenario: string) -> integer`
+| Signature   | `importCardSelectionScenario(cardSelectionScenario: String) -> Int`
 | Since       | 1.1
 | Description | Imports a previously exported scenario. The input MUST have been produced by `exportCardSelectionScenario`.
-| Parameters  | `cardSelectionScenario` -- the `string` containing the exported card selection scenario.
+| Parameters  | `cardSelectionScenario` -- the `String` containing the exported card selection scenario.
 | Returns     | The index of the last imported selection in the scenario.
 | Throws      | `IllegalArgumentException` -- if the string is malformed.
 | See also    | <<op_CardSelectionManager_exportCardSelectionScenario,`exportCardSelectionScenario`>>
@@ -936,7 +938,7 @@ of the call.
 |===
 | Signature
 | `importProcessedCardSelectionScenario(` +
-`{nbsp}{nbsp}{nbsp}{nbsp}processedCardSelectionScenario: string` +
+`{nbsp}{nbsp}{nbsp}{nbsp}processedCardSelectionScenario: String` +
 `) -> CardSelectionResult`
 | Since       | 1.3
 | Description
@@ -945,7 +947,7 @@ of the call.
   *Prerequisites:* the input MUST have been produced by `exportProcessedCardSelectionScenario`; the local
   environment MUST possess every card extension involved; the current manager MUST first have been configured
   with the same selection scenario as the manager that produced the export.
-| Parameters  | `processedCardSelectionScenario` -- the `string` containing the exported processed card selection scenario.
+| Parameters  | `processedCardSelectionScenario` -- the `String` containing the exported processed card selection scenario.
 | Returns     | A <<type_CardSelectionResult,`CardSelectionResult`>>.
 | Throws
 | `IllegalArgumentException` -- if the string is malformed or contains more selection cases than the
@@ -979,7 +981,7 @@ of the call.
 | `prepareSelection(` +
 `{nbsp}{nbsp}{nbsp}{nbsp}cardSelector: CardSelector<?>,` +
 `{nbsp}{nbsp}{nbsp}{nbsp}cardSelectionExtension: CardSelectionExtension` +
-`) -> integer`
+`) -> Int`
 | Since       | 2.0
 | Description
 | Appends a selection case to the scenario. The returned index gives the position of the selection in the
@@ -988,7 +990,7 @@ of the call.
 | Parameters
 | `cardSelector` (<<type_CardSelector,`CardSelector`>>) -- the card selector containing the filters to be used to select the card. +
   `cardSelectionExtension` (<<type_CardSelectionExtension,`CardSelectionExtension`>>) -- the card selection extension to be used to parse the card selection response.
-| Returns      | A non-negative `integer` -- the index of the appended selection case.
+| Returns      | A non-negative `Int` -- the index of the appended selection case.
 | Throws      | None.
 |===
 
@@ -1052,7 +1054,7 @@ of the call.
 `{nbsp}{nbsp}{nbsp}{nbsp}observableCardReader: ObservableCardReader,` +
 `{nbsp}{nbsp}{nbsp}{nbsp}cardPresenceNotificationPolicy: CardPresenceNotificationPolicy,` +
 `{nbsp}{nbsp}{nbsp}{nbsp}selectionExecutionPolicy: SelectionExecutionPolicy` +
-`) -> unit`
+`) -> Unit`
 | Since       | 3.0
 | Description
 | Schedules the execution of the prepared selection scenario as soon as a card is presented to the supplied
@@ -1088,10 +1090,10 @@ to the active selected card. In multi-channel mode, several active selections ma
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `getActiveSelectionIndex() -> integer`
+| Signature   | `getActiveSelectionIndex() -> Int`
 | Since       | 1.0
 | Description | Returns the index of the active selection, if any. Identical to the first element of `getActiveSelectionIndexes()` when applicable.
-| Returns     | A non-negative `integer` if an active selection exists, `-1` otherwise.
+| Returns     | A non-negative `Int` if an active selection exists, `-1` otherwise.
 | Throws      | None.
 |===
 
@@ -1100,10 +1102,10 @@ to the active selected card. In multi-channel mode, several active selections ma
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `getActiveSelectionIndexes() -> list<integer>`
+| Signature   | `getActiveSelectionIndexes() -> List<Int>`
 | Since       | 3.0
 | Description | Returns the indexes of all active selections, one per channel in multi-channel mode.
-| Returns     | A possibly empty list of non-negative `integer` values.
+| Returns     | A possibly empty list of non-negative `Int` values.
 | Throws      | None.
 |===
 
@@ -1143,7 +1145,7 @@ to the active selected card. In multi-channel mode, several active selections ma
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `getSmartCards() -> map<integer, SmartCard>`
+| Signature   | `getSmartCards() -> Map<Int, SmartCard>`
 | Since       | 1.0
 | Description | Returns all <<type_SmartCard,`SmartCard`>> instances corresponding to successful selection cases, indexed by the value returned by `prepareSelection`.
 | Returns     | A possibly empty map.
@@ -1191,7 +1193,7 @@ card is not selected if at least one of them rejects it.
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `filterByPowerOnData(powerOnDataRegex: string) -> T`
+| Signature   | `filterByPowerOnData(powerOnDataRegex: String) -> T`
 | Since       | 2.0
 | Description | Restricts the selection process to cards whose power-on data, as provided by the reader, matches a specific regular expression.
 | Parameters  | `powerOnDataRegex` -- the regular expression to use as filter.
@@ -1222,13 +1224,13 @@ defined, the card is not selected as soon as one of them rejects it.
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `filterByDfName(aid: byte array) -> IsoCardSelector`
+| Signature   | `filterByDfName(aid: ByteArray) -> IsoCardSelector`
 | Since       | 2.0
 | Description
 | Selects a card application DF by its name. The DF is selected only if its name starts with the provided AID,
   as defined by ISO/IEC 7816-4 § 4.2.
   The provided AID is used as a parameter of the *Select Application* ISO card command.
-| Parameters  | `aid` -- the AID as a `byte array` containing 5 to 16 bytes.
+| Parameters  | `aid` -- the AID as a `ByteArray` containing 5 to 16 bytes.
 | Returns     | The current instance (<<type_IsoCardSelector,`IsoCardSelector`>>).
 | Throws      | `IllegalArgumentException` -- if the provided array is out of range.
 |===
@@ -1238,10 +1240,10 @@ defined, the card is not selected as soon as one of them rejects it.
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `filterByDfName(aid: string) -> IsoCardSelector`
+| Signature   | `filterByDfName(aid: String) -> IsoCardSelector`
 | Since       | 2.0
 | Description | Selects a card application DF by its name. The AID is provided as a hexadecimal string. Semantics are otherwise identical to the byte-array overload.
-| Parameters  | `aid` -- the AID as a hexadecimal `string` of 5 to 16 bytes.
+| Parameters  | `aid` -- the AID as a hexadecimal `String` of 5 to 16 bytes.
 | Returns     | The current instance (<<type_IsoCardSelector,`IsoCardSelector`>>).
 | Throws      | `IllegalArgumentException` -- if the provided string is invalid or out of range.
 |===
@@ -1299,7 +1301,7 @@ The reader's complete insertion/processing/removal lifecycle -- including when e
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `endCardProcessing() -> unit`
+| Signature   | `endCardProcessing() -> Unit`
 | Since       | 3.0
 | Description
 a| Notifies the reader that the *business processing* of the current card has been completed. Upon receiving this
@@ -1328,7 +1330,7 @@ the end of a card processing whatever the outcome.
 | `startCardDetection(` +
 `{nbsp}{nbsp}{nbsp}{nbsp}settings: CardDetectionSettings,` +
 `{nbsp}{nbsp}{nbsp}{nbsp}eventHandler: CardReaderEventHandler` +
-`) -> unit`
+`) -> Unit`
 | Since       | 3.0
 | Description
 | Activates card detection. Once activated, the application is notified of card events through the registered
@@ -1350,7 +1352,7 @@ the end of a card processing whatever the outcome.
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `stopCardDetection() -> unit`
+| Signature   | `stopCardDetection() -> Unit`
 | Since       | 1.0
 | Description | Stops card detection. After this operation has returned, the registered event handler does not receive card events until detection is restarted.
 | Throws      | None.
@@ -1481,10 +1483,10 @@ This SPI unifies the reception of nominal events (`onReaderEvent`) and of fatal 
 |===
 | Signature
 | `onReaderError(` +
-`{nbsp}{nbsp}{nbsp}{nbsp}context: string,` +
-`{nbsp}{nbsp}{nbsp}{nbsp}readerName: string,` +
-`{nbsp}{nbsp}{nbsp}{nbsp}e: throwable` +
-`) -> unit`
+`{nbsp}{nbsp}{nbsp}{nbsp}context: String,` +
+`{nbsp}{nbsp}{nbsp}{nbsp}readerName: String,` +
+`{nbsp}{nbsp}{nbsp}{nbsp}e: Throwable` +
+`) -> Unit`
 | Since       | 3.0
 | Description
 | Called when a fatal error occurs on the observed reader. After the operation returns, the observation process
@@ -1501,7 +1503,7 @@ This SPI unifies the reception of nominal events (`onReaderEvent`) and of fatal 
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `onReaderEvent(cardReaderEvent: CardReaderEvent) -> unit`
+| Signature   | `onReaderEvent(cardReaderEvent: CardReaderEvent) -> Unit`
 | Since       | 3.0
 | Description
 | Called when a reader event occurs. Dispatch is *sequential* and *synchronous* unless a different policy is
@@ -1547,7 +1549,7 @@ minimise network exchanges, which is especially valuable in distributed architec
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `processCommands() -> unit`
+| Signature   | `processCommands() -> Unit`
 | Since       | 3.0
 | Description
 | Processes all previously prepared commands.
@@ -1613,7 +1615,7 @@ always present.
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `getSelectApplicationResponse() -> byte array?`
+| Signature   | `getSelectApplicationResponse() -> ByteArray?`
 | Since       | 1.0
 | Description | Returns the data received from the card in response to the *Select Application* command, including the status word.
 | Returns     | The non-empty response bytes, or `null` if no *Select Application* command has been performed.
@@ -1625,7 +1627,7 @@ always present.
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `isBasicChannel() -> boolean`
+| Signature   | `isBasicChannel() -> Boolean`
 | Since       | 3.0
 | Description
 | Indicates whether this smart card is attached to the basic channel (channel `0`) of the underlying ISO/IEC 7816-4
@@ -1658,7 +1660,7 @@ This contract MAY be obtained either:
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `closeChannel() -> unit`
+| Signature   | `closeChannel() -> Unit`
 | Since       | 3.0
 | Description | Closes the underlying logical channel without processing any pending command. This operation is idempotent: calling it on an already-closed channel has no effect.
 | Throws
@@ -1671,7 +1673,7 @@ This contract MAY be obtained either:
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `processCommandsAndCloseChannel() -> unit`
+| Signature   | `processCommandsAndCloseChannel() -> Unit`
 | Since       | 3.0
 | Description | Processes all previously prepared commands and, upon success, closes the underlying logical channel. If any command fails, the channel is left open, as with `processCommands`.
 | Throws
@@ -1700,7 +1702,7 @@ selection.
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `getPowerOnData() -> string?`
+| Signature   | `getPowerOnData() -> String?`
 | Since       | 1.0
 | Description
 a| Returns the card's power-on data, as collected by the reader at the moment the card was inserted.
@@ -1711,7 +1713,7 @@ a| Returns the card's power-on data, as collected by the reader at the moment th
   including for example elements from the anti-collision stage of ISO/IEC 14443 (ATQA, ATQB, ATS, SAK, etc.)
   or any proprietary definitions.
 
-Because this data varies from one reader to another, it is exposed here as a `string` that MAY be either a
+Because this data varies from one reader to another, it is exposed here as a `String` that MAY be either a
 hexadecimal string or any other relevant representation.
 | Returns     | The non-empty power-on data, or `null` if no power-on data is available.
 | Throws      | None.
@@ -1724,7 +1726,7 @@ hexadecimal string or any other relevant representation.
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature   | `isActive() -> boolean`
+| Signature   | `isActive() -> Boolean`
 | Since       | 3.0
 | Description
 a| Returns whether this smart card is currently active on its logical channel.

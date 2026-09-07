@@ -72,52 +72,52 @@ end legend
 package "reader" as reader {
 
 +class "**final** ReaderApiProperties" as ApiProperties <<green>> {
-    +{static} **final** VERSION: string
+    +{static} **final** VERSION: String
 }
 +interface "ReaderApiFactory" as ReaderApiFactory <<blue>> {
-    +<color:blue>getCardReaderProvider() -> CardReaderProvider
+    +<color:blue>getCardReaderProvider() → CardReaderProvider
 
-    +createCardSelectionManager() -> CardSelectionManager
+    +createCardSelectionManager() → CardSelectionManager
 
-    +createBasicCardSelector() -> BasicCardSelector
-    +createIsoCardSelector() -> IsoCardSelector
+    +createBasicCardSelector() → BasicCardSelector
+    +createIsoCardSelector() → IsoCardSelector
 
-    +<color:blue>createCardDetectionSettings() -> CardDetectionSettings
+    +<color:blue>createCardDetectionSettings() → CardDetectionSettings
 }
 
 +interface "<color:blue>CardReaderProvider" as CardReaderProvider <<blue>> {
-    +<color:blue>getReaderNames() -> set<string>
-    +<color:blue>getReaders() -> set<CardReader>
-    +<color:blue>getReader(readerName: string) -> CardReader?
-    +<color:blue>findReader(readerNameRegex: string) -> CardReader?
+    +<color:blue>getReaderNames() → Set<String>
+    +<color:blue>getReaders() → Set<CardReader>
+    +<color:blue>getReader(readerName: String) → CardReader?
+    +<color:blue>findReader(readerNameRegex: String) → CardReader?
 }
 
 ' SERVICE
 +interface CardReader {
-    +getName() -> string
-    +isContactless() -> boolean
+    +getName() → String
+    +isContactless() → Boolean
 
-    +isCardPresent() -> boolean
+    +isCardPresent() → Boolean
 }
 +interface "ObservableCardReader" as ObservableCardReader extends CardReader {
-    +<color:blue>startCardDetection(settings: CardDetectionSettings, eventHandler: CardReaderEventHandler) -> unit
-    +stopCardDetection() -> unit
+    +<color:blue>startCardDetection(settings: CardDetectionSettings, eventHandler: CardReaderEventHandler) → Unit
+    +stopCardDetection() → Unit
 
-    +<color:blue>endCardProcessing() -> unit
+    +<color:blue>endCardProcessing() → Unit
 }
 +interface "<color:blue>CardDetectionSettings" as CardDetectionSettings <<blue>> {
-    +<color:blue>setDetectionMode(detectionMode: DetectionMode) -> CardDetectionSettings
-    +<color:blue>setRfTechnologies(rfTechnologies: set<<back:yellow>RfTechnology</back>>) -> CardDetectionSettings
-    +<color:blue>setEcpFrame(ecpFrame: byte array) -> CardDetectionSettings
+    +<color:blue>setDetectionMode(detectionMode: DetectionMode) → CardDetectionSettings
+    +<color:blue>setRfTechnologies(rfTechnologies: Set<<back:yellow>RfTechnology</back>>) → CardDetectionSettings
+    +<color:blue>setEcpFrame(ecpFrame: ByteArray) → CardDetectionSettings
 }
 +enum DetectionMode <<green>> {
     REPEATING
     <color:blue>SINGLE_SHOT
 }
 +interface CardReaderEvent {
-    +getReaderName() -> string
-    +getType() -> Type
-    +getScheduledCardSelectionsResponse() -> ScheduledCardSelectionsResponse?
+    +getReaderName() → String
+    +getType() → Type
+    +getScheduledCardSelectionsResponse() → ScheduledCardSelectionsResponse?
 }
 +enum "Type" as CardReaderEventType <<green>> {
     CARD_INSERTED
@@ -128,8 +128,8 @@ package "reader" as reader {
 ' SPI
 package "spi" as readerSpi {
     +interface "<color:blue>CardReaderEventHandler" as CardReaderEventHandler <<red>> {
-        +<color:blue>onReaderEvent(cardReaderEvent: CardReaderEvent) -> unit
-        +<color:blue>onReaderError(context: string, readerName: string, e: throwable) -> unit
+        +<color:blue>onReaderEvent(cardReaderEvent: CardReaderEvent) → Unit
+        +<color:blue>onReaderError(context: String, readerName: String, e: Throwable) → Unit
     }
 }
 
@@ -137,20 +137,20 @@ package "spi" as readerSpi {
 package "selection" as selectionApi {
     ' Selection
     +interface CardSelectionManager <<blue>> {
-        +prepareSelection(cardSelector: CardSelector<?>, cardSelectionExtension: CardSelectionExtension) -> integer
+        +prepareSelection(cardSelector: CardSelector<?>, cardSelectionExtension: CardSelectionExtension) → Int
 
-        +exportCardSelectionScenario() -> string
-        +importCardSelectionScenario(cardSelectionScenario: string) -> integer
+        +exportCardSelectionScenario() → String
+        +importCardSelectionScenario(cardSelectionScenario: String) → Int
 
-        +<color:blue>processCardSelectionScenario(reader: CardReader, selectionExecutionPolicy: SelectionExecutionPolicy) -> CardSelectionResult
+        +<color:blue>processCardSelectionScenario(reader: CardReader, selectionExecutionPolicy: SelectionExecutionPolicy) → CardSelectionResult
 
-        +<color:blue>scheduleCardSelectionScenario(observableCardReader: ObservableCardReader, cardPresenceNotificationPolicy: CardPresenceNotificationPolicy, selectionExecutionPolicy: SelectionExecutionPolicy) -> unit
-        +parseScheduledCardSelectionsResponse(scheduledCardSelectionsResponse: ScheduledCardSelectionsResponse) -> CardSelectionResult
+        +<color:blue>scheduleCardSelectionScenario(observableCardReader: ObservableCardReader, cardPresenceNotificationPolicy: CardPresenceNotificationPolicy, selectionExecutionPolicy: SelectionExecutionPolicy) → Unit
+        +parseScheduledCardSelectionsResponse(scheduledCardSelectionsResponse: ScheduledCardSelectionsResponse) → CardSelectionResult
 
-        +<color:blue>processMultichannelCardSelectionScenario(reader: CardReader, channelSelectionPolicy: ChannelSelectionPolicy) -> CardSelectionResult
+        +<color:blue>processMultichannelCardSelectionScenario(reader: CardReader, channelSelectionPolicy: ChannelSelectionPolicy) → CardSelectionResult
 
-        +exportProcessedCardSelectionScenario() -> string
-        +importProcessedCardSelectionScenario(processedCardSelectionScenario: string) -> CardSelectionResult
+        +exportProcessedCardSelectionScenario() → String
+        +importProcessedCardSelectionScenario(processedCardSelectionScenario: String) → CardSelectionResult
     }
     +enum "<color:blue>CardPresenceNotificationPolicy" as CardPresenceNotificationPolicy <<green>> {
         <color:blue>ALWAYS
@@ -165,17 +165,17 @@ package "selection" as selectionApi {
         <color:blue>LOGICAL_CHANNEL_ONLY
     }
     +interface "CardSelector<T : CardSelector<T>>" as CardSelector {
-        +<color:blue>filterByCardType(cardType: <back:yellow>CardType</back>) -> T
-        +filterByPowerOnData(powerOnDataRegex: string) -> T
+        +<color:blue>filterByCardType(cardType: <back:yellow>CardType</back>) → T
+        +filterByPowerOnData(powerOnDataRegex: String) → T
     }
     +interface "BasicCardSelector" as BasicCardSelector <<blue>> extends CardSelector {
     }
     +interface "IsoCardSelector" as IsoCardSelector <<blue>> extends CardSelector {
-        +filterByDfName(aid: byte array) -> IsoCardSelector
-        +filterByDfName(aid: string) -> IsoCardSelector
+        +filterByDfName(aid: ByteArray) → IsoCardSelector
+        +filterByDfName(aid: String) → IsoCardSelector
 
-        +setFileOccurrence(fileOccurrence: FileOccurrence) -> IsoCardSelector
-        +setFileControlInformation(fileControlInformation: FileControlInformation) -> IsoCardSelector
+        +setFileOccurrence(fileOccurrence: FileOccurrence) → IsoCardSelector
+        +setFileControlInformation(fileControlInformation: FileControlInformation) → IsoCardSelector
     }
     +enum "FileOccurrence" as FileOccurrence <<green>> {
         FIRST
@@ -195,20 +195,20 @@ package "selection" as selectionApi {
         +interface "CardSelectionExtension" as CardSelectionExtension <<red>> {
         }
         +interface "SmartCard" as SmartCard <<red>> {
-            +getPowerOnData() -> string?
-            +<color:blue>isActive() -> boolean
+            +getPowerOnData() → String?
+            +<color:blue>isActive() → Boolean
         }
         +interface "IsoSmartCard" as IsoSmartCard <<red>> extends SmartCard {
-            +getSelectApplicationResponse() -> byte array?
-            +<color:blue>isBasicChannel() -> boolean
+            +getSelectApplicationResponse() → ByteArray?
+            +<color:blue>isBasicChannel() → Boolean
         }
     }
     +interface CardSelectionResult {
-        +<color:blue>getCardType() -> <back:yellow>CardType</back>
-        +getSmartCards() -> map<integer, SmartCard>
-        +getActiveSmartCard() -> SmartCard?
-        +getActiveSelectionIndex() -> integer
-        +<color:blue>getActiveSelectionIndexes() -> list<integer>
+        +<color:blue>getCardType() → <back:yellow>CardType</back>
+        +getSmartCards() → Map<Int, SmartCard>
+        +getActiveSmartCard() → SmartCard?
+        +getActiveSelectionIndex() → Int
+        +<color:blue>getActiveSelectionIndexes() → List<Int>
     }
     +interface ScheduledCardSelectionsResponse {
     }
@@ -218,14 +218,14 @@ package "selection" as selectionApi {
 package "transaction" as transactionApi {
     package "spi" as transactionSpi {
         +interface "CardTransactionManager" as CardTransactionManager <<red>> {
-            +<color:blue>processCommands() -> unit
+            +<color:blue>processCommands() → Unit
         }
         +interface "<color:blue>IsoCardTransactionManager" as IsoCardTransactionManager <<red>> extends CardTransactionManager {
-            +<color:blue>asMultichannelCardTransactionManager() -> MultichannelCardTransactionManager
+            +<color:blue>asMultichannelCardTransactionManager() → MultichannelCardTransactionManager
         }
         +interface "<color:blue>MultichannelCardTransactionManager" as MultichannelCardTransactionManager <<red>> extends CardTransactionManager {
-            +<color:blue>processCommandsAndCloseChannel() -> unit
-            +<color:blue>closeChannel() -> unit
+            +<color:blue>processCommandsAndCloseChannel() → Unit
+            +<color:blue>closeChannel() → Unit
         }
     }
 }
