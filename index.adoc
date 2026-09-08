@@ -253,7 +253,7 @@ Each operation defined in this document is described by a table of the form:
 | Description | A normative description of the operation's behaviour.
 | Parameters  | A description of each input parameter.
 | Returns     | A description of the returned value, if any.
-| Pre-conditions | The conditions the caller MUST satisfy before invoking the operation, each prefixed by its nature. Present only when applicable.
+| Pre-conditions | The conditions the caller MUST satisfy before invoking the operation, each prefixed by its nature.
 | Errors      | A list of error conditions a correct caller must handle, each mapped to a specific error type.
 | See also    | Cross-references to related operations or types, each a hyperlink to the corresponding table. Present only when applicable.
 |===
@@ -698,6 +698,7 @@ fluent composition. Setters that are not called default to the values specified 
 | Since       | 1.0
 | Description | Returns the name of the reader.
 | Returns     | A non-empty `String` identifying the reader. The value is stable for the lifetime of the reader instance.
+| Pre-conditions | None.
 | Errors      | None.
 |===
 
@@ -714,6 +715,7 @@ fluent composition. Setters that are not called default to the values specified 
   in the slot; on a *contactless* reader, a card is present when it lies within range of the antenna (in the RF
   field).
 | Returns     | `true` if a card is present -- inserted for a contact reader, or within the field for a contactless reader -- `false` otherwise.
+| Pre-conditions | None.
 | Errors      | <<type_ReaderCommunication,`ReaderCommunication`>> -- if the communication with the reader has failed.
 |===
 
@@ -726,6 +728,7 @@ fluent composition. Setters that are not called default to the values specified 
 | Since       | 1.0
 | Description | Indicates whether the card communication mode is contactless.
 | Returns     | `true` if the communication mode is contactless, `false` otherwise.
+| Pre-conditions | None.
 | Errors      | None.
 |===
 
@@ -753,6 +756,7 @@ card selection response. The circumstances under which each event type is emitte
 | Since       | 1.0
 | Description | Returns the name of the reader that generated the event.
 | Returns     | A non-empty `String`.
+| Pre-conditions | None.
 | Errors      | None.
 |===
 
@@ -773,6 +777,7 @@ card selection response. The circumstances under which each event type is emitte
   scenario, or on another `CardSelectionManager` sharing the same context -- that is, one that has previously
   prepared the same selection scenario.
 | Returns     | The scheduled card selections response (<<type_ScheduledCardSelectionsResponse,`ScheduledCardSelectionsResponse`>>), or `null` if no selection scenario has been scheduled.
+| Pre-conditions | None.
 | Errors      | None.
 |===
 
@@ -785,6 +790,7 @@ card selection response. The circumstances under which each event type is emitte
 | Since       | 1.0
 | Description | Returns the type of the event.
 | Returns     | A <<type_Type,`Type`>> value.
+| Pre-conditions | None.
 | Errors      | None.
 |===
 
@@ -845,6 +851,7 @@ implementation-agnostic view over the readers currently registered in the enviro
 | Since       | 3.0
 | Description | Returns the names of all readers currently registered in the execution environment.
 | Returns     | A `Set` of reader names; empty if no reader is registered.
+| Pre-conditions | None.
 | Errors      | None.
 |===
 
@@ -857,6 +864,7 @@ implementation-agnostic view over the readers currently registered in the enviro
 | Since       | 3.0
 | Description | Returns all readers currently registered in the execution environment.
 | Returns     | A `Set` of <<type_CardReader,`CardReader`>> references; empty if no reader is registered.
+| Pre-conditions | None.
 | Errors      | None.
 |===
 
@@ -904,6 +912,7 @@ of the call.
 | Since       | 1.1
 | Description | Exports the content of the current prepared selection scenario as a `String`. The result MAY be imported into the same or another `CardSelectionManager` via `importCardSelectionScenario`.
 | Returns     | A non-empty `String`.
+| Pre-conditions | None.
 | Errors      | None.
 | See also    | <<op_CardSelectionManager_importCardSelectionScenario,`importCardSelectionScenario`>>
 |===
@@ -1115,6 +1124,7 @@ to the active selected card. In multi-channel mode, several active selections ma
 | Since       | 1.0
 | Description | Returns the index of the active selection, if any. Identical to the first element of `getActiveSelectionIndexes()` when applicable.
 | Returns     | A non-negative `Int` if an active selection exists, `-1` otherwise.
+| Pre-conditions | None.
 | Errors      | None.
 |===
 
@@ -1127,6 +1137,7 @@ to the active selected card. In multi-channel mode, several active selections ma
 | Since       | 3.0
 | Description | Returns the indexes of all active selections, one per channel in multi-channel mode.
 | Returns     | A possibly empty list of non-negative `Int` values.
+| Pre-conditions | None.
 | Errors      | None.
 |===
 
@@ -1144,6 +1155,7 @@ to the active selected card. In multi-channel mode, several active selections ma
   returned. Use <<op_CardSelectionResult_getActiveSelectionIndexes,`getActiveSelectionIndexes`>> to obtain the full set of active
   selection indexes.
 | Returns     | The active <<type_SmartCard,`SmartCard`>>, or `null` if there is no active card.
+| Pre-conditions | None.
 | Errors      | None.
 |===
 
@@ -1158,6 +1170,7 @@ to the active selected card. In multi-channel mode, several active selections ma
 | Returns the type of the detected card, as defined by the `CardType` enumeration of the Terminal Definitions API
   (see <<ref_cna_td,CNA-TD-API>>). The returned value is intrinsically tied to the lifecycle of this `CardSelectionResult`.
 | Returns     | A `CardType` (<<ref_cna_td,CNA-TD-API>>). `UNKNOWN` is returned when the card type could not be identified.
+| Pre-conditions | None.
 | Errors      | None.
 |===
 
@@ -1170,6 +1183,7 @@ to the active selected card. In multi-channel mode, several active selections ma
 | Since       | 1.0
 | Description | Returns all <<type_SmartCard,`SmartCard`>> instances corresponding to successful selection cases, indexed by the value returned by `prepareSelection`.
 | Returns     | A possibly empty map.
+| Pre-conditions | None.
 | Errors      | None.
 |===
 
@@ -1348,6 +1362,7 @@ following the last selection (see <<sec_smartcard_lifecycle,the `SmartCard` life
 This operation is idempotent: calling it twice on the same card processing cycle has no effect after the
 first call. It is RECOMMENDED to call `endCardProcessing` systematically (e.g. inside a `finally` block) at
 the end of a card processing whatever the outcome.
+| Pre-conditions | None.
 | Errors      | None.
 |===
 
@@ -1386,6 +1401,7 @@ the end of a card processing whatever the outcome.
 | Signature   | `stopCardDetection() -> Unit`
 | Since       | 1.0
 | Description | Stops card detection. After this operation has returned, the registered event handler does not receive card events until detection is restarted.
+| Pre-conditions | None.
 | Errors      | None.
 |===
 
@@ -1416,6 +1432,7 @@ the API. It is provided as a single instance whose accessors each return a fresh
 a selection scenario. Use <<op_ReaderApiFactory_createIsoCardSelector,`createIsoCardSelector`>> when ISO/IEC 7816-4
 (AID-based) selection is required.
 | Returns     | A <<type_BasicCardSelector,`BasicCardSelector`>>.
+| Pre-conditions | None.
 | Errors      | None.
 |===
 
@@ -1430,6 +1447,7 @@ a selection scenario. Use <<op_ReaderApiFactory_createIsoCardSelector,`createIso
 | Creates a <<type_CardDetectionSettings,`CardDetectionSettings`>> carrying the configuration of a card detection
 cycle.
 | Returns     | A <<type_CardDetectionSettings,`CardDetectionSettings`>>.
+| Pre-conditions | None.
 | Errors      | None.
 |===
 
@@ -1444,6 +1462,7 @@ cycle.
 | Creates a <<type_CardSelectionManager,`CardSelectionManager`>>, the service used to prepare and execute a card
 selection scenario.
 | Returns     | A <<type_CardSelectionManager,`CardSelectionManager`>>.
+| Pre-conditions | None.
 | Errors      | None.
 |===
 
@@ -1458,6 +1477,7 @@ selection scenario.
 | Creates an <<type_IsoCardSelector,`IsoCardSelector`>> for ISO/IEC 7816-4 (AID-based) card selection. Use
 <<op_ReaderApiFactory_createBasicCardSelector,`createBasicCardSelector`>> for technology-agnostic selection.
 | Returns     | An <<type_IsoCardSelector,`IsoCardSelector`>>.
+| Pre-conditions | None.
 | Errors      | None.
 |===
 
@@ -1470,6 +1490,7 @@ selection scenario.
 | Since       | 3.0
 | Description | Returns the <<type_CardReaderProvider,`CardReaderProvider`>>, giving standardised access to the readers available in the execution environment.
 | Returns     | A <<type_CardReaderProvider,`CardReaderProvider`>>.
+| Pre-conditions | None.
 | Errors      | None.
 |===
 
@@ -1591,6 +1612,7 @@ minimise network exchanges, which is especially valuable in distributed architec
   to update the <<type_SmartCard,`SmartCard`>> associated with the transaction.
   For write commands, the `SmartCard` is updated only when the command is successful. The process is
   interrupted at the first failed command. The underlying logical channel is left open after processing.
+| Pre-conditions | None.
 | Errors
 | <<type_ReaderCommunication,`ReaderCommunication`>> -- if a communication error with the reader occurs. +
   <<type_CardCommunication,`CardCommunication`>> -- if a communication error with the card occurs. +
@@ -1623,6 +1645,7 @@ minimise network exchanges, which is especially valuable in distributed architec
 
   *Prerequisite:* the underlying ISO/IEC 7816-4 card MUST support multi-channel operation; otherwise an `InvalidCardResponse` is raised during command processing.
 | Returns     | A <<type_MultichannelCardTransactionManager,`MultichannelCardTransactionManager`>>.
+| Pre-conditions | None.
 | Errors      | <<type_InvalidCardResponse,`InvalidCardResponse`>> -- if the card does not support multi-channel.
 |===
 
@@ -1652,6 +1675,7 @@ always present.
 | Since       | 1.0
 | Description | Returns the data received from the card in response to the *Select Application* command, including the status word.
 | Returns     | The non-empty response bytes, or `null` if no *Select Application* command has been performed.
+| Pre-conditions | None.
 | Errors      | None.
 |===
 
@@ -1666,6 +1690,7 @@ always present.
 | Indicates whether this smart card is attached to the basic channel (channel `0`) of the underlying ISO/IEC 7816-4
   card, or to an additional logical channel.
 | Returns     | `true` if attached to the basic channel, `false` if attached to an additional logical channel.
+| Pre-conditions | None.
 | Errors      | None.
 |===
 
@@ -1696,6 +1721,7 @@ This contract MAY be obtained either:
 | Signature   | `closeChannel() -> Unit`
 | Since       | 3.0
 | Description | Closes the underlying logical channel without processing any pending command. This operation is idempotent: calling it on an already-closed channel has no effect.
+| Pre-conditions | None.
 | Errors
 | <<type_ReaderCommunication,`ReaderCommunication`>> -- if a communication error with the reader occurs. +
   <<type_CardCommunication,`CardCommunication`>> -- if a communication error with the card occurs.
@@ -1709,6 +1735,7 @@ This contract MAY be obtained either:
 | Signature   | `processCommandsAndCloseChannel() -> Unit`
 | Since       | 3.0
 | Description | Processes all previously prepared commands and, upon success, closes the underlying logical channel. If any command fails, the channel is left open, as with `processCommands`.
+| Pre-conditions | None.
 | Errors
 | <<type_ReaderCommunication,`ReaderCommunication`>> -- if a communication error with the reader occurs. +
   <<type_CardCommunication,`CardCommunication`>> -- if a communication error with the card occurs. +
@@ -1749,6 +1776,7 @@ a| Returns the card's power-on data, as collected by the reader at the moment th
 Because this data varies from one reader to another, it is exposed here as a `String` that MAY be either a
 hexadecimal string or any other relevant representation.
 | Returns     | The non-empty power-on data, or `null` if no power-on data is available.
+| Pre-conditions | None.
 | Errors      | None.
 |===
 
@@ -1780,6 +1808,7 @@ Until then, the reader holds the references to the `SmartCard` instances produce
 selection. Once a smart card has been deactivated, any further attempt to use it is detected prior to any
 actual exchange with the card.
 | Returns     | `true` if the smart card is active, `false` otherwise.
+| Pre-conditions | None.
 | Errors      | None.
 |===
 
