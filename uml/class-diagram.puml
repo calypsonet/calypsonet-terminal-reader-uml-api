@@ -23,6 +23,7 @@ skinparam stereotypeABorderColor #A9DCDF
 skinparam stereotypeIBorderColor #B4A7E5
 skinparam stereotypeCBorderColor #ADD1B2
 skinparam stereotypeEBorderColor #EB93DF
+skinparam stereotypeXBorderColor #D94321
 ' -- END --
 
 skinparam ClassBorderThickness 2
@@ -66,7 +67,7 @@ legend top
     *** <back:#EBF5FB><color:#3498DB><b>Factory or interface provided by the factory
     *** <back:#FEFECE><color:#D4AC0D><b>Interface that cannot be instantiated directly by the factory
     *** <back:#FDEDEC><color:#E74C3C><b>SPI (Service Provider Interface) to be provided by the end-user
-    *** <back:#E9F7EF><color:#27AE60><b>Class, enum or exception
+    *** <back:#E9F7EF><color:#27AE60><b>Class, enum or error
 end legend
 
 package "reader" as reader {
@@ -231,11 +232,16 @@ package "transaction" as transactionApi {
 }
 
 ' EXCEPTIONS
-+class "<<RuntimeException>>\nReaderCommunicationException" as ReaderCommunicationException <<green>> {
++class "<<errors>>\nReaderCommunication" as ReaderCommunication <<green>> {
 }
-+class "<<RuntimeException>>\nCardCommunicationException" as CardCommunicationException <<green>> {
++class "<<errors>>\nCardCommunication" as CardCommunication <<green>> {
 }
-+class "<<RuntimeException>>\nInvalidCardResponseException" as InvalidCardResponseException <<green>> {
++class "<<errors>>\nInvalidCardResponse" as InvalidCardResponse <<green>> {
+}
+exception "<i>«errors»" as errors <<grey>>  {
+    +<color:blue>ReaderCommunication
+    +<color:blue>CardCommunication
+    +<color:blue>InvalidCardResponse
 }
 
 }
@@ -280,8 +286,8 @@ IsoCardTransactionManager .right.> MultichannelCardTransactionManager #C_LINK : 
 ' == LAYOUT ==
 
 ReaderApiFactory -[hidden]right- ApiProperties
-ReaderCommunicationException -[hidden]- CardCommunicationException
-CardCommunicationException -[hidden]- InvalidCardResponseException
+ReaderCommunication -[hidden]- CardCommunication
+CardCommunication -[hidden]- InvalidCardResponse
 DetectionMode -[hidden]- CardTransactionManager
 
 ' == STYLE ==
