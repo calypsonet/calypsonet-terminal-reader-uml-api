@@ -253,7 +253,7 @@ Each operation defined in this document is described by a table of the form:
 | Description | A normative description of the operation's behaviour.
 | Parameters  | A description of each input parameter.
 | Returns     | A description of the returned value, if any.
-| Throws      | A list of error conditions, each mapped to a specific error type.
+| Errors      | A list of error conditions, each mapped to a specific error type.
 | See also    | Cross-references to related operations or types, each a hyperlink to the corresponding table. Present only when applicable.
 |===
 
@@ -262,9 +262,10 @@ Each operation defined in this document is described by a table of the form:
 To avoid repetition, the following rules apply to every operation table in <<sec_specification>> and are therefore
 not restated for each operation:
 
-* *Non-`null` arguments.* Unless explicitly stated otherwise, every input parameter MUST be non-`null`. An
-  implementation MUST raise `IllegalArgumentError` if a `null` value is supplied. This implicit `null` check is
-  not repeated in the *Throws* row, which states `None.` when no other error can occur.
+* *Non-`null` arguments.* Unless explicitly stated otherwise, every input parameter being non-`null` is an
+  implicit pre-condition of the operation. Checking it is the responsibility of the implementation, and failing
+  to meet that pre-condition MUST raise an illegal argument error. This implicit check is not restated in the
+  *Errors* row, which states `None.` when no other error can occur.
 * *Non-`null` results.* Unless the return type is marked nullable (`T?`) or the *Returns* row states otherwise, an
   operation returns a non-`null` value.
 * *Collections.* Unless the return type is marked nullable (`T?`), an operation whose return type is a collection
@@ -623,7 +624,7 @@ fluent composition. Setters that are not called default to the values specified 
   semantics of each value are given by the <<type_DetectionMode,`DetectionMode`>> enumeration.
 | Parameters  | `detectionMode` (<<type_DetectionMode,`DetectionMode`>>) -- the desired detection mode.
 | Returns     | The current instance (<<type_CardDetectionSettings,`CardDetectionSettings`>>).
-| Throws      | None.
+| Errors      | None.
 |===
 
 [[op_CardDetectionSettings_setEcpFrame]]
@@ -644,7 +645,7 @@ fluent composition. Setters that are not called default to the values specified 
   When this setter is not called, no ECP frame is emitted (default *none*; see the defaults above).
 | Parameters  | `ecpFrame` -- the non-empty ECP frame.
 | Returns     | The current instance (<<type_CardDetectionSettings,`CardDetectionSettings`>>).
-| Throws      | `IllegalArgumentError` -- if the provided array is empty.
+| Errors      | `IllegalArgumentError` -- if the provided array is empty.
 |===
 
 [[op_CardDetectionSettings_setRfTechnologies]]
@@ -663,7 +664,7 @@ fluent composition. Setters that are not called default to the values specified 
   When this setter is not called, the reader polls the default set `{ ISO_14443_AB }` (see the defaults above).
 | Parameters  | `rfTechnologies` -- the non-empty set of RF technologies to activate.
 | Returns     | The current instance (<<type_CardDetectionSettings,`CardDetectionSettings`>>).
-| Throws      | `IllegalArgumentError` -- if the provided set is empty.
+| Errors      | `IllegalArgumentError` -- if the provided set is empty.
 |===
 
 [[type_CardReader]]
@@ -687,7 +688,7 @@ fluent composition. Setters that are not called default to the values specified 
 | Since       | 1.0
 | Description | Returns the name of the reader.
 | Returns     | A non-empty `String` identifying the reader. The value is stable for the lifetime of the reader instance.
-| Throws      | None.
+| Errors      | None.
 |===
 
 [[op_CardReader_isCardPresent]]
@@ -703,7 +704,7 @@ fluent composition. Setters that are not called default to the values specified 
   in the slot; on a *contactless* reader, a card is present when it lies within range of the antenna (in the RF
   field).
 | Returns     | `true` if a card is present -- inserted for a contact reader, or within the field for a contactless reader -- `false` otherwise.
-| Throws      | <<type_ReaderCommunication,`ReaderCommunication`>> -- if the communication with the reader has failed.
+| Errors      | <<type_ReaderCommunication,`ReaderCommunication`>> -- if the communication with the reader has failed.
 |===
 
 [[op_CardReader_isContactless]]
@@ -715,7 +716,7 @@ fluent composition. Setters that are not called default to the values specified 
 | Since       | 1.0
 | Description | Indicates whether the card communication mode is contactless.
 | Returns     | `true` if the communication mode is contactless, `false` otherwise.
-| Throws      | None.
+| Errors      | None.
 |===
 
 [[type_CardReaderEvent]]
@@ -742,7 +743,7 @@ card selection response. The circumstances under which each event type is emitte
 | Since       | 1.0
 | Description | Returns the name of the reader that generated the event.
 | Returns     | A non-empty `String`.
-| Throws      | None.
+| Errors      | None.
 |===
 
 [[op_CardReaderEvent_getScheduledCardSelectionsResponse]]
@@ -762,7 +763,7 @@ card selection response. The circumstances under which each event type is emitte
   scenario, or on another `CardSelectionManager` sharing the same context -- that is, one that has previously
   prepared the same selection scenario.
 | Returns     | The scheduled card selections response (<<type_ScheduledCardSelectionsResponse,`ScheduledCardSelectionsResponse`>>), or `null` if no selection scenario has been scheduled.
-| Throws      | None.
+| Errors      | None.
 |===
 
 [[op_CardReaderEvent_getType]]
@@ -774,7 +775,7 @@ card selection response. The circumstances under which each event type is emitte
 | Since       | 1.0
 | Description | Returns the type of the event.
 | Returns     | A <<type_Type,`Type`>> value.
-| Throws      | None.
+| Errors      | None.
 |===
 
 [[type_CardReaderProvider]]
@@ -806,7 +807,7 @@ implementation-agnostic view over the readers currently registered in the enviro
   hard-code.
 | Parameters  | `readerNameRegex` -- the regular expression matched against the reader names.
 | Returns     | A <<type_CardReader,`CardReader`>> whose name matches the expression, or `null` if none matches.
-| Throws      | `IllegalArgumentError` -- if the supplied string is not a valid regular expression.
+| Errors      | `IllegalArgumentError` -- if the supplied string is not a valid regular expression.
 |===
 
 [[op_CardReaderProvider_getReader]]
@@ -819,7 +820,7 @@ implementation-agnostic view over the readers currently registered in the enviro
 | Description | Returns the reader whose name exactly matches the supplied string.
 | Parameters  | `readerName` -- the exact name of the reader to retrieve.
 | Returns     | A <<type_CardReader,`CardReader`>> whose name equals `readerName`, or `null` if no such reader is registered.
-| Throws      | None.
+| Errors      | None.
 |===
 
 [[op_CardReaderProvider_getReaderNames]]
@@ -831,7 +832,7 @@ implementation-agnostic view over the readers currently registered in the enviro
 | Since       | 3.0
 | Description | Returns the names of all readers currently registered in the execution environment.
 | Returns     | A `Set` of reader names; empty if no reader is registered.
-| Throws      | None.
+| Errors      | None.
 |===
 
 [[op_CardReaderProvider_getReaders]]
@@ -843,7 +844,7 @@ implementation-agnostic view over the readers currently registered in the enviro
 | Since       | 3.0
 | Description | Returns all readers currently registered in the execution environment.
 | Returns     | A `Set` of <<type_CardReader,`CardReader`>> references; empty if no reader is registered.
-| Throws      | None.
+| Errors      | None.
 |===
 
 [[type_CardSelectionManager]]
@@ -890,7 +891,7 @@ of the call.
 | Since       | 1.1
 | Description | Exports the content of the current prepared selection scenario as a `String`. The result MAY be imported into the same or another `CardSelectionManager` via `importCardSelectionScenario`.
 | Returns     | A non-empty `String`.
-| Throws      | None.
+| Errors      | None.
 | See also    | <<op_CardSelectionManager_importCardSelectionScenario,`importCardSelectionScenario`>>
 |===
 
@@ -913,7 +914,7 @@ of the call.
   scenario MUST be exported so that it can be re-imported and interpreted on a manager which has the relevant
   card extensions.
 | Returns     | A non-empty `String`.
-| Throws      | `IllegalStateError` -- if the scenario has not yet been processed or has failed.
+| Errors      | `IllegalStateError` -- if the scenario has not yet been processed or has failed.
 | See also    | <<op_CardSelectionManager_importProcessedCardSelectionScenario,`importProcessedCardSelectionScenario`>>
 |===
 
@@ -927,7 +928,7 @@ of the call.
 | Description | Imports a previously exported scenario. The input MUST have been produced by `exportCardSelectionScenario`.
 | Parameters  | `cardSelectionScenario` -- the `String` containing the exported card selection scenario.
 | Returns     | The index of the last imported selection in the scenario.
-| Throws      | `IllegalArgumentError` -- if the string is malformed.
+| Errors      | `IllegalArgumentError` -- if the string is malformed.
 | See also    | <<op_CardSelectionManager_exportCardSelectionScenario,`exportCardSelectionScenario`>>
 |===
 
@@ -949,7 +950,7 @@ of the call.
   with the same selection scenario as the manager that produced the export.
 | Parameters  | `processedCardSelectionScenario` -- the `String` containing the exported processed card selection scenario.
 | Returns     | A <<type_CardSelectionResult,`CardSelectionResult`>>.
-| Throws
+| Errors
 | `IllegalArgumentError` -- if the string is malformed or contains more selection cases than the
   current scenario. +
   <<type_InvalidCardResponse,`InvalidCardResponse`>> -- if the data returned by the card could not be interpreted.
@@ -969,7 +970,7 @@ of the call.
 | Description | Analyses the responses provided by a <<type_CardReaderEvent,`CardReaderEvent`>> following the insertion of a card and the execution of the scheduled selection scenario.
 | Parameters  | `scheduledCardSelectionsResponse` (<<type_ScheduledCardSelectionsResponse,`ScheduledCardSelectionsResponse`>>) -- the card selection scenario execution response.
 | Returns     | A <<type_CardSelectionResult,`CardSelectionResult`>>.
-| Throws      | <<type_InvalidCardResponse,`InvalidCardResponse`>> -- if the data returned by the card could not be interpreted.
+| Errors      | <<type_InvalidCardResponse,`InvalidCardResponse`>> -- if the data returned by the card could not be interpreted.
 |===
 
 [[op_CardSelectionManager_prepareSelection]]
@@ -991,7 +992,7 @@ of the call.
 | `cardSelector` (<<type_CardSelector,`CardSelector`>>) -- the card selector containing the filters to be used to select the card. +
   `cardSelectionExtension` (<<type_CardSelectionExtension,`CardSelectionExtension`>>) -- the card selection extension to be used to parse the card selection response.
 | Returns      | A non-negative `Int` -- the index of the appended selection case.
-| Throws      | None.
+| Errors      | None.
 |===
 
 [[op_CardSelectionManager_processCardSelectionScenario]]
@@ -1010,7 +1011,7 @@ of the call.
 | `reader` (<<type_CardReader,`CardReader`>>)                   -- the reader through which the card is reached. +
   `selectionExecutionPolicy` (<<type_SelectionExecutionPolicy,`SelectionExecutionPolicy`>>) -- the policy governing the iteration over selection cases.
 | Returns     | A <<type_CardSelectionResult,`CardSelectionResult`>>.
-| Throws
+| Errors
 | <<type_ReaderCommunication,`ReaderCommunication`>> -- if communication with the reader has failed. +
   <<type_CardCommunication,`CardCommunication`>> -- if communication with the card has failed. +
   <<type_InvalidCardResponse,`InvalidCardResponse`>> -- if the card returned invalid data during the selection process, or if the
@@ -1038,7 +1039,7 @@ of the call.
 | `reader` (<<type_CardReader,`CardReader`>>)                 -- the reader through which the card is reached. +
   `channelSelectionPolicy` (<<type_ChannelSelectionPolicy,`ChannelSelectionPolicy`>>) -- the policy governing the channels on which selections are placed.
 | Returns     | A <<type_CardSelectionResult,`CardSelectionResult`>>.
-| Throws
+| Errors
 | <<type_ReaderCommunication,`ReaderCommunication`>> -- if communication with the reader has failed. +
   <<type_CardCommunication,`CardCommunication`>> -- if communication with the card has failed. +
   <<type_InvalidCardResponse,`InvalidCardResponse`>> -- if the card does not support multi-channel or returned invalid data.
@@ -1065,7 +1066,7 @@ of the call.
 | `observableCardReader` (<<type_ObservableCardReader,`ObservableCardReader`>>)           -- the reader through which the card is reached. +
   `cardPresenceNotificationPolicy` (<<type_CardPresenceNotificationPolicy,`CardPresenceNotificationPolicy`>>) -- the desired card-presence notification policy. +
   `selectionExecutionPolicy` (<<type_SelectionExecutionPolicy,`SelectionExecutionPolicy`>>)       -- the policy governing the iteration over selection cases.
-| Throws      | None.
+| Errors      | None.
 |===
 
 [[type_CardSelectionResult]]
@@ -1094,7 +1095,7 @@ to the active selected card. In multi-channel mode, several active selections ma
 | Since       | 1.0
 | Description | Returns the index of the active selection, if any. Identical to the first element of `getActiveSelectionIndexes()` when applicable.
 | Returns     | A non-negative `Int` if an active selection exists, `-1` otherwise.
-| Throws      | None.
+| Errors      | None.
 |===
 
 [[op_CardSelectionResult_getActiveSelectionIndexes]]
@@ -1106,7 +1107,7 @@ to the active selected card. In multi-channel mode, several active selections ma
 | Since       | 3.0
 | Description | Returns the indexes of all active selections, one per channel in multi-channel mode.
 | Returns     | A possibly empty list of non-negative `Int` values.
-| Throws      | None.
+| Errors      | None.
 |===
 
 [[op_CardSelectionResult_getActiveSmartCard]]
@@ -1123,7 +1124,7 @@ to the active selected card. In multi-channel mode, several active selections ma
   returned. Use <<op_CardSelectionResult_getActiveSelectionIndexes,`getActiveSelectionIndexes`>> to obtain the full set of active
   selection indexes.
 | Returns     | The active <<type_SmartCard,`SmartCard`>>, or `null` if there is no active card.
-| Throws      | None.
+| Errors      | None.
 |===
 
 [[op_CardSelectionResult_getCardType]]
@@ -1137,7 +1138,7 @@ to the active selected card. In multi-channel mode, several active selections ma
 | Returns the type of the detected card, as defined by the `CardType` enumeration of the Terminal Definitions API
   (see <<ref_cna_td,CNA-TD-API>>). The returned value is intrinsically tied to the lifecycle of this `CardSelectionResult`.
 | Returns     | A `CardType` (<<ref_cna_td,CNA-TD-API>>). `UNKNOWN` is returned when the card type could not be identified.
-| Throws      | None.
+| Errors      | None.
 |===
 
 [[op_CardSelectionResult_getSmartCards]]
@@ -1149,7 +1150,7 @@ to the active selected card. In multi-channel mode, several active selections ma
 | Since       | 1.0
 | Description | Returns all <<type_SmartCard,`SmartCard`>> instances corresponding to successful selection cases, indexed by the value returned by `prepareSelection`.
 | Returns     | A possibly empty map.
-| Throws      | None.
+| Errors      | None.
 |===
 
 [[type_CardSelector]]
@@ -1185,7 +1186,7 @@ card is not selected if at least one of them rejects it.
   implementation.
 | Parameters  | `cardType` (`CardType` (<<ref_cna_td,CNA-TD-API>>)) -- the `CardType` (<<ref_cna_td,CNA-TD-API>>) to use as filter.
 | Returns     | The current instance (`T`).
-| Throws      | None.
+| Errors      | None.
 |===
 
 [[op_CardSelector_filterByPowerOnData]]
@@ -1198,7 +1199,7 @@ card is not selected if at least one of them rejects it.
 | Description | Restricts the selection process to cards whose power-on data, as provided by the reader, matches a specific regular expression.
 | Parameters  | `powerOnDataRegex` -- the regular expression to use as filter.
 | Returns     | The current instance (`T`).
-| Throws      | `IllegalArgumentError` -- if the provided regular expression is empty or invalid.
+| Errors      | `IllegalArgumentError` -- if the provided regular expression is empty or invalid.
 |===
 
 [[type_IsoCardSelector]]
@@ -1232,7 +1233,7 @@ defined, the card is not selected as soon as one of them rejects it.
   The provided AID is used as a parameter of the *Select Application* ISO card command.
 | Parameters  | `aid` -- the AID as a `ByteArray` containing 5 to 16 bytes.
 | Returns     | The current instance (<<type_IsoCardSelector,`IsoCardSelector`>>).
-| Throws      | `IllegalArgumentError` -- if the provided array is out of range.
+| Errors      | `IllegalArgumentError` -- if the provided array is out of range.
 |===
 
 [[op_IsoCardSelector_filterByDfName_string]]
@@ -1245,7 +1246,7 @@ defined, the card is not selected as soon as one of them rejects it.
 | Description | Selects a card application DF by its name. The AID is provided as a hexadecimal string. Semantics are otherwise identical to the byte-array overload.
 | Parameters  | `aid` -- the AID as a hexadecimal `String` of 5 to 16 bytes.
 | Returns     | The current instance (<<type_IsoCardSelector,`IsoCardSelector`>>).
-| Throws      | `IllegalArgumentError` -- if the provided string is invalid or out of range.
+| Errors      | `IllegalArgumentError` -- if the provided string is invalid or out of range.
 |===
 
 [[op_IsoCardSelector_setFileControlInformation]]
@@ -1261,7 +1262,7 @@ defined, the card is not selected as soon as one of them rejects it.
 | Description | Sets the file control mode (see ISO/IEC 7816-4). The default value is `FCI`.
 | Parameters  | `fileControlInformation` (<<type_FileControlInformation,`FileControlInformation`>>) -- the file control mode to apply.
 | Returns     | The current instance (<<type_IsoCardSelector,`IsoCardSelector`>>).
-| Throws      | None.
+| Errors      | None.
 |===
 
 [[op_IsoCardSelector_setFileOccurrence]]
@@ -1274,7 +1275,7 @@ defined, the card is not selected as soon as one of them rejects it.
 | Description | Sets the file occurrence mode (see ISO/IEC 7816-4). The default value is `FIRST`.
 | Parameters  | `fileOccurrence` (<<type_FileOccurrence,`FileOccurrence`>>) -- the navigation option to apply.
 | Returns     | The current instance (<<type_IsoCardSelector,`IsoCardSelector`>>).
-| Throws      | None.
+| Errors      | None.
 |===
 
 [[type_ObservableCardReader]]
@@ -1318,7 +1319,7 @@ following the last selection (see <<sec_smartcard_lifecycle,the `SmartCard` life
 This operation is idempotent: calling it twice on the same card processing cycle has no effect after the
 first call. It is RECOMMENDED to call `endCardProcessing` systematically (e.g. inside a `finally` block) at
 the end of a card processing whatever the outcome.
-| Throws      | None.
+| Errors      | None.
 |===
 
 [[op_ObservableCardReader_startCardDetection]]
@@ -1344,7 +1345,7 @@ the end of a card processing whatever the outcome.
 | Parameters
 | `settings` (<<type_CardDetectionSettings,`CardDetectionSettings`>>)     -- the detection configuration. +
   `eventHandler` (<<type_CardReaderEventHandler,`CardReaderEventHandler`>>) -- the application-side handler that receives reader events and errors.
-| Throws      | None.
+| Errors      | None.
 |===
 
 [[op_ObservableCardReader_stopCardDetection]]
@@ -1355,7 +1356,7 @@ the end of a card processing whatever the outcome.
 | Signature   | `stopCardDetection() -> Unit`
 | Since       | 1.0
 | Description | Stops card detection. After this operation has returned, the registered event handler does not receive card events until detection is restarted.
-| Throws      | None.
+| Errors      | None.
 |===
 
 [[type_ReaderApiFactory]]
@@ -1385,7 +1386,7 @@ the API. It is provided as a single instance whose accessors each return a fresh
 a selection scenario. Use <<op_ReaderApiFactory_createIsoCardSelector,`createIsoCardSelector`>> when ISO/IEC 7816-4
 (AID-based) selection is required.
 | Returns     | A <<type_BasicCardSelector,`BasicCardSelector`>>.
-| Throws      | None.
+| Errors      | None.
 |===
 
 [[op_ReaderApiFactory_createCardDetectionSettings]]
@@ -1399,7 +1400,7 @@ a selection scenario. Use <<op_ReaderApiFactory_createIsoCardSelector,`createIso
 | Creates a <<type_CardDetectionSettings,`CardDetectionSettings`>> carrying the configuration of a card detection
 cycle.
 | Returns     | A <<type_CardDetectionSettings,`CardDetectionSettings`>>.
-| Throws      | None.
+| Errors      | None.
 |===
 
 [[op_ReaderApiFactory_createCardSelectionManager]]
@@ -1413,7 +1414,7 @@ cycle.
 | Creates a <<type_CardSelectionManager,`CardSelectionManager`>>, the service used to prepare and execute a card
 selection scenario.
 | Returns     | A <<type_CardSelectionManager,`CardSelectionManager`>>.
-| Throws      | None.
+| Errors      | None.
 |===
 
 [[op_ReaderApiFactory_createIsoCardSelector]]
@@ -1427,7 +1428,7 @@ selection scenario.
 | Creates an <<type_IsoCardSelector,`IsoCardSelector`>> for ISO/IEC 7816-4 (AID-based) card selection. Use
 <<op_ReaderApiFactory_createBasicCardSelector,`createBasicCardSelector`>> for technology-agnostic selection.
 | Returns     | An <<type_IsoCardSelector,`IsoCardSelector`>>.
-| Throws      | None.
+| Errors      | None.
 |===
 
 [[op_ReaderApiFactory_getCardReaderProvider]]
@@ -1439,7 +1440,7 @@ selection scenario.
 | Since       | 3.0
 | Description | Returns the <<type_CardReaderProvider,`CardReaderProvider`>>, giving standardised access to the readers available in the execution environment.
 | Returns     | A <<type_CardReaderProvider,`CardReaderProvider`>>.
-| Throws      | None.
+| Errors      | None.
 |===
 
 [[type_ScheduledCardSelectionsResponse]]
@@ -1495,7 +1496,7 @@ This SPI unifies the reception of nominal events (`onReaderEvent`) and of fatal 
 | `context`     -- the context describing the operation that failed. +
   `readerName`  -- the name of the reader on which the error occurred. +
   `e`           -- the original error that triggered the notification.
-| Throws       | None.
+| Errors       | None.
 |===
 
 [[op_CardReaderEventHandler_onReaderEvent]]
@@ -1509,7 +1510,7 @@ This SPI unifies the reception of nominal events (`onReaderEvent`) and of fatal 
 | Called when a reader event occurs. Dispatch is *sequential* and *synchronous* unless a different policy is
   explicitly documented.
 | Parameters  | `cardReaderEvent` (<<type_CardReaderEvent,`CardReaderEvent`>>) -- the event payload.
-| Throws      | None. Any error thrown by the handler is routed to `onReaderError`.
+| Errors      | None. Any error thrown by the handler is routed to `onReaderError`.
 |===
 
 [[type_CardSelectionExtension]]
@@ -1558,7 +1559,7 @@ minimise network exchanges, which is especially valuable in distributed architec
   to update the <<type_SmartCard,`SmartCard`>> associated with the transaction.
   For write commands, the `SmartCard` is updated only when the command is successful. The process is
   interrupted at the first failed command. The underlying logical channel is left open after processing.
-| Throws
+| Errors
 | <<type_ReaderCommunication,`ReaderCommunication`>> -- if a communication error with the reader occurs. +
   <<type_CardCommunication,`CardCommunication`>> -- if a communication error with the card occurs. +
   <<type_InvalidCardResponse,`InvalidCardResponse`>> -- if a command returns an unexpected status.
@@ -1590,7 +1591,7 @@ minimise network exchanges, which is especially valuable in distributed architec
 
   *Prerequisite:* the underlying ISO/IEC 7816-4 card MUST support multi-channel operation; otherwise an `InvalidCardResponse` is raised during command processing.
 | Returns     | A <<type_MultichannelCardTransactionManager,`MultichannelCardTransactionManager`>>.
-| Throws      | <<type_InvalidCardResponse,`InvalidCardResponse`>> -- if the card does not support multi-channel.
+| Errors      | <<type_InvalidCardResponse,`InvalidCardResponse`>> -- if the card does not support multi-channel.
 |===
 
 [[type_IsoSmartCard]]
@@ -1619,7 +1620,7 @@ always present.
 | Since       | 1.0
 | Description | Returns the data received from the card in response to the *Select Application* command, including the status word.
 | Returns     | The non-empty response bytes, or `null` if no *Select Application* command has been performed.
-| Throws      | None.
+| Errors      | None.
 |===
 
 [[op_IsoSmartCard_isBasicChannel]]
@@ -1633,7 +1634,7 @@ always present.
 | Indicates whether this smart card is attached to the basic channel (channel `0`) of the underlying ISO/IEC 7816-4
   card, or to an additional logical channel.
 | Returns     | `true` if attached to the basic channel, `false` if attached to an additional logical channel.
-| Throws      | None.
+| Errors      | None.
 |===
 
 [[type_MultichannelCardTransactionManager]]
@@ -1663,7 +1664,7 @@ This contract MAY be obtained either:
 | Signature   | `closeChannel() -> Unit`
 | Since       | 3.0
 | Description | Closes the underlying logical channel without processing any pending command. This operation is idempotent: calling it on an already-closed channel has no effect.
-| Throws
+| Errors
 | <<type_ReaderCommunication,`ReaderCommunication`>> -- if a communication error with the reader occurs. +
   <<type_CardCommunication,`CardCommunication`>> -- if a communication error with the card occurs.
 |===
@@ -1676,7 +1677,7 @@ This contract MAY be obtained either:
 | Signature   | `processCommandsAndCloseChannel() -> Unit`
 | Since       | 3.0
 | Description | Processes all previously prepared commands and, upon success, closes the underlying logical channel. If any command fails, the channel is left open, as with `processCommands`.
-| Throws
+| Errors
 | <<type_ReaderCommunication,`ReaderCommunication`>> -- if a communication error with the reader occurs. +
   <<type_CardCommunication,`CardCommunication`>> -- if a communication error with the card occurs. +
   <<type_InvalidCardResponse,`InvalidCardResponse`>> -- if a command returns an unexpected status.
@@ -1716,7 +1717,7 @@ a| Returns the card's power-on data, as collected by the reader at the moment th
 Because this data varies from one reader to another, it is exposed here as a `String` that MAY be either a
 hexadecimal string or any other relevant representation.
 | Returns     | The non-empty power-on data, or `null` if no power-on data is available.
-| Throws      | None.
+| Errors      | None.
 |===
 
 [[sec_smartcard_lifecycle]]
@@ -1747,7 +1748,7 @@ Until then, the reader holds the references to the `SmartCard` instances produce
 selection. Once a smart card has been deactivated, any further attempt to use it is detected prior to any
 actual exchange with the card.
 | Returns     | `true` if the smart card is active, `false` otherwise.
-| Throws      | None.
+| Errors      | None.
 |===
 
 === Enumerations
