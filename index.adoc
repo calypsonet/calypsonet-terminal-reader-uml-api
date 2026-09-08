@@ -253,7 +253,8 @@ Each operation defined in this document is described by a table of the form:
 | Description | A normative description of the operation's behaviour.
 | Parameters  | A description of each input parameter.
 | Returns     | A description of the returned value, if any.
-| Errors      | A list of error conditions, each mapped to a specific error type.
+| Pre-conditions | The conditions the caller MUST satisfy before invoking the operation, each prefixed by its nature. Present only when applicable.
+| Errors      | A list of error conditions a correct caller must handle, each mapped to a specific error type.
 | See also    | Cross-references to related operations or types, each a hyperlink to the corresponding table. Present only when applicable.
 |===
 
@@ -262,10 +263,14 @@ Each operation defined in this document is described by a table of the form:
 To avoid repetition, the following rules apply to every operation table in <<sec_specification>> and are therefore
 not restated for each operation:
 
-* *Non-`null` arguments.* Unless explicitly stated otherwise, every input parameter being non-`null` is an
-  implicit pre-condition of the operation. Checking it is the responsibility of the implementation, and failing
-  to meet that pre-condition MUST raise an illegal argument error. This implicit check is not restated in the
-  *Errors* row, which states `None.` when no other error can occur.
+* *Pre-conditions.* The *Pre-conditions* row states what the caller MUST guarantee before invoking the
+  operation. Violating one is a contract error, never listed in the *Errors* row, which describes only the
+  outcomes a correct caller must handle. Each entry is prefixed by its nature, which determines the error
+  raised when the condition is not met:
+** *Argument* -- an illegal argument error.
+** *Range* -- an index out of bounds error.
+** *State* -- an illegal state error.
+** *Capability* -- an unsupported operation error.
 * *Non-`null` results.* Unless the return type is marked nullable (`T?`) or the *Returns* row states otherwise, an
   operation returns a non-`null` value.
 * *Collections.* Unless the return type is marked nullable (`T?`), an operation whose return type is a collection
@@ -624,6 +629,7 @@ fluent composition. Setters that are not called default to the values specified 
   semantics of each value are given by the <<type_DetectionMode,`DetectionMode`>> enumeration.
 | Parameters  | `detectionMode` (<<type_DetectionMode,`DetectionMode`>>) -- the desired detection mode.
 | Returns     | The current instance (<<type_CardDetectionSettings,`CardDetectionSettings`>>).
+| Pre-conditions | *Argument* -- every parameter is non-`null`.
 | Errors      | None.
 |===
 
@@ -645,7 +651,9 @@ fluent composition. Setters that are not called default to the values specified 
   When this setter is not called, no ECP frame is emitted (default *none*; see the defaults above).
 | Parameters  | `ecpFrame` -- the non-empty ECP frame.
 | Returns     | The current instance (<<type_CardDetectionSettings,`CardDetectionSettings`>>).
-| Errors      | `IllegalArgumentError` -- if the provided array is empty.
+| Pre-conditions | *Argument* -- every parameter is non-`null`. +
+  *Argument* -- the provided array is not empty.
+| Errors      | None.
 |===
 
 [[op_CardDetectionSettings_setRfTechnologies]]
@@ -664,7 +672,9 @@ fluent composition. Setters that are not called default to the values specified 
   When this setter is not called, the reader polls the default set `{ ISO_14443_AB }` (see the defaults above).
 | Parameters  | `rfTechnologies` -- the non-empty set of RF technologies to activate.
 | Returns     | The current instance (<<type_CardDetectionSettings,`CardDetectionSettings`>>).
-| Errors      | `IllegalArgumentError` -- if the provided set is empty.
+| Pre-conditions | *Argument* -- every parameter is non-`null`. +
+  *Argument* -- the provided set is not empty.
+| Errors      | None.
 |===
 
 [[type_CardReader]]
@@ -807,7 +817,9 @@ implementation-agnostic view over the readers currently registered in the enviro
   hard-code.
 | Parameters  | `readerNameRegex` -- the regular expression matched against the reader names.
 | Returns     | A <<type_CardReader,`CardReader`>> whose name matches the expression, or `null` if none matches.
-| Errors      | `IllegalArgumentError` -- if the supplied string is not a valid regular expression.
+| Pre-conditions | *Argument* -- every parameter is non-`null`. +
+  *Argument* -- the supplied string is a valid regular expression.
+| Errors      | None.
 |===
 
 [[op_CardReaderProvider_getReader]]
@@ -820,6 +832,7 @@ implementation-agnostic view over the readers currently registered in the enviro
 | Description | Returns the reader whose name exactly matches the supplied string.
 | Parameters  | `readerName` -- the exact name of the reader to retrieve.
 | Returns     | A <<type_CardReader,`CardReader`>> whose name equals `readerName`, or `null` if no such reader is registered.
+| Pre-conditions | *Argument* -- every parameter is non-`null`.
 | Errors      | None.
 |===
 
@@ -914,7 +927,8 @@ of the call.
   scenario MUST be exported so that it can be re-imported and interpreted on a manager which has the relevant
   card extensions.
 | Returns     | A non-empty `String`.
-| Errors      | `IllegalStateError` -- if the scenario has not yet been processed or has failed.
+| Pre-conditions | *State* -- the scenario has been processed successfully.
+| Errors      | None.
 | See also    | <<op_CardSelectionManager_importProcessedCardSelectionScenario,`importProcessedCardSelectionScenario`>>
 |===
 
@@ -928,7 +942,9 @@ of the call.
 | Description | Imports a previously exported scenario. The input MUST have been produced by `exportCardSelectionScenario`.
 | Parameters  | `cardSelectionScenario` -- the `String` containing the exported card selection scenario.
 | Returns     | The index of the last imported selection in the scenario.
-| Errors      | `IllegalArgumentError` -- if the string is malformed.
+| Pre-conditions | *Argument* -- every parameter is non-`null`. +
+  *Argument* -- the string is well-formed.
+| Errors      | None.
 | See also    | <<op_CardSelectionManager_exportCardSelectionScenario,`exportCardSelectionScenario`>>
 |===
 
@@ -950,10 +966,9 @@ of the call.
   with the same selection scenario as the manager that produced the export.
 | Parameters  | `processedCardSelectionScenario` -- the `String` containing the exported processed card selection scenario.
 | Returns     | A <<type_CardSelectionResult,`CardSelectionResult`>>.
-| Errors
-| `IllegalArgumentError` -- if the string is malformed or contains more selection cases than the
-  current scenario. +
-  <<type_InvalidCardResponse,`InvalidCardResponse`>> -- if the data returned by the card could not be interpreted.
+| Pre-conditions | *Argument* -- every parameter is non-`null`. +
+  *Argument* -- the string is well-formed and contains no more selection cases than the current scenario.
+| Errors      | <<type_InvalidCardResponse,`InvalidCardResponse`>> -- if the data returned by the card could not be interpreted.
 | See also    | <<op_CardSelectionManager_exportProcessedCardSelectionScenario,`exportProcessedCardSelectionScenario`>>
 |===
 
@@ -970,6 +985,7 @@ of the call.
 | Description | Analyses the responses provided by a <<type_CardReaderEvent,`CardReaderEvent`>> following the insertion of a card and the execution of the scheduled selection scenario.
 | Parameters  | `scheduledCardSelectionsResponse` (<<type_ScheduledCardSelectionsResponse,`ScheduledCardSelectionsResponse`>>) -- the card selection scenario execution response.
 | Returns     | A <<type_CardSelectionResult,`CardSelectionResult`>>.
+| Pre-conditions | *Argument* -- every parameter is non-`null`.
 | Errors      | <<type_InvalidCardResponse,`InvalidCardResponse`>> -- if the data returned by the card could not be interpreted.
 |===
 
@@ -992,6 +1008,7 @@ of the call.
 | `cardSelector` (<<type_CardSelector,`CardSelector`>>) -- the card selector containing the filters to be used to select the card. +
   `cardSelectionExtension` (<<type_CardSelectionExtension,`CardSelectionExtension`>>) -- the card selection extension to be used to parse the card selection response.
 | Returns      | A non-negative `Int` -- the index of the appended selection case.
+| Pre-conditions | *Argument* -- every parameter is non-`null`.
 | Errors      | None.
 |===
 
@@ -1011,6 +1028,7 @@ of the call.
 | `reader` (<<type_CardReader,`CardReader`>>)                   -- the reader through which the card is reached. +
   `selectionExecutionPolicy` (<<type_SelectionExecutionPolicy,`SelectionExecutionPolicy`>>) -- the policy governing the iteration over selection cases.
 | Returns     | A <<type_CardSelectionResult,`CardSelectionResult`>>.
+| Pre-conditions | *Argument* -- every parameter is non-`null`.
 | Errors
 | <<type_ReaderCommunication,`ReaderCommunication`>> -- if communication with the reader has failed. +
   <<type_CardCommunication,`CardCommunication`>> -- if communication with the card has failed. +
@@ -1039,6 +1057,7 @@ of the call.
 | `reader` (<<type_CardReader,`CardReader`>>)                 -- the reader through which the card is reached. +
   `channelSelectionPolicy` (<<type_ChannelSelectionPolicy,`ChannelSelectionPolicy`>>) -- the policy governing the channels on which selections are placed.
 | Returns     | A <<type_CardSelectionResult,`CardSelectionResult`>>.
+| Pre-conditions | *Argument* -- every parameter is non-`null`.
 | Errors
 | <<type_ReaderCommunication,`ReaderCommunication`>> -- if communication with the reader has failed. +
   <<type_CardCommunication,`CardCommunication`>> -- if communication with the card has failed. +
@@ -1066,6 +1085,7 @@ of the call.
 | `observableCardReader` (<<type_ObservableCardReader,`ObservableCardReader`>>)           -- the reader through which the card is reached. +
   `cardPresenceNotificationPolicy` (<<type_CardPresenceNotificationPolicy,`CardPresenceNotificationPolicy`>>) -- the desired card-presence notification policy. +
   `selectionExecutionPolicy` (<<type_SelectionExecutionPolicy,`SelectionExecutionPolicy`>>)       -- the policy governing the iteration over selection cases.
+| Pre-conditions | *Argument* -- every parameter is non-`null`.
 | Errors      | None.
 |===
 
@@ -1186,6 +1206,7 @@ card is not selected if at least one of them rejects it.
   implementation.
 | Parameters  | `cardType` (`CardType` (<<ref_cna_td,CNA-TD-API>>)) -- the `CardType` (<<ref_cna_td,CNA-TD-API>>) to use as filter.
 | Returns     | The current instance (`T`).
+| Pre-conditions | *Argument* -- every parameter is non-`null`.
 | Errors      | None.
 |===
 
@@ -1199,7 +1220,9 @@ card is not selected if at least one of them rejects it.
 | Description | Restricts the selection process to cards whose power-on data, as provided by the reader, matches a specific regular expression.
 | Parameters  | `powerOnDataRegex` -- the regular expression to use as filter.
 | Returns     | The current instance (`T`).
-| Errors      | `IllegalArgumentError` -- if the provided regular expression is empty or invalid.
+| Pre-conditions | *Argument* -- every parameter is non-`null`. +
+  *Argument* -- the provided regular expression is non-empty and valid.
+| Errors      | None.
 |===
 
 [[type_IsoCardSelector]]
@@ -1233,7 +1256,9 @@ defined, the card is not selected as soon as one of them rejects it.
   The provided AID is used as a parameter of the *Select Application* ISO card command.
 | Parameters  | `aid` -- the AID as a `ByteArray` containing 5 to 16 bytes.
 | Returns     | The current instance (<<type_IsoCardSelector,`IsoCardSelector`>>).
-| Errors      | `IllegalArgumentError` -- if the provided array is out of range.
+| Pre-conditions | *Argument* -- every parameter is non-`null`. +
+  *Argument* -- the provided array is within range.
+| Errors      | None.
 |===
 
 [[op_IsoCardSelector_filterByDfName_string]]
@@ -1246,7 +1271,9 @@ defined, the card is not selected as soon as one of them rejects it.
 | Description | Selects a card application DF by its name. The AID is provided as a hexadecimal string. Semantics are otherwise identical to the byte-array overload.
 | Parameters  | `aid` -- the AID as a hexadecimal `String` of 5 to 16 bytes.
 | Returns     | The current instance (<<type_IsoCardSelector,`IsoCardSelector`>>).
-| Errors      | `IllegalArgumentError` -- if the provided string is invalid or out of range.
+| Pre-conditions | *Argument* -- every parameter is non-`null`. +
+  *Argument* -- the provided string is valid and within range.
+| Errors      | None.
 |===
 
 [[op_IsoCardSelector_setFileControlInformation]]
@@ -1262,6 +1289,7 @@ defined, the card is not selected as soon as one of them rejects it.
 | Description | Sets the file control mode (see ISO/IEC 7816-4). The default value is `FCI`.
 | Parameters  | `fileControlInformation` (<<type_FileControlInformation,`FileControlInformation`>>) -- the file control mode to apply.
 | Returns     | The current instance (<<type_IsoCardSelector,`IsoCardSelector`>>).
+| Pre-conditions | *Argument* -- every parameter is non-`null`.
 | Errors      | None.
 |===
 
@@ -1275,6 +1303,7 @@ defined, the card is not selected as soon as one of them rejects it.
 | Description | Sets the file occurrence mode (see ISO/IEC 7816-4). The default value is `FIRST`.
 | Parameters  | `fileOccurrence` (<<type_FileOccurrence,`FileOccurrence`>>) -- the navigation option to apply.
 | Returns     | The current instance (<<type_IsoCardSelector,`IsoCardSelector`>>).
+| Pre-conditions | *Argument* -- every parameter is non-`null`.
 | Errors      | None.
 |===
 
@@ -1345,6 +1374,7 @@ the end of a card processing whatever the outcome.
 | Parameters
 | `settings` (<<type_CardDetectionSettings,`CardDetectionSettings`>>)     -- the detection configuration. +
   `eventHandler` (<<type_CardReaderEventHandler,`CardReaderEventHandler`>>) -- the application-side handler that receives reader events and errors.
+| Pre-conditions | *Argument* -- every parameter is non-`null`.
 | Errors      | None.
 |===
 
@@ -1496,6 +1526,7 @@ This SPI unifies the reception of nominal events (`onReaderEvent`) and of fatal 
 | `context`     -- the context describing the operation that failed. +
   `readerName`  -- the name of the reader on which the error occurred. +
   `e`           -- the original error that triggered the notification.
+| Pre-conditions | *Argument* -- every parameter is non-`null`.
 | Errors       | None.
 |===
 
@@ -1510,6 +1541,7 @@ This SPI unifies the reception of nominal events (`onReaderEvent`) and of fatal 
 | Called when a reader event occurs. Dispatch is *sequential* and *synchronous* unless a different policy is
   explicitly documented.
 | Parameters  | `cardReaderEvent` (<<type_CardReaderEvent,`CardReaderEvent`>>) -- the event payload.
+| Pre-conditions | *Argument* -- every parameter is non-`null`.
 | Errors      | None. Any error thrown by the handler is routed to `onReaderError`.
 |===
 
