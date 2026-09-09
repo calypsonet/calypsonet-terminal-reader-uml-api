@@ -99,6 +99,7 @@ package "reader" as reader {
     +isContactless() → Boolean
 
     +isCardPresent() → Boolean
+    {method} <size:10><color:#7F8C8D>    ⚠ errors: ReaderCommunication</color></size>
 }
 +interface "ObservableCardReader" as ObservableCardReader extends CardReader {
     +<color:blue>startCardDetection(settings: CardDetectionSettings, eventHandler: CardReaderEventHandler) → Unit
@@ -144,14 +145,18 @@ package "selection" as selectionApi {
         +importCardSelectionScenario(cardSelectionScenario: String) → Int
 
         +<color:blue>processCardSelectionScenario(reader: CardReader, selectionExecutionPolicy: SelectionExecutionPolicy) → CardSelectionResult
+        {method} <size:10><color:#7F8C8D>    ⚠ errors: ReaderCommunication, CardCommunication, InvalidCardResponse</color></size>
 
         +<color:blue>scheduleCardSelectionScenario(observableCardReader: ObservableCardReader, cardPresenceNotificationPolicy: CardPresenceNotificationPolicy, selectionExecutionPolicy: SelectionExecutionPolicy) → Unit
         +parseScheduledCardSelectionsResponse(scheduledCardSelectionsResponse: ScheduledCardSelectionsResponse) → CardSelectionResult
+        {method} <size:10><color:#7F8C8D>    ⚠ errors: InvalidCardResponse</color></size>
 
         +<color:blue>processMultichannelCardSelectionScenario(reader: CardReader, channelSelectionPolicy: ChannelSelectionPolicy) → CardSelectionResult
+        {method} <size:10><color:#7F8C8D>    ⚠ errors: ReaderCommunication, CardCommunication, InvalidCardResponse</color></size>
 
         +exportProcessedCardSelectionScenario() → String
         +importProcessedCardSelectionScenario(processedCardSelectionScenario: String) → CardSelectionResult
+        {method} <size:10><color:#7F8C8D>    ⚠ errors: InvalidCardResponse</color></size>
     }
     +enum "<color:blue>CardPresenceNotificationPolicy" as CardPresenceNotificationPolicy <<green>> {
         <color:blue>ALWAYS
@@ -220,13 +225,17 @@ package "transaction" as transactionApi {
     package "spi" as transactionSpi {
         +interface "CardTransactionManager" as CardTransactionManager <<red>> {
             +<color:blue>processCommands() → Unit
+            {method} <size:10><color:#7F8C8D>    ⚠ errors: ReaderCommunication, CardCommunication, InvalidCardResponse</color></size>
         }
         +interface "<color:blue>IsoCardTransactionManager" as IsoCardTransactionManager <<red>> extends CardTransactionManager {
             +<color:blue>asMultichannelCardTransactionManager() → MultichannelCardTransactionManager
+            {method} <size:10><color:#7F8C8D>    ⚠ errors: InvalidCardResponse</color></size>
         }
         +interface "<color:blue>MultichannelCardTransactionManager" as MultichannelCardTransactionManager <<red>> extends CardTransactionManager {
             +<color:blue>processCommandsAndCloseChannel() → Unit
+            {method} <size:10><color:#7F8C8D>    ⚠ errors: ReaderCommunication, CardCommunication, InvalidCardResponse</color></size>
             +<color:blue>closeChannel() → Unit
+            {method} <size:10><color:#7F8C8D>    ⚠ errors: ReaderCommunication, CardCommunication</color></size>
         }
     }
 }
