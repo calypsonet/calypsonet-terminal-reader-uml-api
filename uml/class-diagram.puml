@@ -241,7 +241,7 @@ package "transaction" as transactionApi {
 }
 
 ' Errors
-+exception "<i>«error»\nReaderCommunication\nCardCommunication\nInvalidCardResponse" as errors <<purple>>  {
++exception "ReaderCommunication\nCardCommunication\nInvalidCardResponse" as errors <<purple>> <<error>> {
     +val message: String
     +val cause: Any?
 }
