@@ -541,11 +541,11 @@ include::uml/class-diagram.puml[Terminal Reader API class diagram]
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name     | `ReaderApiProperties`
-| Kind     | Final class
+| Name       | `ReaderApiProperties`
+| Kind       | Final class
 | Namespace  | `reader`
-| Since    | 1.0
-| Purpose  | Exposes the immutable properties of the {doc-name}.
+| Since      | 1.0
+| Purpose    | Exposes the immutable properties of the {doc-name}.
 |===
 
 ===== Constants
@@ -573,12 +573,12 @@ The `ReaderApiProperties` type cannot be instantiated; it exposes only static pr
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name     | `BasicCardSelector`
-| Kind     | Interface
+| Name       | `BasicCardSelector`
+| Kind       | Interface
 | Namespace  | `reader.selection`
-| Extends  | `CardSelector<BasicCardSelector>`
-| Since    | 2.0
-| Purpose  | Basic, technology-agnostic card selector. An instance is obtained via <<op_ReaderApiFactory_createBasicCardSelector,`ReaderApiFactory.createBasicCardSelector`>>.
+| Extends    | `CardSelector<BasicCardSelector>`
+| Since      | 2.0
+| Purpose    | Basic, technology-agnostic card selector. An instance is obtained via <<op_ReaderApiFactory_createBasicCardSelector,`ReaderApiFactory.createBasicCardSelector`>>.
 |===
 
 `BasicCardSelector` does not add any operation to <<type_CardSelector,`CardSelector`>>. It exists to express the
@@ -594,11 +594,11 @@ rejects it.
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name     | `CardDetectionSettings`
-| Kind     | Interface (builder)
+| Name       | `CardDetectionSettings`
+| Kind       | Interface (builder)
 | Namespace  | `reader`
-| Since    | 3.0
-| Purpose  | Carries the configuration of a card detection cycle. An instance is obtained via <<op_ReaderApiFactory_createCardDetectionSettings,`ReaderApiFactory.createCardDetectionSettings`>>.
+| Since      | 3.0
+| Purpose    | Carries the configuration of a card detection cycle. An instance is obtained via <<op_ReaderApiFactory_createCardDetectionSettings,`ReaderApiFactory.createCardDetectionSettings`>>.
 |===
 
 `CardDetectionSettings` exposes setters in *builder* form: each operation returns the current instance to allow
@@ -682,11 +682,11 @@ fluent composition. Setters that are not called default to the values specified 
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name     | `CardReader`
-| Kind     | Interface
+| Name       | `CardReader`
+| Kind       | Interface
 | Namespace  | `reader`
-| Since    | 1.0
-| Purpose  | Represents a card reader capable of driving the underlying hardware to manage card detection.
+| Since      | 1.0
+| Purpose    | Represents a card reader capable of driving the underlying hardware to manage card detection.
 |===
 
 [[op_CardReader_getName]]
@@ -737,11 +737,11 @@ fluent composition. Setters that are not called default to the values specified 
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name     | `CardReaderEvent`
-| Kind     | Interface
+| Name       | `CardReaderEvent`
+| Kind       | Interface
 | Namespace  | `reader`
-| Since    | 1.0
-| Purpose  | Data container describing a change of state observed by a `CardReader`.
+| Since      | 1.0
+| Purpose    | Data container describing a change of state observed by a `CardReader`.
 |===
 
 A `CardReaderEvent` carries the origin of the event (the reader name), the event type and, when available, the
@@ -799,11 +799,11 @@ card selection response. The circumstances under which each event type is emitte
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name     | `CardReaderProvider`
-| Kind     | Interface
+| Name       | `CardReaderProvider`
+| Kind       | Interface
 | Namespace  | `reader`
-| Since    | 3.0
-| Purpose  | Standardised discovery and access surface for the card readers available in the execution environment.
+| Since      | 3.0
+| Purpose    | Standardised discovery and access surface for the card readers available in the execution environment.
 |===
 
 The `CardReaderProvider` is obtained from the <<type_ReaderApiFactory,`ReaderApiFactory`>>. It offers an
@@ -873,11 +873,11 @@ implementation-agnostic view over the readers currently registered in the enviro
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name     | `CardSelectionManager`
-| Kind     | Interface
+| Name       | `CardSelectionManager`
+| Kind       | Interface
 | Namespace  | `reader.selection`
-| Since    | 1.0
-| Purpose  | Service responsible for preparing and executing card selection scenarios. An instance is obtained via <<op_ReaderApiFactory_createCardSelectionManager,`ReaderApiFactory.createCardSelectionManager`>>.
+| Since      | 1.0
+| Purpose    | Service responsible for preparing and executing card selection scenarios. An instance is obtained via <<op_ReaderApiFactory_createCardSelectionManager,`ReaderApiFactory.createCardSelectionManager`>>.
 |===
 
 A *card selection scenario* is composed of one or more *selection cases*, each backed by a
@@ -1103,11 +1103,11 @@ of the call.
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name     | `CardSelectionResult`
-| Kind     | Interface
+| Name       | `CardSelectionResult`
+| Kind       | Interface
 | Namespace  | `reader.selection`
-| Since    | 1.0
-| Purpose  | Result of a selection process.
+| Since      | 1.0
+| Purpose    | Result of a selection process.
 |===
 
 Each selection case prepared with the manager is associated with the index returned by `prepareSelection`. The same
@@ -1192,12 +1192,12 @@ to the active selected card. In multi-channel mode, several active selections ma
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name     | `CardSelector`
-| Kind     | Interface
+| Name       | `CardSelector`
+| Kind       | Interface
 | Namespace  | `reader.selection`
-| Generics | `<T : CardSelector<T>>`
-| Since    | 2.0
-| Purpose  | Base contract for all card selectors. Defines filters used to restrict the selection process to a subset of cards.
+| Generics   | `<T : CardSelector<T>>`
+| Since      | 2.0
+| Purpose    | Base contract for all card selectors. Defines filters used to restrict the selection process to a subset of cards.
 |===
 
 All filters defined by this interface are *optional* and MAY be combined. If no filter is specified, any card that
@@ -1244,12 +1244,12 @@ card is not selected if at least one of them rejects it.
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name     | `IsoCardSelector`
-| Kind     | Interface
+| Name       | `IsoCardSelector`
+| Kind       | Interface
 | Namespace  | `reader.selection`
-| Extends  | `CardSelector<IsoCardSelector>`
-| Since    | 2.0
-| Purpose  | ISO/IEC 7816-4 card selector. An instance is obtained via <<op_ReaderApiFactory_createIsoCardSelector,`ReaderApiFactory.createIsoCardSelector`>>.
+| Extends    | `CardSelector<IsoCardSelector>`
+| Since      | 2.0
+| Purpose    | ISO/IEC 7816-4 card selector. An instance is obtained via <<op_ReaderApiFactory_createIsoCardSelector,`ReaderApiFactory.createIsoCardSelector`>>.
 |===
 
 `IsoCardSelector` adds the ISO/IEC 7816-4-specific filters used to restrict the selection process to certain
@@ -1326,12 +1326,12 @@ defined, the card is not selected as soon as one of them rejects it.
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name     | `ObservableCardReader`
-| Kind         | Interface
-| Namespace    | `reader`
-| Extends      | <<type_CardReader,`CardReader`>>
-| Since        | 1.0
-| Purpose      | A `CardReader` capable of observing the insertion and removal of cards.
+| Name       | `ObservableCardReader`
+| Kind       | Interface
+| Namespace  | `reader`
+| Extends    | <<type_CardReader,`CardReader`>>
+| Since      | 1.0
+| Purpose    | A `CardReader` capable of observing the insertion and removal of cards.
 |===
 
 The observation contract is co-located with the start of detection: a single call to `startCardDetection` provides
@@ -1410,11 +1410,11 @@ the end of a card processing whatever the outcome.
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name     | `ReaderApiFactory`
-| Kind     | Interface
+| Name       | `ReaderApiFactory`
+| Kind       | Interface
 | Namespace  | `reader`
-| Since    | 2.0
-| Purpose  | Factory used by the application to obtain instances of the public types provided by the API.
+| Since      | 2.0
+| Purpose    | Factory used by the application to obtain instances of the public types provided by the API.
 |===
 
 The `ReaderApiFactory` is the single entry point through which the application instantiates the public types of
@@ -1499,11 +1499,11 @@ selection scenario.
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name     | `ScheduledCardSelectionsResponse`
-| Kind     | Interface (marker)
+| Name       | `ScheduledCardSelectionsResponse`
+| Kind       | Interface (marker)
 | Namespace  | `reader.selection`
-| Since    | 1.0
-| Purpose  | Carrier for the response of the execution of a scheduled selection scenario, provided by a <<type_CardReaderEvent,`CardReaderEvent`>>.
+| Since      | 1.0
+| Purpose    | Carrier for the response of the execution of a scheduled selection scenario, provided by a <<type_CardReaderEvent,`CardReaderEvent`>>.
 |===
 
 This interface declares no operation. It conveys the card responses to one or more of the scenario's selection
@@ -1517,11 +1517,11 @@ cases (selection step itself plus any subsequent commands). Its content MUST be 
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name     | `CardReaderEventHandler`
-| Kind     | Interface (SPI)
+| Name       | `CardReaderEventHandler`
+| Kind       | Interface (SPI)
 | Namespace  | `reader.spi`
-| Since    | 3.0
-| Purpose  | Interface that the application MUST implement to receive reader events and observation errors from an <<type_ObservableCardReader,`ObservableCardReader`>>.
+| Since      | 3.0
+| Purpose    | Interface that the application MUST implement to receive reader events and observation errors from an <<type_ObservableCardReader,`ObservableCardReader`>>.
 |===
 
 This SPI unifies the reception of nominal events (`onReaderEvent`) and of fatal observation errors
@@ -1571,11 +1571,11 @@ This SPI unifies the reception of nominal events (`onReaderEvent`) and of fatal 
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name     | `CardSelectionExtension`
-| Kind     | Interface (SPI, marker)
+| Name       | `CardSelectionExtension`
+| Kind       | Interface (SPI, marker)
 | Namespace  | `reader.selection.spi`
-| Since    | 2.0
-| Purpose  | Provided by card extensions to enrich a selection case with additional commands and to interpret the response in order to build the corresponding <<type_SmartCard,`SmartCard`>>.
+| Since      | 2.0
+| Purpose    | Provided by card extensions to enrich a selection case with additional commands and to interpret the response in order to build the corresponding <<type_SmartCard,`SmartCard`>>.
 |===
 
 This interface declares no operation at the API level; the contract between the selection manager and the
@@ -1586,11 +1586,11 @@ extension is defined by the card extension specification consuming this SPI.
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name     | `CardTransactionManager`
-| Kind     | Interface (SPI)
+| Name       | `CardTransactionManager`
+| Kind       | Interface (SPI)
 | Namespace  | `reader.transaction.spi`
-| Since    | 2.1
-| Purpose  | Root contract common to every card transaction manager exposed by a card extension. Defines the single operation `processCommands`.
+| Since      | 2.1
+| Purpose    | Root contract common to every card transaction manager exposed by a card extension. Defines the single operation `processCommands`.
 |===
 
 To exchange data with a card, the application first prepares the commands to transmit (via the operations of
@@ -1624,12 +1624,12 @@ minimise network exchanges, which is especially valuable in distributed architec
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name     | `IsoCardTransactionManager`
-| Kind     | Interface (SPI)
+| Name       | `IsoCardTransactionManager`
+| Kind       | Interface (SPI)
 | Namespace  | `reader.transaction.spi`
-| Extends  | <<type_CardTransactionManager,`CardTransactionManager`>>
-| Since    | 3.0
-| Purpose  | Intermediate contract for ISO/IEC 7816-4 cards. Exposes the on-demand cast to multi-channel.
+| Extends    | <<type_CardTransactionManager,`CardTransactionManager`>>
+| Since      | 3.0
+| Purpose    | Intermediate contract for ISO/IEC 7816-4 cards. Exposes the on-demand cast to multi-channel.
 |===
 
 [[op_IsoCardTransactionManager_asMultichannelCardTransactionManager]]
@@ -1654,12 +1654,12 @@ minimise network exchanges, which is especially valuable in distributed architec
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name     | `IsoSmartCard`
-| Kind     | Interface (SPI)
+| Name       | `IsoSmartCard`
+| Kind       | Interface (SPI)
 | Namespace  | `reader.selection.spi`
-| Extends  | <<type_SmartCard,`SmartCard`>>
-| Since    | 2.0
-| Purpose  | ISO/IEC 7816-4 smart card whose communication has been established after a successful selection.
+| Extends    | <<type_SmartCard,`SmartCard`>>
+| Since      | 2.0
+| Purpose    | ISO/IEC 7816-4 smart card whose communication has been established after a successful selection.
 |===
 
 In addition to the inherited power-on data, an `IsoSmartCard` exposes the response to the *Select Application*
@@ -1699,12 +1699,12 @@ always present.
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name     | `MultichannelCardTransactionManager`
-| Kind     | Interface (SPI)
+| Name       | `MultichannelCardTransactionManager`
+| Kind       | Interface (SPI)
 | Namespace  | `reader.transaction.spi`
-| Extends  | <<type_CardTransactionManager,`CardTransactionManager`>>
-| Since    | 3.0
-| Purpose  | Multi-channel contract. Exposes the operations to close a logical channel explicitly.
+| Extends    | <<type_CardTransactionManager,`CardTransactionManager`>>
+| Since      | 3.0
+| Purpose    | Multi-channel contract. Exposes the operations to close a logical channel explicitly.
 |===
 
 This contract MAY be obtained either:
@@ -1747,11 +1747,11 @@ This contract MAY be obtained either:
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name     | `SmartCard`
-| Kind     | Interface (SPI)
+| Name       | `SmartCard`
+| Kind       | Interface (SPI)
 | Namespace  | `reader.selection.spi`
-| Since    | 1.0
-| Purpose  | Basic smart card whose communication has been established after a successful selection. The instance is ready to receive APDUs.
+| Since      | 1.0
+| Purpose    | Basic smart card whose communication has been established after a successful selection. The instance is ready to receive APDUs.
 |===
 
 Card extensions implement (and may extend) this interface to expose the data they collected during the
@@ -1819,11 +1819,11 @@ actual exchange with the card.
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name     | `CardPresenceNotificationPolicy`
-| Kind     | Enumeration
+| Name       | `CardPresenceNotificationPolicy`
+| Kind       | Enumeration
 | Namespace  | `reader.selection`.<<type_CardSelectionManager,`CardSelectionManager`>>
-| Since    | 3.0
-| Purpose  | Options applied when a card is detected, used to decide which cards trigger event-handler notifications.
+| Since      | 3.0
+| Purpose    | Options applied when a card is detected, used to decide which cards trigger event-handler notifications.
 |===
 
 In the reader observation lifecycle, this policy determines whether a detected card is treated as processable -- see <<sec_observation_lifecycle,Reader observation lifecycle>>.
@@ -1841,11 +1841,11 @@ In the reader observation lifecycle, this policy determines whether a detected c
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name     | `Type`
-| Kind     | Enumeration
+| Name       | `Type`
+| Kind       | Enumeration
 | Namespace  | `reader`.<<type_CardReaderEvent,`CardReaderEvent`>>
-| Since    | 1.0
-| Purpose  | Possible card reader events.
+| Since      | 1.0
+| Purpose    | Possible card reader events.
 |===
 
 [cols="^.^2,^.^1,.^6", options="header"]
@@ -1863,11 +1863,11 @@ In the reader observation lifecycle, this policy determines whether a detected c
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name     | `ChannelSelectionPolicy`
-| Kind     | Enumeration
+| Name       | `ChannelSelectionPolicy`
+| Kind       | Enumeration
 | Namespace  | `reader.selection`.<<type_CardSelectionManager,`CardSelectionManager`>>
-| Since    | 3.0
-| Purpose  | Policy governing the use of the basic channel in a multi-channel selection scenario.
+| Since      | 3.0
+| Purpose    | Policy governing the use of the basic channel in a multi-channel selection scenario.
 |===
 
 [cols="^.^2,^.^1,.^6", options="header"]
@@ -1883,11 +1883,11 @@ In the reader observation lifecycle, this policy determines whether a detected c
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name     | `DetectionMode`
-| Kind     | Enumeration
+| Name       | `DetectionMode`
+| Kind       | Enumeration
 | Namespace  | `reader`.<<type_CardDetectionSettings,`CardDetectionSettings`>>
-| Since    | 3.0
-| Purpose  | Defines the behaviour to apply after a card processing cycle has terminated.
+| Since      | 3.0
+| Purpose    | Defines the behaviour to apply after a card processing cycle has terminated.
 |===
 
 In the reader observation lifecycle, this setting is the guard that decides whether detection resumes after a card-processing cycle -- see <<sec_observation_lifecycle,Reader observation lifecycle>>.
@@ -1905,11 +1905,11 @@ In the reader observation lifecycle, this setting is the guard that decides whet
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name     | `FileControlInformation`
-| Kind     | Enumeration
+| Name       | `FileControlInformation`
+| Kind       | Enumeration
 | Namespace  | `reader.selection`.<<type_IsoCardSelector,`IsoCardSelector`>>
-| Since    | 2.0
-| Purpose  | Types of templates returned in response to the *Select Application* command, according to ISO/IEC 7816-4.
+| Since      | 2.0
+| Purpose    | Types of templates returned in response to the *Select Application* command, according to ISO/IEC 7816-4.
 |===
 
 [cols="^.^2,^.^1,.^6", options="header"]
@@ -1926,11 +1926,11 @@ In the reader observation lifecycle, this setting is the guard that decides whet
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name     | `FileOccurrence`
-| Kind     | Enumeration
+| Name       | `FileOccurrence`
+| Kind       | Enumeration
 | Namespace  | `reader.selection`.<<type_IsoCardSelector,`IsoCardSelector`>>
-| Since    | 2.0
-| Purpose  | Navigation options through the applications contained on the card according to ISO/IEC 7816-4.
+| Since      | 2.0
+| Purpose    | Navigation options through the applications contained on the card according to ISO/IEC 7816-4.
 |===
 
 [cols="^.^2,^.^1,.^6", options="header"]
@@ -1947,11 +1947,11 @@ In the reader observation lifecycle, this setting is the guard that decides whet
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name     | `SelectionExecutionPolicy`
-| Kind     | Enumeration
+| Name       | `SelectionExecutionPolicy`
+| Kind       | Enumeration
 | Namespace  | `reader.selection`.<<type_CardSelectionManager,`CardSelectionManager`>>
-| Since    | 3.0
-| Purpose  | Policy governing the iteration over the selection cases of a scenario.
+| Since      | 3.0
+| Purpose    | Policy governing the iteration over the selection cases of a scenario.
 |===
 
 [cols="^.^2,^.^1,.^6", options="header"]
@@ -1965,16 +1965,20 @@ In the reader observation lifecycle, this setting is the guard that decides whet
 [[sec_errors]]
 === Errors
 
+Every error defined below carries two properties: `message` (`String`), which describes the condition, and
+`cause` (`Any?`), the underlying error that triggered it, `null` when there is none. They are not
+restated for each error.
+
 [[type_CardCommunication]]
 ==== Card Communication
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name     | `CardCommunication`
-| Kind     | Error
+| Name       | `CardCommunication`
+| Kind       | Error
 | Namespace  | `reader`
-| Since    | 1.0
-| Purpose  | Indicates that the communication with the card has failed, typically because the card was removed from the reader before the exchange could complete.
+| Since      | 1.0
+| Purpose    | Indicates that the communication with the card has failed, typically because the card was removed from the reader before the exchange could complete.
 |===
 
 [[type_InvalidCardResponse]]
@@ -1982,10 +1986,10 @@ In the reader observation lifecycle, this setting is the guard that decides whet
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name     | `InvalidCardResponse`
-| Kind     | Error
+| Name       | `InvalidCardResponse`
+| Kind       | Error
 | Namespace  | `reader`
-| Since    | 2.1
+| Since      | 2.1
 | Purpose
 | Indicates that a response received from the card was invalid -- typically when the returned status word does not
   match any of those expected -- either during a selection process or during the processing of a transaction. This
@@ -1997,10 +2001,10 @@ In the reader observation lifecycle, this setting is the guard that decides whet
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name     | `ReaderCommunication`
-| Kind     | Error
+| Name       | `ReaderCommunication`
+| Kind       | Error
 | Namespace  | `reader`
-| Since    | 1.0
-| Purpose  | Indicates that the communication with the reader has failed. The most likely cause is a physical disconnection of the reader, but other technical problems MAY also be at the origin of the failure.
+| Since      | 1.0
+| Purpose    | Indicates that the communication with the reader has failed. The most likely cause is a physical disconnection of the reader, but other technical problems MAY also be at the origin of the failure.
 |===
 
