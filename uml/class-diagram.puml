@@ -22,8 +22,7 @@ end title
 skinparam stereotypeABorderColor #A9DCDF
 skinparam stereotypeIBorderColor #B4A7E5
 skinparam stereotypeCBorderColor #ADD1B2
-skinparam stereotypeEBorderColor #EB93DF
-skinparam stereotypeXBorderColor #D94321
+skinparam stereotypeEBorderColor #EB937F
 ' -- END --
 
 skinparam ClassBorderThickness 2
@@ -72,8 +71,8 @@ end legend
 
 package "reader" as reader {
 
-class "**final** ReaderApiProperties" as ApiProperties <<green>> {
-    +{static} **final** VERSION: String
+class "ReaderApiProperties" as ApiProperties <<green>> <<constants>> {
+    +const VERSION: String = "3.0"
 }
 interface "ReaderApiFactory" as ReaderApiFactory <<blue>> {
     +<color:blue>getCardReaderProvider() → CardReaderProvider
