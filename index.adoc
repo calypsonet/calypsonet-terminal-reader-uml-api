@@ -211,16 +211,18 @@ semantic intent rather than the syntactic form.
 
 [cols="^.^1,.^3,.^3", options="header"]
 |===
-| Type            | Description                                                     | Typical bindings
-| `String`        | Sequence of characters, UTF-8 encoded by default.                | `String`, `string`, `str`.
-| `Boolean`       | Two-state truth value.                                           | `boolean`, `bool`.
-| `Int`           | Signed 32-bit integer.                                           | `int`, `Int32`, `i32`.
-| `Long`          | Signed 64-bit integer.                                           | `long`, `Int64`, `i64`.
-| `ByteArray`     | Ordered sequence of octets.                                      | `byte[]`, `[u8]`, `bytes`.
-| `List<T>`       | Ordered collection of `T` values, may contain duplicates.        | `List<T>`, `Vec<T>`.
-| `Set<T>`        | Unordered collection of unique `T` values.                       | `Set<T>`, `HashSet<T>`.
-| `Map<K,V>`      | Associative array binding keys of type `K` to values of type `V`.| `Map<K,V>`, `Dictionary<K,V>`, `HashMap<K,V>`.
-| `Unit`          | Indicates that an operation returns no value.                    | `void`, `Unit`, `None`, `()`.
+| Type        | Description                                                       | Typical bindings
+| `String`    | Sequence of characters, UTF-8 encoded by default.                 | `String`, `string`, `str`.
+| `Boolean`   | Two-state truth value.                                            | `boolean`, `bool`.
+| `Int`       | Signed 32-bit integer.                                            | `int`, `Int32`, `i32`.
+| `Long`      | Signed 64-bit integer.                                            | `long`, `Int64`, `i64`.
+| `ByteArray` | Ordered sequence of octets.                                       | `byte[]`, `[u8]`, `bytes`.
+| `List<T>`   | Ordered collection of `T` values, may contain duplicates.         | `List<T>`, `Vec<T>`.
+| `Set<T>`    | Unordered collection of unique `T` values.                        | `Set<T>`, `HashSet<T>`.
+| `Map<K,V>`  | Associative array binding keys of type `K` to values of type `V`. | `Map<K,V>`, `Dictionary<K,V>`, `HashMap<K,V>`.
+| `T?`        | Nullable value: either a `T` value or `null`.                     | `Optional<T>`, `T?`, `Option<T>`.
+| `null`      | Absence of value, the alternative held by a nullable type.        | `null`, `nil`, `None`.
+| `Unit`      | Indicates that an operation returns no value.                     | `void`, `Unit`, `()`.
 |===
 
 ==== Type tables
@@ -558,7 +560,7 @@ include::uml/class-diagram.puml[Terminal Reader API class diagram]
   The value is a dotted decimal of the form `MAJOR.MINOR`; it is `"{api-version}"` for this revision of the specification.
 |===
 
-=== API Interfaces
+=== Data
 
 [[type_BasicCardSelector]]
 ==== Basic Card Selector
@@ -566,20 +568,36 @@ include::uml/class-diagram.puml[Terminal Reader API class diagram]
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
 | Name       | `BasicCardSelector`
-| Kind       | Interface
+| Kind       | Data
 | Namespace  | `reader.selection`
-| Extends    | `CardSelector<BasicCardSelector>`
+| Implements | <<type_CardSelector,`CardSelector`>>
 | Since      | 2.0
-| Purpose    | Basic, technology-agnostic card selector. An instance is obtained via <<op_ReaderApiFactory_createBasicCardSelector,`ReaderApiFactory.createBasicCardSelector`>>.
+| Purpose    | Basic, technology-agnostic card selector, built directly by the application.
 |===
 
-`BasicCardSelector` does not add any operation to <<type_CardSelector,`CardSelector`>>. It exists to express the
-absence of ISO/IEC 7816-4-specific filters at the type level.
+`BasicCardSelector` carries no ISO/IEC 7816-4-specific filter; it exists to express their absence at the
+type level. Every filter is *optional* and MAY be combined with the others. When no filter is set, any card
+that responds when presented to the reader is considered selected; when one or more filters are set, the card
+is rejected as soon as one of them does not match.
 
-The filters carried by a selector restrict the selection process to certain cards. They are all *optional* and MAY
-be combined. If no filter is specified, any card that responds when presented to the reader is considered
-selected. Conversely, when one or more filters are defined, the card is not selected as soon as one of them
-rejects it.
+[cols="^.^1,^.^1,^.^1,^.^1,.^5", options="header"]
+|===
+| Name | Type | Default | Since | Description
+
+| `cardType`
+| `CardType?` (<<ref_cna_td,CNA-TD-API>>)
+| `null`
+| 3.0
+| Restricts the selection to cards whose detected type matches this value. The value `UNKNOWN` MAY be
+  used to capture cards whose type could not be identified. `null` disables the filter.
+
+| `powerOnDataRegex`
+| `String?`
+| `null`
+| 2.0
+| Restricts the selection to cards whose power-on data, as provided by the reader, matches this regular
+  expression. `null` disables the filter.
+|===
 
 [[type_CardDetectionSettings]]
 ==== Card Detection Settings
@@ -587,87 +605,205 @@ rejects it.
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
 | Name       | `CardDetectionSettings`
-| Kind       | Interface (builder)
+| Kind       | Data
 | Namespace  | `reader`
 | Since      | 3.0
-| Purpose    | Carries the configuration of a card detection cycle. An instance is obtained via <<op_ReaderApiFactory_createCardDetectionSettings,`ReaderApiFactory.createCardDetectionSettings`>>.
+| Purpose    | Carries the configuration of a card detection cycle, built directly by the application.
 |===
 
-`CardDetectionSettings` exposes setters in *builder* form: each operation returns the current instance to allow
-fluent composition. Setters that are not called default to the values specified below.
-
-[cols="^.^1h,.^5", grid=rows, frame=all]
+[cols="^.^1,^.^1,^.^1,^.^1,.^5", options="header"]
 |===
-| Default detection mode       | `REPEATING`
-| Default RF technologies      | `{ ISO_14443_AB }` (single-element set, see <<ref_cna_td,CNA-TD-API>>)
-| Default ECP frame            | _none_
-|===
+| Name | Type | Default | Since | Description
 
-[[op_CardDetectionSettings_setDetectionMode]]
-===== Set Detection Mode
-
-[cols="^.^1h,.^5", grid=rows, frame=all]
-|===
-| Signature      | `setDetectionMode(detectionMode: DetectionMode) -> CardDetectionSettings`
-| Since          | 3.0
-| Description
-| Sets the *detection mode*, which governs the reader's behaviour once a card-processing cycle has terminated.
-  With `REPEATING`, the reader automatically resumes polling and waits for the next card insertion, enabling
-  continuous, unattended operation. With `SINGLE_SHOT`, the reader stops detection after the current cycle; a new
-  call to <<op_ObservableCardReader_startCardDetection,`startCardDetection`>> is required before another card can
+| `detectionMode`
+| <<type_DetectionMode,`DetectionMode`>>
+| `DetectionMode.REPEATING`
+| 3.0
+| Governs the reader behaviour once a card-processing cycle has terminated. With `REPEATING`, the reader
+  automatically resumes polling and waits for the next card insertion, enabling continuous, unattended
+  operation. With `SINGLE_SHOT`, the reader stops detection after the current cycle; a new call to
+  <<op_ObservableCardReader_startCardDetection,`startCardDetection`>> is required before another card can
   be detected.
 
-  When this setter is not called, the detection mode defaults to `REPEATING` (see the defaults above). The full
-  semantics of each value are given by the <<type_DetectionMode,`DetectionMode`>> enumeration.
-| Parameters     | `detectionMode` (<<type_DetectionMode,`DetectionMode`>>) -- the desired detection mode.
-| Returns        | The current instance (<<type_CardDetectionSettings,`CardDetectionSettings`>>).
-| Pre-conditions | *Argument* -- every parameter is non-`null`.
-| Errors         | None.
+| `rfTechnologies`
+| `Set<RfTechnology>` (<<ref_cna_td,CNA-TD-API>>)
+| `setOf(RfTechnology.ISO_14443_AB)`
+| 3.0
+| The set of RF technologies the reader activates during polling. Not relevant for contact readers, where
+  it is accepted without effect. MUST NOT be empty.
+
+| `ecpFrame`
+| `ByteArray?`
+| `null`
+| 3.0
+| The ECP (Enhanced Contactless Polling) frame to emit at polling startup, treated by this specification
+  as opaque binary data constructed by the application in accordance with the relevant ECP specification
+  and transmitted as-is to the reader. Relevant only on readers supporting ECP; on the others the frame is
+  silently ignored and a `WARN`-level message is typically logged. `null` means that no ECP frame is
+  emitted. When set, it MUST NOT be empty.
 |===
 
-[[op_CardDetectionSettings_setEcpFrame]]
-===== Set ECP Frame
+[[type_CardReaderEvent]]
+==== Card Reader Event
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature      | `setEcpFrame(ecpFrame: ByteArray) -> CardDetectionSettings`
-| Since          | 3.0
-| Description
-| Provides the ECP (Enhanced Contactless Polling) frame to emit at polling startup. The frame is treated by this
-  specification as opaque binary data constructed by the application in accordance with the relevant ECP
-  specification and transmitted as-is to the reader.
-
-  Relevant only on readers supporting ECP. If the underlying reader does not support ECP, the provided frame is
-  silently ignored and a `WARN`-level message is typically logged.
-
-  When this setter is not called, no ECP frame is emitted (default *none*; see the defaults above).
-| Parameters     | `ecpFrame` -- the non-empty ECP frame.
-| Returns        | The current instance (<<type_CardDetectionSettings,`CardDetectionSettings`>>).
-| Pre-conditions | *Argument* -- every parameter is non-`null`. +
-  *Argument* -- the provided array is not empty.
-| Errors         | None.
+| Name       | `CardReaderEvent`
+| Kind       | Data
+| Namespace  | `reader`
+| Since      | 1.0
+| Purpose    | Data container describing a change of state observed by a `CardReader`.
 |===
 
-[[op_CardDetectionSettings_setRfTechnologies]]
-===== Set RF Technologies
+A `CardReaderEvent` carries the origin of the event (the reader name), the event type and, when available,
+the card selection response. The circumstances under which each event type is emitted are described in
+<<sec_observation_lifecycle,Reader observation lifecycle>>.
+
+[cols="^.^1,^.^1,^.^1,^.^1,.^5", options="header"]
+|===
+| Name | Type | Default | Since | Description
+
+| `readerName`
+| `String`
+| --
+| 1.0
+| Name of the reader that generated the event. Non-empty.
+
+| `type`
+| <<type_CardReaderEventType,`CardReaderEventType`>>
+| --
+| 1.0
+| Type of the event.
+
+| `scheduledCardSelectionsResponse`
+| <<type_ScheduledCardSelectionsResponse,`ScheduledCardSelectionsResponse`>>?
+| --
+| 1.0
+| Response of the selection scenario scheduled on the reader. It is `null` *only* when no selection
+  scenario has been scheduled; in every other case it is non-`null`. When non-`null`, it MUST be passed for
+  interpretation to
+  <<op_CardSelectionManager_parseScheduledCardSelectionsResponse,`CardSelectionManager.parseScheduledCardSelectionsResponse`>>,
+  called on the <<type_CardSelectionManager,`CardSelectionManager`>> instance that prepared the associated
+  selection scenario, or on another `CardSelectionManager` sharing the same context -- that is, one that
+  has previously prepared the same selection scenario.
+|===
+
+[[type_CardSelectionResult]]
+==== Card Selection Result
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature      | `setRfTechnologies(rfTechnologies: Set<RfTechnology>) -> CardDetectionSettings`
-| Since          | 3.0
-| Description
-| Declares the set of RF technologies the reader activates during polling. The `RfTechnology` enumeration is
-  defined in the Terminal Definitions API (see <<ref_cna_td,CNA-TD-API>>).
-
-  Not relevant for contact readers; on such readers, this setter is accepted without effect.
-
-  When this setter is not called, the reader polls the default set `{ ISO_14443_AB }` (see the defaults above).
-| Parameters     | `rfTechnologies` -- the non-empty set of RF technologies to activate.
-| Returns        | The current instance (<<type_CardDetectionSettings,`CardDetectionSettings`>>).
-| Pre-conditions | *Argument* -- every parameter is non-`null`. +
-  *Argument* -- the provided set is not empty.
-| Errors         | None.
+| Name       | `CardSelectionResult`
+| Kind       | Data
+| Namespace  | `reader.selection`
+| Since      | 1.0
+| Purpose    | Result of a selection process.
 |===
+
+Each selection case prepared with the manager is associated with the index returned by `prepareSelection`.
+The same index is used to retrieve the corresponding result here. In single-channel mode, at most one case
+will correspond to the active selected card. In multi-channel mode, several active selections may coexist;
+see `activeSelectionIndexes` below.
+
+[cols="^.^1,^.^1,^.^1,^.^1,.^5", options="header"]
+|===
+| Name | Type | Default | Since | Description
+
+| `cardType`
+| `CardType` (<<ref_cna_td,CNA-TD-API>>)
+| --
+| 3.0
+| Type of the detected card, as defined by the `CardType` enumeration of the Terminal Definitions API
+  (see <<ref_cna_td,CNA-TD-API>>). `UNKNOWN` when the card type could not be identified. The value is
+  intrinsically tied to the lifecycle of this `CardSelectionResult`.
+
+| `smartCards`
+| `Map<Int, SmartCard>`
+| --
+| 1.0
+| All <<type_SmartCard,`SmartCard`>> instances corresponding to successful selection cases, indexed by the
+  value returned by `prepareSelection`. Possibly empty.
+
+| `activeSmartCard`
+| <<type_SmartCard,`SmartCard`>>?
+| --
+| 1.0
+| The active matching card, that is, the card that has been selected, or `null` if there is none. In case
+  of multiple active smart cards (multi-channel mode), the one placed on channel `0`.
+
+| `activeSelectionIndex`
+| `Int?`
+| --
+| 1.0
+| Index of the active selection, or `null` if there is none. Identical to the first element of
+  `activeSelectionIndexes` when applicable.
+
+| `activeSelectionIndexes`
+| `List<Int>`
+| --
+| 3.0
+| Indexes of all active selections, one per channel in multi-channel mode. Possibly empty. Values are
+  non-negative.
+|===
+
+[[type_IsoCardSelector]]
+==== ISO Card Selector
+
+[cols="^.^1h,.^5", grid=rows, frame=all]
+|===
+| Name       | `IsoCardSelector`
+| Kind       | Data
+| Namespace  | `reader.selection`
+| Implements | <<type_CardSelector,`CardSelector`>>
+| Since      | 2.0
+| Purpose    | ISO/IEC 7816-4 card selector, built directly by the application.
+|===
+
+`IsoCardSelector` adds the ISO/IEC 7816-4-specific filters to those common to every selector. They are all
+*optional* and MAY be combined. When no filter is set, any card that responds when presented to the reader is
+considered selected; when one or more filters are set, the card is rejected as soon as one of them does not
+match.
+
+[cols="^.^1,^.^1,^.^1,^.^1,.^5", options="header"]
+|===
+| Name | Type | Default | Since | Description
+
+| `cardType`
+| `CardType?` (<<ref_cna_td,CNA-TD-API>>)
+| `null`
+| 3.0
+| Restricts the selection to cards whose detected type matches this value. The value `UNKNOWN` MAY be
+  used to capture cards whose type could not be identified. `null` disables the filter.
+
+| `powerOnDataRegex`
+| `String?`
+| `null`
+| 2.0
+| Restricts the selection to cards whose power-on data, as provided by the reader, matches this regular
+  expression. `null` disables the filter.
+
+| `dfName`
+| `ByteArray?`
+| `null`
+| 2.0
+| Selects a card application DF by its name: the DF is selected only if its name starts with this AID, as
+  defined by ISO/IEC 7816-4 section 4.2. The value is used as a parameter of the *Select Application* ISO
+  card command and MUST contain 5 to 16 bytes. `null` disables the filter.
+
+| `fileOccurrence`
+| <<type_FileOccurrence,`FileOccurrence`>>
+| `FileOccurrence.FIRST`
+| 2.0
+| File occurrence mode (see ISO/IEC 7816-4).
+
+| `fileControlInformation`
+| <<type_FileControlInformation,`FileControlInformation`>>
+| `FileControlInformation.FCI`
+| 2.0
+| File control mode (see ISO/IEC 7816-4).
+|===
+
+=== API Interfaces
 
 [[type_CardReader]]
 ==== Card Reader
@@ -720,68 +856,6 @@ fluent composition. Setters that are not called default to the values specified 
 | Since          | 1.0
 | Description    | Indicates whether the card communication mode is contactless.
 | Returns        | `true` if the communication mode is contactless, `false` otherwise.
-| Pre-conditions | None.
-| Errors         | None.
-|===
-
-[[type_CardReaderEvent]]
-==== Card Reader Event
-
-[cols="^.^1h,.^5", grid=rows, frame=all]
-|===
-| Name       | `CardReaderEvent`
-| Kind       | Interface
-| Namespace  | `reader`
-| Since      | 1.0
-| Purpose    | Data container describing a change of state observed by a `CardReader`.
-|===
-
-A `CardReaderEvent` carries the origin of the event (the reader name), the event type and, when available, the
-card selection response. The circumstances under which each event type is emitted are described in <<sec_observation_lifecycle,Reader observation lifecycle>>.
-
-[[op_CardReaderEvent_getReaderName]]
-===== Get Reader Name
-
-[cols="^.^1h,.^5", grid=rows, frame=all]
-|===
-| Signature      | `getReaderName() -> String`
-| Since          | 1.0
-| Description    | Returns the name of the reader that generated the event.
-| Returns        | A non-empty `String`.
-| Pre-conditions | None.
-| Errors         | None.
-|===
-
-[[op_CardReaderEvent_getScheduledCardSelectionsResponse]]
-===== Get Scheduled Card Selections Response
-
-[cols="^.^1h,.^5", grid=rows, frame=all]
-|===
-| Signature      | `getScheduledCardSelectionsResponse() -> ScheduledCardSelectionsResponse?`
-| Since          | 1.0
-| Description
-| Returns the response of the selection scenario scheduled on the reader. It is `null` *only* when no selection
-  scenario has been scheduled; in every other case it is non-`null`.
-
-  When non-`null`, the returned value MUST be passed for interpretation to
-  <<op_CardSelectionManager_parseScheduledCardSelectionsResponse,`CardSelectionManager.parseScheduledCardSelectionsResponse`>>, called
-  on the <<type_CardSelectionManager,`CardSelectionManager`>> instance that prepared the associated selection
-  scenario, or on another `CardSelectionManager` sharing the same context -- that is, one that has previously
-  prepared the same selection scenario.
-| Returns        | The scheduled card selections response (<<type_ScheduledCardSelectionsResponse,`ScheduledCardSelectionsResponse`>>), or `null` if no selection scenario has been scheduled.
-| Pre-conditions | None.
-| Errors         | None.
-|===
-
-[[op_CardReaderEvent_getType]]
-===== Get Type
-
-[cols="^.^1h,.^5", grid=rows, frame=all]
-|===
-| Signature      | `getType() -> Type`
-| Since          | 1.0
-| Description    | Returns the type of the event.
-| Returns        | A <<type_Type,`Type`>> value.
 | Pre-conditions | None.
 | Errors         | None.
 |===
@@ -997,7 +1071,7 @@ of the call.
 |===
 | Signature
 | `prepareSelection(` +
-`{nbsp}{nbsp}{nbsp}{nbsp}cardSelector: CardSelector<?>,` +
+`{nbsp}{nbsp}{nbsp}{nbsp}cardSelector: CardSelector,` +
 `{nbsp}{nbsp}{nbsp}{nbsp}cardSelectionExtension: CardSelectionExtension` +
 `) -> Int`
 | Since          | 2.0
@@ -1090,228 +1164,20 @@ of the call.
 | Errors         | None.
 |===
 
-[[type_CardSelectionResult]]
-==== Card Selection Result
-
-[cols="^.^1h,.^5", grid=rows, frame=all]
-|===
-| Name       | `CardSelectionResult`
-| Kind       | Interface
-| Namespace  | `reader.selection`
-| Since      | 1.0
-| Purpose    | Result of a selection process.
-|===
-
-Each selection case prepared with the manager is associated with the index returned by `prepareSelection`. The same
-index is used to retrieve the corresponding result here. In single-channel mode, at most one case will correspond
-to the active selected card. In multi-channel mode, several active selections may coexist; see
-<<op_CardSelectionResult_getActiveSelectionIndexes,`getActiveSelectionIndexes`>>.
-
-[[op_CardSelectionResult_getActiveSelectionIndex]]
-===== Get Active Selection Index
-
-[cols="^.^1h,.^5", grid=rows, frame=all]
-|===
-| Signature      | `getActiveSelectionIndex() -> Int`
-| Since          | 1.0
-| Description    | Returns the index of the active selection, if any. Identical to the first element of `getActiveSelectionIndexes()` when applicable.
-| Returns        | A non-negative `Int` if an active selection exists, `-1` otherwise.
-| Pre-conditions | None.
-| Errors         | None.
-|===
-
-[[op_CardSelectionResult_getActiveSelectionIndexes]]
-===== Get Active Selection Indexes
-
-[cols="^.^1h,.^5", grid=rows, frame=all]
-|===
-| Signature      | `getActiveSelectionIndexes() -> List<Int>`
-| Since          | 3.0
-| Description    | Returns the indexes of all active selections, one per channel in multi-channel mode.
-| Returns        | A possibly empty list of non-negative `Int` values.
-| Pre-conditions | None.
-| Errors         | None.
-|===
-
-[[op_CardSelectionResult_getActiveSmartCard]]
-===== Get Active Smart Card
-
-[cols="^.^1h,.^5", grid=rows, frame=all]
-|===
-| Signature      | `getActiveSmartCard() -> SmartCard?`
-| Since          | 1.0
-| Description
-| Returns the active matching card, i.e. the card that has been selected.
-
-  In case of multiple active smart cards (multi-channel mode), the active smart card placed on channel `0` is
-  returned. Use <<op_CardSelectionResult_getActiveSelectionIndexes,`getActiveSelectionIndexes`>> to obtain the full set of active
-  selection indexes.
-| Returns        | The active <<type_SmartCard,`SmartCard`>>, or `null` if there is no active card.
-| Pre-conditions | None.
-| Errors         | None.
-|===
-
-[[op_CardSelectionResult_getCardType]]
-===== Get Card Type
-
-[cols="^.^1h,.^5", grid=rows, frame=all]
-|===
-| Signature      | `getCardType() -> CardType`
-| Since          | 3.0
-| Description
-| Returns the type of the detected card, as defined by the `CardType` enumeration of the Terminal Definitions API
-  (see <<ref_cna_td,CNA-TD-API>>). The returned value is intrinsically tied to the lifecycle of this `CardSelectionResult`.
-| Returns        | A `CardType` (<<ref_cna_td,CNA-TD-API>>). `UNKNOWN` is returned when the card type could not be identified.
-| Pre-conditions | None.
-| Errors         | None.
-|===
-
-[[op_CardSelectionResult_getSmartCards]]
-===== Get Smart Cards
-
-[cols="^.^1h,.^5", grid=rows, frame=all]
-|===
-| Signature      | `getSmartCards() -> Map<Int, SmartCard>`
-| Since          | 1.0
-| Description    | Returns all <<type_SmartCard,`SmartCard`>> instances corresponding to successful selection cases, indexed by the value returned by `prepareSelection`.
-| Returns        | A possibly empty map.
-| Pre-conditions | None.
-| Errors         | None.
-|===
-
 [[type_CardSelector]]
 ==== Card Selector
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
 | Name       | `CardSelector`
-| Kind       | Interface
+| Kind       | Sealed interface
 | Namespace  | `reader.selection`
-| Generics   | `<T : CardSelector<T>>`
 | Since      | 2.0
-| Purpose    | Base contract for all card selectors. Defines filters used to restrict the selection process to a subset of cards.
+| Purpose    | Common supertype of the card selectors. Carries no member; it exists to let an operation accept any selector.
 |===
 
-All filters defined by this interface are *optional* and MAY be combined. If no filter is specified, any card that
-responds when inserted in the reader is considered selected. Conversely, if one or more filters are defined, a
-card is not selected if at least one of them rejects it.
-
-[[op_CardSelector_filterByCardType]]
-===== Filter By Card Type
-
-[cols="^.^1h,.^5", grid=rows, frame=all]
-|===
-| Signature      | `filterByCardType(cardType: CardType) -> T`
-| Since          | 3.0
-| Description
-| Restricts the selection process to cards whose detected type matches the provided value.
-  The `CardType` enumeration is defined in the Terminal Definitions API (see <<ref_cna_td,CNA-TD-API>>) and characterises the
-  detected card as a combination of transport protocol family and, when applicable, product identity.
-
-  The value `UNKNOWN` MAY be used to explicitly capture cards whose type could not be identified by the
-  implementation.
-| Parameters     | `cardType` (`CardType` (<<ref_cna_td,CNA-TD-API>>)) -- the `CardType` (<<ref_cna_td,CNA-TD-API>>) to use as filter.
-| Returns        | The current instance (`T`).
-| Pre-conditions | *Argument* -- every parameter is non-`null`.
-| Errors         | None.
-|===
-
-[[op_CardSelector_filterByPowerOnData]]
-===== Filter By Power On Data
-
-[cols="^.^1h,.^5", grid=rows, frame=all]
-|===
-| Signature      | `filterByPowerOnData(powerOnDataRegex: String) -> T`
-| Since          | 2.0
-| Description    | Restricts the selection process to cards whose power-on data, as provided by the reader, matches a specific regular expression.
-| Parameters     | `powerOnDataRegex` -- the regular expression to use as filter.
-| Returns        | The current instance (`T`).
-| Pre-conditions | *Argument* -- every parameter is non-`null`. +
-  *Argument* -- the provided regular expression is non-empty and valid.
-| Errors         | None.
-|===
-
-[[type_IsoCardSelector]]
-==== ISO Card Selector
-
-[cols="^.^1h,.^5", grid=rows, frame=all]
-|===
-| Name       | `IsoCardSelector`
-| Kind       | Interface
-| Namespace  | `reader.selection`
-| Extends    | `CardSelector<IsoCardSelector>`
-| Since      | 2.0
-| Purpose    | ISO/IEC 7816-4 card selector. An instance is obtained via <<op_ReaderApiFactory_createIsoCardSelector,`ReaderApiFactory.createIsoCardSelector`>>.
-|===
-
-`IsoCardSelector` adds the ISO/IEC 7816-4-specific filters used to restrict the selection process to certain
-cards. Like every selector filter, they are all *optional* and MAY be combined. If no filter is specified, any
-card that responds when presented to the reader is considered selected. Conversely, when one or more filters are
-defined, the card is not selected as soon as one of them rejects it.
-
-[[op_IsoCardSelector_filterByDfName_byteArray]]
-===== Filter By DF Name (Byte Array)
-
-[cols="^.^1h,.^5", grid=rows, frame=all]
-|===
-| Signature      | `filterByDfName(aid: ByteArray) -> IsoCardSelector`
-| Since          | 2.0
-| Description
-| Selects a card application DF by its name. The DF is selected only if its name starts with the provided AID,
-  as defined by ISO/IEC 7816-4 § 4.2.
-  The provided AID is used as a parameter of the *Select Application* ISO card command.
-| Parameters     | `aid` -- the AID as a `ByteArray` containing 5 to 16 bytes.
-| Returns        | The current instance (<<type_IsoCardSelector,`IsoCardSelector`>>).
-| Pre-conditions | *Argument* -- every parameter is non-`null`. +
-  *Argument* -- the provided array is within range.
-| Errors         | None.
-|===
-
-[[op_IsoCardSelector_filterByDfName_string]]
-===== Filter By DF Name (String)
-
-[cols="^.^1h,.^5", grid=rows, frame=all]
-|===
-| Signature      | `filterByDfName(aid: String) -> IsoCardSelector`
-| Since          | 2.0
-| Description    | Selects a card application DF by its name. The AID is provided as a hexadecimal string. Semantics are otherwise identical to the byte-array overload.
-| Parameters     | `aid` -- the AID as a hexadecimal `String` of 5 to 16 bytes.
-| Returns        | The current instance (<<type_IsoCardSelector,`IsoCardSelector`>>).
-| Pre-conditions | *Argument* -- every parameter is non-`null`. +
-  *Argument* -- the provided string is valid and within range.
-| Errors         | None.
-|===
-
-[[op_IsoCardSelector_setFileControlInformation]]
-===== Set File Control Information
-
-[cols="^.^1h,.^5", grid=rows, frame=all]
-|===
-| Signature
-| `setFileControlInformation(` +
-`{nbsp}{nbsp}{nbsp}{nbsp}fileControlInformation: FileControlInformation` +
-`) -> IsoCardSelector`
-| Since          | 2.0
-| Description    | Sets the file control mode (see ISO/IEC 7816-4). The default value is `FCI`.
-| Parameters     | `fileControlInformation` (<<type_FileControlInformation,`FileControlInformation`>>) -- the file control mode to apply.
-| Returns        | The current instance (<<type_IsoCardSelector,`IsoCardSelector`>>).
-| Pre-conditions | *Argument* -- every parameter is non-`null`.
-| Errors         | None.
-|===
-
-[[op_IsoCardSelector_setFileOccurrence]]
-===== Set File Occurrence
-
-[cols="^.^1h,.^5", grid=rows, frame=all]
-|===
-| Signature      | `setFileOccurrence(fileOccurrence: FileOccurrence) -> IsoCardSelector`
-| Since          | 2.0
-| Description    | Sets the file occurrence mode (see ISO/IEC 7816-4). The default value is `FIRST`.
-| Parameters     | `fileOccurrence` (<<type_FileOccurrence,`FileOccurrence`>>) -- the navigation option to apply.
-| Returns        | The current instance (<<type_IsoCardSelector,`IsoCardSelector`>>).
-| Pre-conditions | *Argument* -- every parameter is non-`null`.
-| Errors         | None.
-|===
+Its permitted implementations are <<type_BasicCardSelector,`BasicCardSelector`>> and
+<<type_IsoCardSelector,`IsoCardSelector`>>, which carry the filters restricting the selection process.
 
 [[type_ObservableCardReader]]
 ==== Observable Card Reader
@@ -1377,7 +1243,7 @@ the end of a card processing whatever the outcome.
 
   Parameters carried by `CardDetectionSettings` that are not supported by the underlying reader (for example an
   unsupported `RfTechnology`, or an ECP frame on a reader that does not support ECP) are silently ignored.
-  A `WARN`-level message is typically logged in such cases. No error is thrown.
+  A `WARN`-level message is typically logged in such cases. No error is raised.
 | Parameters
 | `settings` (<<type_CardDetectionSettings,`CardDetectionSettings`>>)     -- the detection configuration. +
   `eventHandler` (<<type_CardReaderEventHandler,`CardReaderEventHandler`>>) -- the application-side handler that receives reader events and errors.
@@ -1412,37 +1278,6 @@ the end of a card processing whatever the outcome.
 The `ReaderApiFactory` is the single entry point through which the application instantiates the public types of
 the API. It is provided as a single instance whose accessors each return a fresh, fully initialised object.
 
-[[op_ReaderApiFactory_createBasicCardSelector]]
-===== Create Basic Card Selector
-
-[cols="^.^1h,.^5", grid=rows, frame=all]
-|===
-| Signature      | `createBasicCardSelector() -> BasicCardSelector`
-| Since          | 2.0
-| Description
-| Creates a <<type_BasicCardSelector,`BasicCardSelector`>>, a technology-agnostic selector used to target a card in
-a selection scenario. Use <<op_ReaderApiFactory_createIsoCardSelector,`createIsoCardSelector`>> when ISO/IEC 7816-4
-(AID-based) selection is required.
-| Returns        | A <<type_BasicCardSelector,`BasicCardSelector`>>.
-| Pre-conditions | None.
-| Errors         | None.
-|===
-
-[[op_ReaderApiFactory_createCardDetectionSettings]]
-===== Create Card Detection Settings
-
-[cols="^.^1h,.^5", grid=rows, frame=all]
-|===
-| Signature      | `createCardDetectionSettings() -> CardDetectionSettings`
-| Since          | 3.0
-| Description
-| Creates a <<type_CardDetectionSettings,`CardDetectionSettings`>> carrying the configuration of a card detection
-cycle.
-| Returns        | A <<type_CardDetectionSettings,`CardDetectionSettings`>>.
-| Pre-conditions | None.
-| Errors         | None.
-|===
-
 [[op_ReaderApiFactory_createCardSelectionManager]]
 ===== Create Card Selection Manager
 
@@ -1454,21 +1289,6 @@ cycle.
 | Creates a <<type_CardSelectionManager,`CardSelectionManager`>>, the service used to prepare and execute a card
 selection scenario.
 | Returns        | A <<type_CardSelectionManager,`CardSelectionManager`>>.
-| Pre-conditions | None.
-| Errors         | None.
-|===
-
-[[op_ReaderApiFactory_createIsoCardSelector]]
-===== Create ISO Card Selector
-
-[cols="^.^1h,.^5", grid=rows, frame=all]
-|===
-| Signature      | `createIsoCardSelector() -> IsoCardSelector`
-| Since          | 2.0
-| Description
-| Creates an <<type_IsoCardSelector,`IsoCardSelector`>> for ISO/IEC 7816-4 (AID-based) card selection. Use
-<<op_ReaderApiFactory_createBasicCardSelector,`createBasicCardSelector`>> for technology-agnostic selection.
-| Returns        | An <<type_IsoCardSelector,`IsoCardSelector`>>.
 | Pre-conditions | None.
 | Errors         | None.
 |===
@@ -1529,7 +1349,7 @@ This SPI unifies the reception of nominal events (`onReaderEvent`) and of fatal 
 | `onReaderError(` +
 `{nbsp}{nbsp}{nbsp}{nbsp}context: String,` +
 `{nbsp}{nbsp}{nbsp}{nbsp}readerName: String,` +
-`{nbsp}{nbsp}{nbsp}{nbsp}e: Throwable` +
+`{nbsp}{nbsp}{nbsp}{nbsp}error: Any` +
 `) -> Unit`
 | Since          | 3.0
 | Description
@@ -1538,7 +1358,7 @@ This SPI unifies the reception of nominal events (`onReaderEvent`) and of fatal 
 | Parameters
 | `context`     -- the context describing the operation that failed. +
   `readerName`  -- the name of the reader on which the error occurred. +
-  `e`           -- the original error that triggered the notification.
+  `error`       -- the original error that triggered the notification.
 | Pre-conditions | *Argument* -- every parameter is non-`null`.
 | Errors         | None.
 |===
@@ -1555,7 +1375,7 @@ This SPI unifies the reception of nominal events (`onReaderEvent`) and of fatal 
   explicitly documented.
 | Parameters     | `cardReaderEvent` (<<type_CardReaderEvent,`CardReaderEvent`>>) -- the event payload.
 | Pre-conditions | *Argument* -- every parameter is non-`null`.
-| Errors         | None. Any error thrown by the handler is routed to `onReaderError`.
+| Errors         | None. Any error raised by the handler is routed to `onReaderError`.
 |===
 
 [[type_CardSelectionExtension]]
@@ -1828,14 +1648,14 @@ In the reader observation lifecycle, this policy determines whether a detected c
 | `MATCHED_ONLY` | 3.0 | Only cards that have been successfully selected are notified. The others are ignored.
 |===
 
-[[type_Type]]
+[[type_CardReaderEventType]]
 ==== Card Reader Event Type
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name       | `Type`
+| Name       | `CardReaderEventType`
 | Kind       | Enumeration
-| Namespace  | `reader`.<<type_CardReaderEvent,`CardReaderEvent`>>
+| Namespace  | `reader`
 | Since      | 1.0
 | Purpose    | Possible card reader events.
 |===

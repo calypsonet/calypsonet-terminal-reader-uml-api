@@ -71,18 +71,12 @@ end legend
 
 package "reader" as reader {
 
-class "ReaderApiProperties" as ApiProperties <<green>> <<constants>> {
+class "ReaderApiProperties" as ApiProperties <<constants>> <<green>> {
     +const VERSION: String = "3.0"
 }
 interface "ReaderApiFactory" as ReaderApiFactory <<blue>> {
     +<color:blue>getCardReaderProvider() → CardReaderProvider
-
     +createCardSelectionManager() → CardSelectionManager
-
-    +createBasicCardSelector() → BasicCardSelector
-    +createIsoCardSelector() → IsoCardSelector
-
-    +<color:blue>createCardDetectionSettings() → CardDetectionSettings
 }
 
 interface "<color:blue>CardReaderProvider" as CardReaderProvider <<blue>> {
@@ -106,21 +100,21 @@ interface "ObservableCardReader" as ObservableCardReader extends CardReader {
 
     +<color:blue>endCardProcessing() → Unit
 }
-interface "<color:blue>CardDetectionSettings" as CardDetectionSettings <<blue>> {
-    +<color:blue>setDetectionMode(detectionMode: DetectionMode) → CardDetectionSettings
-    +<color:blue>setRfTechnologies(rfTechnologies: Set<<back:yellow>RfTechnology</back>>) → CardDetectionSettings
-    +<color:blue>setEcpFrame(ecpFrame: ByteArray) → CardDetectionSettings
+class "<color:blue>CardDetectionSettings" as CardDetectionSettings <<data>> <<green>> {
+    +<color:blue>val detectionMode: DetectionMode = DetectionMode.REPEATING
+    +{field} <color:blue>val rfTechnologies: Set<<back:yellow>RfTechnology</back>> = setOf(<back:yellow>RfTechnology.ISO_14443_AB</back>)
+    +{field} <color:blue>val ecpFrame: ByteArray? = null
 }
 enum DetectionMode <<green>> {
     REPEATING
     <color:blue>SINGLE_SHOT
 }
-interface CardReaderEvent {
-    +getReaderName() → String
-    +getType() → Type
-    +getScheduledCardSelectionsResponse() → ScheduledCardSelectionsResponse?
+class CardReaderEvent <<data>> <<green>> {
+    +val readerName: String
+    +val type: CardReaderEventType
+    +val scheduledCardSelectionsResponse: ScheduledCardSelectionsResponse?
 }
-enum "Type" as CardReaderEventType <<green>> {
+enum "<color:blue>CardReaderEventType" as CardReaderEventType <<green>> {
     CARD_INSERTED
     CARD_MATCHED
     CARD_REMOVED
@@ -130,7 +124,7 @@ enum "Type" as CardReaderEventType <<green>> {
 package "spi" as readerSpi {
     interface "<color:blue>CardReaderEventHandler" as CardReaderEventHandler <<red>> {
         +<color:blue>onReaderEvent(cardReaderEvent: CardReaderEvent) → Unit
-        +<color:blue>onReaderError(context: String, readerName: String, e: Throwable) → Unit
+        +<color:blue>onReaderError(context: String, readerName: String, error: Any) → Unit
     }
 }
 
@@ -138,7 +132,7 @@ package "spi" as readerSpi {
 package "selection" as selectionApi {
     ' Selection
     interface CardSelectionManager <<blue>> {
-        +prepareSelection(cardSelector: CardSelector<?>, cardSelectionExtension: CardSelectionExtension) → Int
+        +prepareSelection(cardSelector: CardSelector, cardSelectionExtension: CardSelectionExtension) → Int
 
         +exportCardSelectionScenario() → String
         +importCardSelectionScenario(cardSelectionScenario: String) → Int
@@ -169,18 +163,18 @@ package "selection" as selectionApi {
         <color:blue>ALLOW_BASIC_CHANNEL
         <color:blue>LOGICAL_CHANNEL_ONLY
     }
-    interface "CardSelector<T : CardSelector<T>>" as CardSelector {
-        +<color:blue>filterByCardType(cardType: <back:yellow>CardType</back>) → T
-        +filterByPowerOnData(powerOnDataRegex: String) → T
+    interface "CardSelector" as CardSelector <<sealed>> {
     }
-    interface "BasicCardSelector" as BasicCardSelector <<blue>> extends CardSelector {
+    class "BasicCardSelector" as BasicCardSelector <<data>> <<green>> implements CardSelector {
+        +<color:blue>val cardType: <back:yellow>CardType</back>? = null
+        +val powerOnDataRegex: String? = null
     }
-    interface "IsoCardSelector" as IsoCardSelector <<blue>> extends CardSelector {
-        +filterByDfName(aid: ByteArray) → IsoCardSelector
-        +filterByDfName(aid: String) → IsoCardSelector
-
-        +setFileOccurrence(fileOccurrence: FileOccurrence) → IsoCardSelector
-        +setFileControlInformation(fileControlInformation: FileControlInformation) → IsoCardSelector
+    class "IsoCardSelector" as IsoCardSelector <<data>> <<green>> implements CardSelector {
+        +<color:blue>val cardType: <back:yellow>CardType</back>? = null
+        +val powerOnDataRegex: String? = null
+        +val dfName: ByteArray? = null
+        +val fileOccurrence: FileOccurrence = FileOccurrence.FIRST
+        +val fileControlInformation: FileControlInformation = FileControlInformation.FCI
     }
     enum "FileOccurrence" as FileOccurrence <<green>> {
         FIRST
@@ -208,12 +202,12 @@ package "selection" as selectionApi {
             +<color:blue>isBasicChannel() → Boolean
         }
     }
-    interface CardSelectionResult {
-        +<color:blue>getCardType() → <back:yellow>CardType</back>
-        +getSmartCards() → Map<Int, SmartCard>
-        +getActiveSmartCard() → SmartCard?
-        +getActiveSelectionIndex() → Int
-        +<color:blue>getActiveSelectionIndexes() → List<Int>
+    class "CardSelectionResult" as CardSelectionResult <<data>> <<green>> {
+        +<color:blue>val cardType: <back:yellow>CardType</back>
+        +val smartCards: Map<Int, SmartCard>
+        +val activeSmartCard: SmartCard?
+        +val activeSelectionIndex: Int?
+        +<color:blue>val activeSelectionIndexes: List<Int>
     }
     interface ScheduledCardSelectionsResponse {
     }
@@ -240,7 +234,7 @@ package "transaction" as transactionApi {
 }
 
 ' Errors
-exception "ReaderCommunication\nCardCommunication\nInvalidCardResponse" as errors <<green>> <<error>> {
+exception "ReaderCommunication\nCardCommunication\nInvalidCardResponse" as errors <<error>> <<green>> {
     +val message: String
     +val cause: Any?
 }
@@ -252,22 +246,18 @@ exception "ReaderCommunication\nCardCommunication\nInvalidCardResponse" as error
 ObservableCardReader ..> CardDetectionSettings #C_USE : use >
 ObservableCardReader ..> CardReaderEventHandler #C_USE : use >
 
-CardDetectionSettings +-- DetectionMode
 CardDetectionSettings ..> DetectionMode #C_USE : use >
 
-CardReaderEvent +-- CardReaderEventType
-CardReaderEvent ..> CardReaderEventType #C_LINK : provide >
-CardReaderEvent .up.> ScheduledCardSelectionsResponse #C_LINK : provide >
+CardReaderEvent ..> CardReaderEventType #C_USE : use >
+CardReaderEvent .up.> ScheduledCardSelectionsResponse #C_USE : use >
 
 CardReaderEventHandler ..> CardReaderEvent #C_USE : use >
 
 CardReaderProvider ..> CardReader #C_LINK : provide >
 
-CardSelectionResult ..> SmartCard #C_LINK : provide >
+CardSelectionResult ..> SmartCard #C_USE : use >
 
-IsoCardSelector +-- FileOccurrence
 IsoCardSelector ..> FileOccurrence #C_USE : use >
-IsoCardSelector +-- FileControlInformation
 IsoCardSelector ..> FileControlInformation #C_USE : use >
 
 CardSelectionManager ..> CardSelector #C_USE : use >
@@ -275,11 +265,8 @@ CardSelectionManager ..> CardSelectionExtension #C_USE : use >
 CardSelectionManager ..> ScheduledCardSelectionsResponse #C_USE : use >
 CardSelectionManager ..> CardSelectionResult #C_LINK : provide >
 CardSelectionManager .left.> CardReader #C_USE : use >
-CardSelectionManager +-up- CardPresenceNotificationPolicy
 CardSelectionManager .up.> CardPresenceNotificationPolicy #C_USE : use >
-CardSelectionManager +-up- SelectionExecutionPolicy
 CardSelectionManager .up.> SelectionExecutionPolicy #C_USE : use >
-CardSelectionManager +-up- ChannelSelectionPolicy
 CardSelectionManager .up.> ChannelSelectionPolicy #C_USE : use >
 
 IsoCardTransactionManager .right.> MultichannelCardTransactionManager #C_LINK : cast to >
