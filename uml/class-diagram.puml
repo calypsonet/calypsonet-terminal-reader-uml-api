@@ -106,8 +106,8 @@ class "<color:blue>CardDetectionSettings" as CardDetectionSettings <<data>> <<gr
     +{field} <color:blue>val ecpFrame: ByteArray? = null
 }
 enum DetectionMode <<green>> {
-    REPEATING
-    <color:blue>SINGLE_SHOT
+    +REPEATING
+    +<color:blue>SINGLE_SHOT
 }
 class CardReaderEvent <<data>> <<green>> {
     +val readerName: String
@@ -115,10 +115,10 @@ class CardReaderEvent <<data>> <<green>> {
     +val scheduledCardSelectionsResponse: ScheduledCardSelectionsResponse?
 }
 enum "<color:blue>CardReaderEventType" as CardReaderEventType <<green>> {
-    CARD_INSERTED
-    CARD_MATCHED
-    CARD_REMOVED
-    <color:blue>READER_UNREGISTERED
+    +CARD_INSERTED
+    +CARD_MATCHED
+    +CARD_REMOVED
+    +<color:blue>READER_UNREGISTERED
 }
 ' SPI
 package "spi" as readerSpi {
@@ -152,16 +152,16 @@ package "selection" as selectionApi {
         {method} <size:10><color:#7F8C8D>    ⚠ errors: InvalidCardResponse</color></size>
     }
     enum "<color:blue>CardPresenceNotificationPolicy" as CardPresenceNotificationPolicy <<green>> {
-        <color:blue>ALWAYS
-        <color:blue>MATCHED_ONLY
+        +<color:blue>ALWAYS
+        +<color:blue>MATCHED_ONLY
     }
     enum "<color:blue>SelectionExecutionPolicy" as SelectionExecutionPolicy <<green>> {
-        <color:blue>STOP_ON_FIRST_MATCH
-        <color:blue>PROCESS_ALL
+        +<color:blue>STOP_ON_FIRST_MATCH
+        +<color:blue>PROCESS_ALL
     }
     enum "<color:blue>ChannelSelectionPolicy" as ChannelSelectionPolicy <<green>> {
-        <color:blue>ALLOW_BASIC_CHANNEL
-        <color:blue>LOGICAL_CHANNEL_ONLY
+        +<color:blue>ALLOW_BASIC_CHANNEL
+        +<color:blue>LOGICAL_CHANNEL_ONLY
     }
     interface "CardSelector" as CardSelector <<sealed>> {
     }
@@ -177,16 +177,16 @@ package "selection" as selectionApi {
         +val fileControlInformation: FileControlInformation = FileControlInformation.FCI
     }
     enum "FileOccurrence" as FileOccurrence <<green>> {
-        FIRST
-        LAST
-        NEXT
-        PREVIOUS
+        +FIRST
+        +LAST
+        +NEXT
+        +PREVIOUS
     }
     enum "FileControlInformation" as FileControlInformation <<green>> {
-        FCI
-        FCP
-        FMD
-        NO_RESPONSE
+        +FCI
+        +FCP
+        +FMD
+        +NO_RESPONSE
     }
 
     ' Card Extension SPI
