@@ -234,7 +234,6 @@ Each interface, class, enumeration and error defined in this document is describ
 | Name       | The type's normalized name.
 | Kind       | The category of the type (interface, class, enumeration, error, etc.).
 | Namespace  | The namespace in which the type is defined.
-| Generics   | The generic type parameter of this type, when applicable. A constraint on that parameter is written `<T : Bound>`.
 | Extends    | The type extended by this type, when applicable.
 | Implements | The interface implemented by this type, when applicable.
 | Since      | The version of the API in which the type was introduced.
@@ -1633,7 +1632,7 @@ actual exchange with the card.
 |===
 | Name       | `CardPresenceNotificationPolicy`
 | Kind       | Enumeration
-| Namespace  | `reader.selection`.<<type_CardSelectionManager,`CardSelectionManager`>>
+| Namespace  | `reader.selection`
 | Since      | 3.0
 | Purpose    | Options applied when a card is detected, used to decide which cards trigger event-handler notifications.
 |===
@@ -1677,7 +1676,7 @@ In the reader observation lifecycle, this policy determines whether a detected c
 |===
 | Name       | `ChannelSelectionPolicy`
 | Kind       | Enumeration
-| Namespace  | `reader.selection`.<<type_CardSelectionManager,`CardSelectionManager`>>
+| Namespace  | `reader.selection`
 | Since      | 3.0
 | Purpose    | Policy governing the use of the basic channel in a multi-channel selection scenario.
 |===
@@ -1697,7 +1696,7 @@ In the reader observation lifecycle, this policy determines whether a detected c
 |===
 | Name       | `DetectionMode`
 | Kind       | Enumeration
-| Namespace  | `reader`.<<type_CardDetectionSettings,`CardDetectionSettings`>>
+| Namespace  | `reader`
 | Since      | 3.0
 | Purpose    | Defines the behaviour to apply after a card processing cycle has terminated.
 |===
@@ -1719,7 +1718,7 @@ In the reader observation lifecycle, this setting is the guard that decides whet
 |===
 | Name       | `FileControlInformation`
 | Kind       | Enumeration
-| Namespace  | `reader.selection`.<<type_IsoCardSelector,`IsoCardSelector`>>
+| Namespace  | `reader.selection`
 | Since      | 2.0
 | Purpose    | Types of templates returned in response to the *Select Application* command, according to ISO/IEC 7816-4.
 |===
@@ -1740,7 +1739,7 @@ In the reader observation lifecycle, this setting is the guard that decides whet
 |===
 | Name       | `FileOccurrence`
 | Kind       | Enumeration
-| Namespace  | `reader.selection`.<<type_IsoCardSelector,`IsoCardSelector`>>
+| Namespace  | `reader.selection`
 | Since      | 2.0
 | Purpose    | Navigation options through the applications contained on the card according to ISO/IEC 7816-4.
 |===
@@ -1761,7 +1760,7 @@ In the reader observation lifecycle, this setting is the guard that decides whet
 |===
 | Name       | `SelectionExecutionPolicy`
 | Kind       | Enumeration
-| Namespace  | `reader.selection`.<<type_CardSelectionManager,`CardSelectionManager`>>
+| Namespace  | `reader.selection`
 | Since      | 3.0
 | Purpose    | Policy governing the iteration over the selection cases of a scenario.
 |===
