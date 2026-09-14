@@ -1311,7 +1311,7 @@ selection scenario.
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
 | Name       | `ScheduledCardSelectionsResponse`
-| Kind       | Interface (marker)
+| Kind       | Marker interface
 | Namespace  | `reader.selection`
 | Since      | 1.0
 | Purpose    | Carrier for the response of the execution of a scheduled selection scenario, provided by a <<type_CardReaderEvent,`CardReaderEvent`>>.
@@ -1383,7 +1383,7 @@ This SPI unifies the reception of nominal events (`onReaderEvent`) and of fatal 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
 | Name       | `CardSelectionExtension`
-| Kind       | Interface (SPI, marker)
+| Kind       | Marker interface (SPI)
 | Namespace  | `reader.selection.spi`
 | Since      | 2.0
 | Purpose    | Provided by card extensions to enrich a selection case with additional commands and to interpret the response in order to build the corresponding <<type_SmartCard,`SmartCard`>>.
