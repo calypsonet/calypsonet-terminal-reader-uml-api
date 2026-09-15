@@ -271,7 +271,7 @@ ObservableCardReader ..> CardReaderEventHandler #C_USE : use >
 CardDetectionSettings ..> DetectionMode #C_USE : use >
 
 CardReaderEvent ..> CardReaderEventType #C_USE : use >
-CardReaderEvent .up.> ScheduledCardSelectionsResponse #C_USE : use >
+CardReaderEvent ...> ScheduledCardSelectionsResponse #C_USE : use >
 
 CardReaderEventHandler ..> CardReaderEvent #C_USE : use >
 
@@ -286,21 +286,21 @@ MultichannelCardSelectionResult ..> SmartCard #C_USE : use >
 IsoCardSelector ..> FileOccurrence #C_USE : use >
 IsoCardSelector ..> FileControlInformation #C_USE : use >
 
-CardSelectionManager .....> CardSelector #C_USE : use >
+CardSelectionManager .up...> CardSelector #C_USE : use >
 CardSelectionManager ..> CardSelectionExtension #C_USE : use >
 
 SingleCardSelectionManager ...> SingleCardSelectionResult #C_LINK : provide >
-SingleCardSelectionManager ..> CardReader #C_USE : use >
-SingleCardSelectionManager ....> ScheduledCardSelectionsResponse #C_USE : use >
+SingleCardSelectionManager .up.....> CardReader #C_USE : use >
+SingleCardSelectionManager .up....> ScheduledCardSelectionsResponse #C_USE : use >
 SingleCardSelectionManager ..> CardPresenceNotificationPolicy #C_USE : use >
 
 MultipleCardSelectionManager ...> MultipleCardSelectionResult #C_LINK : provide >
-MultipleCardSelectionManager ..> CardReader #C_USE : use >
-MultipleCardSelectionManager ....> ScheduledCardSelectionsResponse #C_USE : use >
+MultipleCardSelectionManager .up.....> CardReader #C_USE : use >
+MultipleCardSelectionManager .up....> ScheduledCardSelectionsResponse #C_USE : use >
 MultipleCardSelectionManager ..> CardPresenceNotificationPolicy #C_USE : use >
 
 MultichannelCardSelectionManager ...> MultichannelCardSelectionResult #C_LINK : provide >
-MultichannelCardSelectionManager ..> CardReader #C_USE : use >
+MultichannelCardSelectionManager .up.....> CardReader #C_USE : use >
 MultichannelCardSelectionManager ..> ChannelSelectionPolicy #C_USE : use >
 
 IsoCardTransactionManager .right.> MultichannelCardTransactionManager #C_LINK : cast to >
@@ -308,10 +308,10 @@ IsoCardTransactionManager .right.> MultichannelCardTransactionManager #C_LINK : 
 ' == LAYOUT ==
 
 ApiProperties -[hidden]- errors
-ReaderApiFactory -[hidden]left- ApiProperties
-ReaderApiFactory -[hidden]- CardReaderProvider
-CardReaderEventType -[hidden]- CardTransactionManager
-CardReaderEventHandler -[hidden]up- CardDetectionSettings
+'ReaderApiFactory -[hidden]left- ApiProperties
+ReaderApiFactory -[hidden]right- CardReaderProvider
+'CardReaderEventType -[hidden]- CardTransactionManager
+'CardReaderEventHandler -[hidden]up- CardDetectionSettings
 
 ' == STYLE ==
 
