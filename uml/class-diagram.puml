@@ -289,19 +289,19 @@ IsoCardSelector ..> FileControlInformation #C_USE : use >
 CardSelectionManager .....> CardSelector #C_USE : use >
 CardSelectionManager ..> CardSelectionExtension #C_USE : use >
 
-SingleCardSelectionManager ..> SingleCardSelectionResult #C_LINK : provide >
+SingleCardSelectionManager ...> SingleCardSelectionResult #C_LINK : provide >
 SingleCardSelectionManager ..> CardReader #C_USE : use >
 SingleCardSelectionManager ....> ScheduledCardSelectionsResponse #C_USE : use >
-SingleCardSelectionManager .up.> CardPresenceNotificationPolicy #C_USE : use >
+SingleCardSelectionManager ..> CardPresenceNotificationPolicy #C_USE : use >
 
-MultipleCardSelectionManager ..> MultipleCardSelectionResult #C_LINK : provide >
+MultipleCardSelectionManager ...> MultipleCardSelectionResult #C_LINK : provide >
 MultipleCardSelectionManager ..> CardReader #C_USE : use >
 MultipleCardSelectionManager ....> ScheduledCardSelectionsResponse #C_USE : use >
-MultipleCardSelectionManager .up.> CardPresenceNotificationPolicy #C_USE : use >
+MultipleCardSelectionManager ..> CardPresenceNotificationPolicy #C_USE : use >
 
-MultichannelCardSelectionManager ..> MultichannelCardSelectionResult #C_LINK : provide >
+MultichannelCardSelectionManager ...> MultichannelCardSelectionResult #C_LINK : provide >
 MultichannelCardSelectionManager ..> CardReader #C_USE : use >
-MultichannelCardSelectionManager .up.> ChannelSelectionPolicy #C_USE : use >
+MultichannelCardSelectionManager ..> ChannelSelectionPolicy #C_USE : use >
 
 IsoCardTransactionManager .right.> MultichannelCardTransactionManager #C_LINK : cast to >
 
@@ -310,7 +310,8 @@ IsoCardTransactionManager .right.> MultichannelCardTransactionManager #C_LINK : 
 ApiProperties -[hidden]- errors
 ReaderApiFactory -[hidden]left- ApiProperties
 ReaderApiFactory -[hidden]- CardReaderProvider
-DetectionMode -[hidden]-- CardTransactionManager
+CardReaderEventType -[hidden]- CardTransactionManager
+CardReaderEventHandler -[hidden]up- CardDetectionSettings
 
 ' == STYLE ==
 
