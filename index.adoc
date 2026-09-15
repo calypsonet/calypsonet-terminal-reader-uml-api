@@ -220,6 +220,7 @@ semantic intent rather than the syntactic form.
 | `List<T>`   | Ordered collection of `T` values, may contain duplicates.         | `List<T>`, `Vec<T>`.
 | `Set<T>`    | Unordered collection of unique `T` values.                        | `Set<T>`, `HashSet<T>`.
 | `Map<K,V>`  | Associative array binding keys of type `K` to values of type `V`. | `Map<K,V>`, `Dictionary<K,V>`, `HashMap<K,V>`.
+| `Any`       | Value of any type, root of the type hierarchy.                    | `Object`, `Any`, `object`, `Box<dyn Any>`.
 | `T?`        | Nullable value: either a `T` value or `null`.                     | `Optional<T>`, `T?`, `Option<T>`.
 | `null`      | Absence of value, the alternative held by a nullable type.        | `null`, `nil`, `None`.
 | `Unit`      | Indicates that an operation returns no value.                     | `void`, `Unit`, `()`.
@@ -434,7 +435,7 @@ The design follows a three-tier hierarchy in the `reader.transaction.spi` namesp
   `MultichannelCardTransactionManager`>> when the card supports it.
 . <<type_MultichannelCardTransactionManager,`MultichannelCardTransactionManager`>> -- contract for cards that are
   *intrinsically multi-channel* by design. Consumer APIs whose target cards are always multi-channel SHOULD
-  stereotype their transaction manager directly on this contract.
+  make their transaction manager extend this contract directly.
 
 [[sec_card_selection_modes]]
 === Card selection modes
@@ -993,15 +994,13 @@ of the call.
 | Exports the content of the previously processed selection scenario as a `String`. The result MAY be imported
   through `importProcessedCardSelectionScenario`.
 
-  *Prerequisite:* the selection scenario MUST have been processed previously via `processCardSelectionScenario`,
-  `processMultichannelCardSelectionScenario` or `parseScheduledCardSelectionsResponse`.
-
   *Caution:* if the local environment does not have all the card extensions involved in the scenario, the
   `CardSelectionResult` produced locally will not contain any active selection. In that case, the processed
   scenario MUST be exported so that it can be re-imported and interpreted on a manager which has the relevant
   card extensions.
 | Returns        | A non-empty `String`.
-| Pre-conditions | *State* -- the scenario has been processed successfully.
+| Pre-conditions | *State* -- the scenario has been processed successfully, via `processCardSelectionScenario`,
+  `processMultichannelCardSelectionScenario` or `parseScheduledCardSelectionsResponse`.
 | Errors         | None.
 | See also       | <<op_CardSelectionManager_importProcessedCardSelectionScenario,`importProcessedCardSelectionScenario`>>
 |===
@@ -1034,14 +1033,14 @@ of the call.
 | Since          | 1.3
 | Description
 | Imports a previously exported *processed* selection scenario and returns the corresponding result.
-
-  *Prerequisites:* the input MUST have been produced by `exportProcessedCardSelectionScenario`; the local
-  environment MUST possess every card extension involved; the current manager MUST first have been configured
-  with the same selection scenario as the manager that produced the export.
 | Parameters     | `processedCardSelectionScenario` -- the `String` containing the exported processed card selection scenario.
 | Returns        | A <<type_CardSelectionResult,`CardSelectionResult`>>.
 | Pre-conditions | *Argument* -- every parameter is non-`null`. +
-  *Argument* -- the string is well-formed and contains no more selection cases than the current scenario.
+  *Argument* -- the string has been produced by `exportProcessedCardSelectionScenario`, is well-formed and contains
+  no more selection cases than the current scenario. +
+  *State* -- the manager has been configured with the same selection scenario as the manager that produced the
+  export. +
+  *Capability* -- the local environment possesses every card extension involved in the scenario.
 | Errors         | <<type_InvalidCardResponse,`InvalidCardResponse`>> -- if the data returned by the card could not be interpreted.
 | See also       | <<op_CardSelectionManager_exportProcessedCardSelectionScenario,`exportProcessedCardSelectionScenario`>>
 |===
@@ -1125,8 +1124,8 @@ of the call.
 | Explicitly executes the previously prepared selection scenario in *multi-channel* mode against the provided
   reader, with the requested channel policy, and returns the result.
 
-  *Prerequisite:* the presented card MUST be a multi-channel ISO/IEC 7816-4 card. If it is not, an
-  `InvalidCardResponse` is raised at scenario execution time.
+  If the presented card is not a multi-channel ISO/IEC 7816-4 card, an `InvalidCardResponse` is raised at
+  scenario execution time.
 | Parameters
 | `reader` (<<type_CardReader,`CardReader`>>)                 -- the reader through which the card is reached. +
   `channelSelectionPolicy` (<<type_ChannelSelectionPolicy,`ChannelSelectionPolicy`>>) -- the policy governing the channels on which selections are placed.
@@ -1275,7 +1274,8 @@ the end of a card processing whatever the outcome.
 |===
 
 The `ReaderApiFactory` is the single entry point through which the application instantiates the public types of
-the API. It is provided as a single instance whose accessors each return a fresh, fully initialised object.
+the API. It is provided as a single instance. Its `create` operations each return a fresh, fully initialised
+object, whereas `getCardReaderProvider` gives access to the `CardReaderProvider` of the execution environment.
 
 [[op_ReaderApiFactory_createCardSelectionManager]]
 ===== Create Card Selection Manager
@@ -1299,7 +1299,7 @@ selection scenario.
 |===
 | Signature      | `getCardReaderProvider() -> CardReaderProvider`
 | Since          | 3.0
-| Description    | Returns the <<type_CardReaderProvider,`CardReaderProvider`>>, giving standardised access to the readers available in the execution environment.
+| Description    | Returns the <<type_CardReaderProvider,`CardReaderProvider`>> of the execution environment, giving standardised access to the readers available in it. Successive calls return the same instance.
 | Returns        | A <<type_CardReaderProvider,`CardReaderProvider`>>.
 | Pre-conditions | None.
 | Errors         | None.
@@ -1427,7 +1427,7 @@ minimise network exchanges, which is especially valuable in distributed architec
 | Errors
 | <<type_ReaderCommunication,`ReaderCommunication`>> -- if a communication error with the reader occurs. +
   <<type_CardCommunication,`CardCommunication`>> -- if a communication error with the card occurs. +
-  <<type_InvalidCardResponse,`InvalidCardResponse`>> -- if a command returns an unexpected status.
+  <<type_InvalidCardResponse,`InvalidCardResponse`>> -- if a command returns an unexpected status, or if the manager was obtained through `asMultichannelCardTransactionManager` and the card does not support multi-channel.
 |===
 
 [[type_IsoCardTransactionManager]]
@@ -1454,10 +1454,11 @@ minimise network exchanges, which is especially valuable in distributed architec
 | Returns a view of this manager as a <<type_MultichannelCardTransactionManager,
   `MultichannelCardTransactionManager`>>, granting access to the multi-channel operations.
 
-  *Prerequisite:* the underlying ISO/IEC 7816-4 card MUST support multi-channel operation; otherwise an `InvalidCardResponse` is raised during command processing.
+  The conversion itself never fails. If the underlying ISO/IEC 7816-4 card does not support multi-channel
+  operation, an `InvalidCardResponse` is raised only when the commands are processed through the returned manager.
 | Returns        | A <<type_MultichannelCardTransactionManager,`MultichannelCardTransactionManager`>>.
 | Pre-conditions | None.
-| Errors         | <<type_InvalidCardResponse,`InvalidCardResponse`>> -- if the card does not support multi-channel.
+| Errors         | None.
 |===
 
 [[type_IsoSmartCard]]
@@ -1522,7 +1523,8 @@ This contract MAY be obtained either:
 
 * through <<type_IsoCardTransactionManager,`IsoCardTransactionManager.asMultichannelCardTransactionManager`>>, for
   ISO/IEC 7816-4 cards on which multi-channel is an optional capability;
-* directly as the declared stereotype of a card extension targeting intrinsically multi-channel cards.
+* directly as the declared supertype of the transaction manager of a card extension targeting intrinsically
+  multi-channel cards.
 
 [[op_MultichannelCardTransactionManager_closeChannel]]
 ===== Close Channel
@@ -1550,7 +1552,8 @@ This contract MAY be obtained either:
 | Errors
 | <<type_ReaderCommunication,`ReaderCommunication`>> -- if a communication error with the reader occurs. +
   <<type_CardCommunication,`CardCommunication`>> -- if a communication error with the card occurs. +
-  <<type_InvalidCardResponse,`InvalidCardResponse`>> -- if a command returns an unexpected status.
+  <<type_InvalidCardResponse,`InvalidCardResponse`>> -- if a command returns an unexpected status, or if the card does
+  not support multi-channel.
 |===
 
 [[type_SmartCard]]

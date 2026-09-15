@@ -109,7 +109,7 @@ enum DetectionMode <<green>> {
     +REPEATING
     +<color:blue>SINGLE_SHOT
 }
-class CardReaderEvent <<data>> <<green>> {
+class "CardReaderEvent" as CardReaderEvent <<data>> <<green>> {
     +val readerName: String
     +val type: CardReaderEventType
     +val scheduledCardSelectionsResponse: ScheduledCardSelectionsResponse?
@@ -222,7 +222,6 @@ package "transaction" as transactionApi {
         }
         interface "<color:blue>IsoCardTransactionManager" as IsoCardTransactionManager <<red>> extends CardTransactionManager {
             +<color:blue>asMultichannelCardTransactionManager() → MultichannelCardTransactionManager
-            {method} <size:10><color:#7F8C8D>    ⚠ errors: InvalidCardResponse</color></size>
         }
         interface "<color:blue>MultichannelCardTransactionManager" as MultichannelCardTransactionManager <<red>> extends CardTransactionManager {
             +<color:blue>processCommandsAndCloseChannel() → Unit
