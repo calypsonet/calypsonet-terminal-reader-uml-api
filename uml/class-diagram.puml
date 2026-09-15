@@ -76,7 +76,10 @@ class "ReaderApiProperties" as ApiProperties <<constants>> <<green>> {
 }
 interface "ReaderApiFactory" as ReaderApiFactory <<blue>> {
     +<color:blue>getCardReaderProvider() → CardReaderProvider
-    +createCardSelectionManager() → CardSelectionManager
+
+    +<color:blue>createSingleCardSelectionManager() → SingleCardSelectionManager
+    +<color:blue>createMultipleCardSelectionManager() → MultipleCardSelectionManager
+    +<color:blue>createMultichannelCardSelectionManager() → MultichannelCardSelectionManager
 }
 
 interface "<color:blue>CardReaderProvider" as CardReaderProvider <<blue>> {
@@ -131,33 +134,46 @@ package "spi" as readerSpi {
 ' SELECTION
 package "selection" as selectionApi {
     ' Selection
-    interface CardSelectionManager <<blue>> {
-        +prepareSelection(cardSelector: CardSelector, cardSelectionExtension: CardSelectionExtension) → Int
+    interface CardSelectionManager {
+        +<color:blue>prepareSelection(selectionId: Int, cardSelector: CardSelector, cardSelectionExtension: CardSelectionExtension) → Self
 
         +exportCardSelectionScenario() → String
-        +importCardSelectionScenario(cardSelectionScenario: String) → Int
-
-        +<color:blue>processCardSelectionScenario(reader: CardReader, selectionExecutionPolicy: SelectionExecutionPolicy) → CardSelectionResult
-        {method} <size:10><color:#7F8C8D>    ⚠ errors: ReaderCommunication, CardCommunication, InvalidCardResponse</color></size>
-
-        +<color:blue>scheduleCardSelectionScenario(observableCardReader: ObservableCardReader, cardPresenceNotificationPolicy: CardPresenceNotificationPolicy, selectionExecutionPolicy: SelectionExecutionPolicy) → Unit
-        +parseScheduledCardSelectionsResponse(scheduledCardSelectionsResponse: ScheduledCardSelectionsResponse) → CardSelectionResult
-        {method} <size:10><color:#7F8C8D>    ⚠ errors: InvalidCardResponse</color></size>
-
-        +<color:blue>processMultichannelCardSelectionScenario(reader: CardReader, channelSelectionPolicy: ChannelSelectionPolicy) → CardSelectionResult
-        {method} <size:10><color:#7F8C8D>    ⚠ errors: ReaderCommunication, CardCommunication, InvalidCardResponse</color></size>
+        +<color:blue>importCardSelectionScenario(cardSelectionScenario: String) → Self
 
         +exportProcessedCardSelectionScenario() → String
-        +importProcessedCardSelectionScenario(processedCardSelectionScenario: String) → CardSelectionResult
+    }
+    interface "<color:blue>SingleCardSelectionManager" as SingleCardSelectionManager <<blue>> extends CardSelectionManager {
+        +<color:blue>processCardSelectionScenario(reader: CardReader) → SingleCardSelectionResult
+        {method} <size:10><color:#7F8C8D>    ⚠ errors: ReaderCommunication, CardCommunication, InvalidCardResponse</color></size>
+
+        +<color:blue>scheduleCardSelectionScenario(observableCardReader: ObservableCardReader, cardPresenceNotificationPolicy: CardPresenceNotificationPolicy) → Unit
+        +<color:blue>parseScheduledCardSelectionsResponse(scheduledCardSelectionsResponse: ScheduledCardSelectionsResponse) → SingleCardSelectionResult
+        {method} <size:10><color:#7F8C8D>    ⚠ errors: InvalidCardResponse</color></size>
+
+        +<color:blue>importProcessedCardSelectionScenario(processedCardSelectionScenario: String) → SingleCardSelectionResult
+        {method} <size:10><color:#7F8C8D>    ⚠ errors: InvalidCardResponse</color></size>
+    }
+    interface "<color:blue>MultipleCardSelectionManager" as MultipleCardSelectionManager <<blue>> extends CardSelectionManager {
+        +<color:blue>processCardSelectionScenario(reader: CardReader) → MultipleCardSelectionResult
+        {method} <size:10><color:#7F8C8D>    ⚠ errors: ReaderCommunication, CardCommunication, InvalidCardResponse</color></size>
+
+        +<color:blue>scheduleCardSelectionScenario(observableCardReader: ObservableCardReader, cardPresenceNotificationPolicy: CardPresenceNotificationPolicy) → Unit
+        +<color:blue>parseScheduledCardSelectionsResponse(scheduledCardSelectionsResponse: ScheduledCardSelectionsResponse) → MultipleCardSelectionResult
+        {method} <size:10><color:#7F8C8D>    ⚠ errors: InvalidCardResponse</color></size>
+
+        +<color:blue>importProcessedCardSelectionScenario(processedCardSelectionScenario: String) → MultipleCardSelectionResult
+        {method} <size:10><color:#7F8C8D>    ⚠ errors: InvalidCardResponse</color></size>
+    }
+    interface "<color:blue>MultichannelCardSelectionManager" as MultichannelCardSelectionManager <<blue>> extends CardSelectionManager {
+        +<color:blue>processCardSelectionScenario(reader: CardReader, channelSelectionPolicy: ChannelSelectionPolicy) → MultichannelCardSelectionResult
+        {method} <size:10><color:#7F8C8D>    ⚠ errors: ReaderCommunication, CardCommunication, InvalidCardResponse</color></size>
+
+        +<color:blue>importProcessedCardSelectionScenario(processedCardSelectionScenario: String) → MultichannelCardSelectionResult
         {method} <size:10><color:#7F8C8D>    ⚠ errors: InvalidCardResponse</color></size>
     }
     enum "<color:blue>CardPresenceNotificationPolicy" as CardPresenceNotificationPolicy <<green>> {
         +<color:blue>ALWAYS
         +<color:blue>MATCHED_ONLY
-    }
-    enum "<color:blue>SelectionExecutionPolicy" as SelectionExecutionPolicy <<green>> {
-        +<color:blue>STOP_ON_FIRST_MATCH
-        +<color:blue>PROCESS_ALL
     }
     enum "<color:blue>ChannelSelectionPolicy" as ChannelSelectionPolicy <<green>> {
         +<color:blue>ALLOW_BASIC_CHANNEL
@@ -202,12 +218,19 @@ package "selection" as selectionApi {
             +<color:blue>isBasicChannel() → Boolean
         }
     }
-    class "CardSelectionResult" as CardSelectionResult <<data>> <<green>> {
+    class "<color:blue>SingleCardSelectionResult" as SingleCardSelectionResult <<data>> <<green>> {
         +<color:blue>val cardType: <back:yellow>CardType</back>
-        +val smartCards: Map<Int, SmartCard>
-        +val activeSmartCard: SmartCard?
-        +val activeSelectionIndex: Int?
-        +<color:blue>val activeSelectionIndexes: List<Int>
+        +<color:blue>val selectionId: Int?
+        +<color:blue>val smartCard: SmartCard?
+    }
+    class "<color:blue>MultipleCardSelectionResult" as MultipleCardSelectionResult <<data>> <<green>> {
+        +<color:blue>val cardType: <back:yellow>CardType</back>
+        +<color:blue>val smartCards: Map<Int, SmartCard>
+        +<color:blue>val activeSelectionId: Int?
+    }
+    class "<color:blue>MultichannelCardSelectionResult" as MultichannelCardSelectionResult <<data>> <<green>> {
+        +<color:blue>val cardType: <back:yellow>CardType</back>
+        +<color:blue>val smartCards: Map<Int, SmartCard>
     }
     interface ScheduledCardSelectionsResponse {
     }
@@ -254,26 +277,40 @@ CardReaderEventHandler ..> CardReaderEvent #C_USE : use >
 
 CardReaderProvider ..> CardReader #C_LINK : provide >
 
-CardSelectionResult ..> SmartCard #C_USE : use >
+SingleCardSelectionResult ..> SmartCard #C_USE : use >
+
+MultipleCardSelectionResult ..> SmartCard #C_USE : use >
+
+MultichannelCardSelectionResult ..> SmartCard #C_USE : use >
 
 IsoCardSelector ..> FileOccurrence #C_USE : use >
 IsoCardSelector ..> FileControlInformation #C_USE : use >
 
-CardSelectionManager ..> CardSelector #C_USE : use >
+CardSelectionManager .....> CardSelector #C_USE : use >
 CardSelectionManager ..> CardSelectionExtension #C_USE : use >
-CardSelectionManager ..> ScheduledCardSelectionsResponse #C_USE : use >
-CardSelectionManager ..> CardSelectionResult #C_LINK : provide >
-CardSelectionManager .left.> CardReader #C_USE : use >
-CardSelectionManager .up.> CardPresenceNotificationPolicy #C_USE : use >
-CardSelectionManager .up.> SelectionExecutionPolicy #C_USE : use >
-CardSelectionManager .up.> ChannelSelectionPolicy #C_USE : use >
+
+SingleCardSelectionManager ..> SingleCardSelectionResult #C_LINK : provide >
+SingleCardSelectionManager ..> CardReader #C_USE : use >
+SingleCardSelectionManager ....> ScheduledCardSelectionsResponse #C_USE : use >
+SingleCardSelectionManager .up.> CardPresenceNotificationPolicy #C_USE : use >
+
+MultipleCardSelectionManager ..> MultipleCardSelectionResult #C_LINK : provide >
+MultipleCardSelectionManager ..> CardReader #C_USE : use >
+MultipleCardSelectionManager ....> ScheduledCardSelectionsResponse #C_USE : use >
+MultipleCardSelectionManager .up.> CardPresenceNotificationPolicy #C_USE : use >
+
+MultichannelCardSelectionManager ..> MultichannelCardSelectionResult #C_LINK : provide >
+MultichannelCardSelectionManager ..> CardReader #C_USE : use >
+MultichannelCardSelectionManager .up.> ChannelSelectionPolicy #C_USE : use >
 
 IsoCardTransactionManager .right.> MultichannelCardTransactionManager #C_LINK : cast to >
 
 ' == LAYOUT ==
 
-ReaderApiFactory -[hidden]right- ApiProperties
-DetectionMode -[hidden]- CardTransactionManager
+ApiProperties -[hidden]- errors
+ReaderApiFactory -[hidden]left- ApiProperties
+ReaderApiFactory -[hidden]- CardReaderProvider
+DetectionMode -[hidden]-- CardTransactionManager
 
 ' == STYLE ==
 

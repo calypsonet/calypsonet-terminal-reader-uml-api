@@ -36,21 +36,22 @@ skinparam activity {
 |Event handler|
 |Application|
 start
+:create the card selection manager
+of the selection mode;
 :**prepareSelection()**
 build the card selection scenario;
-if (selection mode?) then (synchronous)
-  :**processCardSelectionScenario()**
-  or
-  **processMultichannelCardSelectionScenario()**;
+if (execution?) then (synchronous)
+  :**processCardSelectionScenario()**;
   |Card reader|
   :execute the scenario
   on the already-present card;
   |Application|
-  :receive **CardSelectionResult**;
+  :receive the selection result;
   :process the card;
   stop
 else (asynchronous)
-  :**scheduleCardSelectionScenario()**;
+  :**scheduleCardSelectionScenario()**
+  (single-channel managers only);
   :**startCardDetection()**;
   |Observable card reader|
   :wait for a card, then execute
