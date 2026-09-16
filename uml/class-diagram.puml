@@ -308,10 +308,7 @@ IsoCardTransactionManager .right.> MultichannelCardTransactionManager #C_LINK : 
 ' == LAYOUT ==
 
 ApiProperties -[hidden]- errors
-'ReaderApiFactory -[hidden]left- ApiProperties
 ReaderApiFactory -[hidden]right- CardReaderProvider
-'CardReaderEventType -[hidden]- CardTransactionManager
-'CardReaderEventHandler -[hidden]up- CardDetectionSettings
 
 ' == STYLE ==
 
