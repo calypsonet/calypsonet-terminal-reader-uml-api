@@ -102,6 +102,8 @@ interface "ObservableCardReader" as ObservableCardReader extends CardReader {
     +stopCardDetection() → Unit
 
     +<color:blue>endCardProcessing() → Unit
+
+    +<color:blue>clearScheduledCardSelectionScenario() → Unit
 }
 class "<color:blue>CardDetectionSettings" as CardDetectionSettings <<data>> <<green>> {
     +<color:blue>val detectionMode: DetectionMode = DetectionMode.REPEATING

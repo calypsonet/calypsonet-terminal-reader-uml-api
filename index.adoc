@@ -1350,6 +1350,25 @@ both the <<type_CardDetectionSettings,`CardDetectionSettings`>> that govern the 
 
 The reader's complete insertion/processing/removal lifecycle -- including when each observation event is produced -- is described in <<sec_observation_lifecycle,Reader observation lifecycle>>.
 
+[[op_ObservableCardReader_clearScheduledCardSelectionScenario]]
+===== Clear Scheduled Card Selection Scenario
+
+[cols="^.^1h,.^5", grid=rows, frame=all]
+|===
+| Signature      | `clearScheduledCardSelectionScenario() -> Unit`
+| Since          | 3.0
+| Description
+| Removes the card selection scenario scheduled on this reader, if any. From the next card insertion onwards, no
+  scenario is executed and the `scheduledCardSelectionsResponse` of the resulting
+  <<type_CardReaderEvent,`CardReaderEvent`>> is `null`. The processing of a card already inserted is not affected.
+
+  This operation is idempotent: calling it when no scenario is scheduled has no effect.
+| Pre-conditions | None.
+| Errors         | None.
+| See also       | <<op_SingleCardSelectionManager_scheduleCardSelectionScenario,`SingleCardSelectionManager.scheduleCardSelectionScenario`>> +
+                   <<op_MultipleCardSelectionManager_scheduleCardSelectionScenario,`MultipleCardSelectionManager.scheduleCardSelectionScenario`>>
+|===
+
 [[op_ObservableCardReader_endCardProcessing]]
 ===== End Card Processing
 
