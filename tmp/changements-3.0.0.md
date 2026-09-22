@@ -266,11 +266,11 @@ Chaque borne se déclare selon deux familles de réglages, chacune avec une opé
 - **par CSN** (`…ByCsn(maxDuration: Long, csnMin: Long)`) : `csnMin` est un **seuil** sur le CSN (Calypso Serial Number, c'est-à-dire l'Application Serial Number, comparé comme entier non signé sur 64 bits) ;
 - **par FCI** (`…ByFci(maxDuration: Long, fciRegex: String)`) : `fciRegex` est une expression régulière appliquée au **FCI complet** retourné par *Select Application* (hors mot d'état), représenté en hexadécimal majuscule sans séparateur.
 
-- **`SymmetricCryptoSecuritySetting`** — six nouvelles opérations :
+- **`SymmetricCryptoSecuritySettings`** — six nouvelles opérations :
   - `assignOpenSecureSessionMaxDurationByCsn(maxDuration: Long, csnMin: Long) → Self` et `assignOpenSecureSessionMaxDurationByFci(maxDuration: Long, fciRegex: String) → Self` — durée maximale de l'échange de la commande *Open Secure Session* ;
   - `assignCloseSecureSessionMaxDurationByCsn(maxDuration: Long, csnMin: Long) → Self` et `assignCloseSecureSessionMaxDurationByFci(maxDuration: Long, fciRegex: String) → Self` — durée maximale de l'échange de la commande *Close Secure Session* ;
   - `assignSvCommandMaxDurationByCsn(maxDuration: Long, csnMin: Long) → Self` et `assignSvCommandMaxDurationByFci(maxDuration: Long, fciRegex: String) → Self` — durée maximale de l'échange de l'une des commandes *SV Reload*, *SV Debit* ou *SV Undebit*.
-- **`AsymmetricCryptoSecuritySetting`** — quatre nouvelles opérations :
+- **`AsymmetricCryptoSecuritySettings`** — quatre nouvelles opérations :
   - `assignOpenSecureSessionMaxDurationByCsn(maxDuration: Long, csnMin: Long) → Self` et `assignOpenSecureSessionMaxDurationByFci(maxDuration: Long, fciRegex: String) → Self` — durée maximale de l'échange de la commande *Open Secure Session* ;
   - `assignCloseSecureSessionMaxDurationByCsn(maxDuration: Long, csnMin: Long) → Self` et `assignCloseSecureSessionMaxDurationByFci(maxDuration: Long, fciRegex: String) → Self` — durée maximale de l'échange de la commande *Close Secure Session*.
 
@@ -403,6 +403,8 @@ Ce thème regroupe les renommages et suppressions motivés par la clarté ou la 
   - `CalypsoCardApiFactory.createSearchCommandData()` (cf. Thème 11).
 - **Renommages** d'opérations surchargées (cf. Thème 10) : `prepareSelectFile(short)` → `prepareSelectFileByLid`, `prepareSelectFile(SelectFileControl)` → `prepareSelectFileByControl` (paramètre harmonisé `selectFileControl`), dans `CalypsoCardSelectionExtension` et `TransactionManager`.
 - **Énumérations imbriquées renommées** : `CalypsoCard.ProductType` → `CalypsoCardProductType`, `ElementaryFile.Type` → `ElementaryFileType`.
+- **Collections nommées au pluriel** : les paramètres `counterNumberToDecValueMap` / `counterNumberToIncValueMap` de `prepareDecreaseCounters` / `prepareIncreaseCounters` deviennent `decrementValues` / `incrementValues` ; les propriétés `kif` / `kvc` de `DirectoryHeader` deviennent `kifByAccessLevel` / `kvcByAccessLevel`.
+- **Réglages de sécurité renommés au pluriel** : `SymmetricCryptoSecuritySetting` → `SymmetricCryptoSecuritySettings`, `AsymmetricCryptoSecuritySetting` → `AsymmetricCryptoSecuritySettings` ; les opérations de fabrique suivent (`createSymmetricCryptoSecuritySettings`, `createAsymmetricCryptoSecuritySettings`), ainsi que le paramètre `securitySettings` des opérations `createSecure…TransactionManager`.
 
 ### 6.4 Legacy SAM API
 
@@ -420,7 +422,7 @@ Ce thème regroupe les renommages et suppressions motivés par la clarté ou la 
 | `setDynamicUnlockDataProvider(provider)` | `setDynamicUnlockDataProviderWithDeferredReader(provider)` |
 | `setDynamicUnlockDataProvider(provider, targetSamReader)` | `setDynamicUnlockDataProvider(provider, targetSamReader)` *(cas nominal, nom inchangé)* |
 | `prepareReadWorkKeyParameters(int)` / `(byte, byte)` | `prepareReadWorkKeyParametersByRecordNumber` / `prepareReadWorkKeyParametersByKifKvc` |
-| `getWorkKeyParameter(int)` / `(byte, byte)` | `getWorkKeyParameterByRecordNumber` / `getWorkKeyParameterByKifKvc` |
+| `getWorkKeyParameter(int)` / `(byte, byte)` | `getWorkKeyParametersByRecordNumber` / `getWorkKeyParametersByKifKvc` |
 | `prepareTransferWorkKeyDiversified(…, diversifier)` | `prepareTransferWorkKeyDiversifiedWithSpecificDiversifier(…, diversifier)` |
 | `LegacySam.ProductType` | `LegacySamProductType` |
 
@@ -713,18 +715,18 @@ Plusieurs types de données des versions en production mêlaient **données** et
 - **`FileData` est supprimée**, avec ses opérations `getContent()`, `getContent(numRecord)`, `getContent(numRecord, dataOffset, dataLength)`, `getAllRecordsContent()`, `getContentAsCounterValue(numCounter)` et `getAllCountersValue()` :
   - les enregistrements sont exposés directement par la propriété `ElementaryFile.records: SortedMap<Int, ByteArray>` (à la place de `ElementaryFile.getData()`) ;
   - les valeurs de compteurs sont obtenues par `CalypsoCard.getCounterValuesBySfi(sfi: Byte) → SortedMap<Int, Int>?` et `CalypsoCard.getCounterValuesByLid(lid: Short) → SortedMap<Int, Int>?`.
-- **`DirectoryHeader`** : `getKif(WriteAccessLevel)` et `getKvc(WriteAccessLevel)` deviennent les propriétés `kif: Map<WriteAccessLevel, Byte>` et `kvc: Map<WriteAccessLevel, Byte>`.
+- **`DirectoryHeader`** : `getKif(WriteAccessLevel)` et `getKvc(WriteAccessLevel)` deviennent les propriétés `kifByAccessLevel: Map<WriteAccessLevel, Byte>` et `kvcByAccessLevel: Map<WriteAccessLevel, Byte>`.
 - **`SearchCommandData`** devient une classe de données d'entrée (`sfi`, `searchData`, `startAtRecord = 1`, `offset = 0`, `repeatedOffset = false`, `mask: ByteArray? = null`, `fetchFirstMatchingResult = false`) ; le résultat est lu par `CalypsoCard.getMatchingRecordNumbers(commandId)` (cf. Thème 7) ; `CalypsoCardApiFactory.createSearchCommandData()` disparaît.
 - **`SvLoadLogRecord` et `SvDebitLogRecord`** deviennent des classes de données sans la propriété `rawData`, redondante avec les champs décodés. Les valeurs brutes restent accessibles par trois nouvelles opérations de `CalypsoCard` : `getSvLoadLogRecordRawData() → ByteArray?`, `getSvDebitLogLastRecordRawData() → ByteArray?` et `getSvDebitLogAllRecordsRawData() → List<ByteArray>` ; chaque objet décodé renvoyé correspond au décodage de la valeur brute au moment de l'appel.
 - `DirectoryHeader`, `ElementaryFile` et `FileHeader` deviennent des classes de données.
 
 ### 12.3 Legacy SAM API
 
-- **`KeyParameter`** devient une classe de données (`kif`, `kvc`, `algorithm`, `parameterValues: SortedMap<Int, Byte>`), sans `rawData` ; `getParameterValue(parameterNumber)` est remplacée par la propriété `parameterValues`. Les valeurs brutes sont accessibles par `LegacySam.getSystemKeyParameterRawData(systemKeyType)`, `getWorkKeyParameterRawDataByRecordNumber(recordNumber)` et `getWorkKeyParameterRawDataByKifKvc(kif, kvc)`.
+- **`KeyParameter`** devient la classe de données **`KeyParameters`**, renommée au pluriel comme les getters `getSystemKeyParameters` / `getWorkKeyParameters…` qui la renvoient (`kif`, `kvc`, `algorithm`, `parameterValues: SortedMap<Int, Byte>`), sans `rawData` ; `getParameterValue(parameterNumber)` est remplacée par la propriété `parameterValues`. Les valeurs brutes sont accessibles par `LegacySam.getSystemKeyParametersRawData(systemKeyType)`, `getWorkKeyParametersRawDataByRecordNumber(recordNumber)` et `getWorkKeyParametersRawDataByKifKvc(kif, kvc)`.
 - **`SamParameters`** est supprimée : `LegacySam.getSamParameters()` renvoie directement `ByteArray?`.
 - **Compteurs** : `getCounter(counterNumber)` et `getCounterCeiling(counterNumber)` sont supprimées (les tables `getCounters()` et `getCounterCeilings()` suffisent) ; `getCounterIncrementAccess(counterNumber)` est remplacée par `getCounterIncrementAccesses() → SortedMap<Int, CounterIncrementAccess>`.
 - **Données de commande** : `LegacyCardCertificateComputationData`, `BasicSignatureComputationData`, `TraceableSignatureComputationData`, `BasicSignatureVerificationData` et `TraceableSignatureVerificationData` deviennent des classes de données d'entrée (propriétés et valeurs par défaut au lieu de setters ; `withSamTraceabilityMode(offset, mode)` devient `samTraceabilityMode` / `traceabilityOffset`, `withoutBusyMode()` devient `busyMode = false`) ; leurs résultats sont lus sur la `LegacySam` par `commandId` (cf. §8.5). `KeyPairContainer` est supprimée. Les opérations `create…Data()` et `createKeyPairContainer()` disparaissent de `LegacySamApiFactory`.
-- **`SecuritySetting`** devient une classe de données (`samReader`, `controlSam`) à la place de `setControlSamResource(samReader, controlSam)` ; `LegacySamApiFactory.createSecuritySetting()` disparaît.
+- **`SecuritySetting`** devient la classe de données **`SecuritySettings`** (`samReader`, `controlSam`), renommée au pluriel comme les réglages de sécurité de la Calypso Card API, à la place de `setControlSamResource(samReader, controlSam)` ; `LegacySamApiFactory.createSecuritySetting()` disparaît.
 
 ### 12.4 Card API
 
@@ -831,7 +833,7 @@ Les spécifications apportent en outre des clarifications qui ne changent pas le
 
 Les éléments suivants figurent en gris dans le diagramme de la Legacy SAM API ; ils ne font **pas** partie du périmètre normatif soumis à validation :
 
-- `LegacySamApiFactory.createSecureReadTransactionManager(samReader, sam, securitySetting)` et l'interface `SecureReadTransactionManager` ;
+- `LegacySamApiFactory.createSecureReadTransactionManager(samReader, sam, securitySettings)` et l'interface `SecureReadTransactionManager` ;
 - `FreeTransactionManager.preparePlainLoadWorkKey(...)` et `preparePlainExportWorkKey(...)` ;
 - `LegacySamSelectionExtension.prepareReadCaadRecord(...)` / `prepareReadCaadRecords(...)` et leurs équivalents sur `ReadTransactionManager` ;
 - `SecureWriteTransactionManager.prepareWriteCaadRecord(...)`.
@@ -967,8 +969,11 @@ Cette annexe liste, pour chaque API, le devenir de chaque élément des versions
 | `CalypsoCard.getDirectoryHeader()`, `getFileBySfi`, `getFileByLid`, `getSvLoadLogRecord`, `getSvDebitLogLastRecord` | → retours nullables explicites |
 | — | Ajoutées : `CalypsoCard.getCounterValuesBySfi`, `getCounterValuesByLid`, `getMatchingRecordNumbers(commandId)`, `getSvLoadLogRecordRawData`, `getSvDebitLogLastRecordRawData`, `getSvDebitLogAllRecordsRawData` |
 | `CalypsoCard.ProductType` | → `CalypsoCardProductType` |
+| `TransactionManager.prepareDecreaseCounters(sfi, counterNumberToDecValueMap)`, `prepareIncreaseCounters(sfi, counterNumberToIncValueMap)` | → paramètres renommés `decrementValues`, `incrementValues` |
+| `SymmetricCryptoSecuritySetting`, `AsymmetricCryptoSecuritySetting` | → `SymmetricCryptoSecuritySettings`, `AsymmetricCryptoSecuritySettings` |
+| `CalypsoCardApiFactory.createSymmetricCryptoSecuritySetting(...)`, `createAsymmetricCryptoSecuritySetting(...)` | → `createSymmetricCryptoSecuritySettings(...)`, `createAsymmetricCryptoSecuritySettings(...)` ; paramètre `securitySetting` → `securitySettings` dans `createSecure…TransactionManager` |
 | `CalypsoCardSelectionExtension.prepareSelectFile(short)` / `prepareSelectFile(SelectFileControl selectControl)` | → `prepareSelectFileByLid(lid)` / `prepareSelectFileByControl(selectFileControl)` |
-| `DirectoryHeader` (interface ; `getKif(level)`, `getKvc(level)`) | → classe de données ; `kif`, `kvc` : `Map<WriteAccessLevel, Byte>` |
+| `DirectoryHeader` (interface ; `getKif(level)`, `getKvc(level)`) | → classe de données ; `kifByAccessLevel`, `kvcByAccessLevel` : `Map<WriteAccessLevel, Byte>` |
 | `ElementaryFile` (interface ; `getData()`) | → classe de données (`sfi`, `header?`, `records: SortedMap<Int, ByteArray>`) |
 | `ElementaryFile.Type` | → `ElementaryFileType` |
 | `FileData` (toutes opérations) | Supprimée (cf. §12.2) |
@@ -987,7 +992,7 @@ Cette annexe liste, pour chaque API, le devenir de chaque élément des versions
 | — | Ajoutée : `prepareSvUndebit(amount, date, time)` |
 | `SvAction` | Supprimée |
 | `SvOperation.DEBIT` | → `SvOperation.DEBIT_UNDEBIT` |
-| — | Ajoutées : `SymmetricCryptoSecuritySetting.assignOpenSecureSessionMaxDurationByCsn/ByFci(...)`, `assignCloseSecureSessionMaxDurationByCsn/ByFci(...)`, `assignSvCommandMaxDurationByCsn/ByFci(...)` ; `AsymmetricCryptoSecuritySetting.assignOpenSecureSessionMaxDurationByCsn/ByFci(...)`, `assignCloseSecureSessionMaxDurationByCsn/ByFci(...)` |
+| — | Ajoutées : `SymmetricCryptoSecuritySettings.assignOpenSecureSessionMaxDurationByCsn/ByFci(...)`, `assignCloseSecureSessionMaxDurationByCsn/ByFci(...)`, `assignSvCommandMaxDurationByCsn/ByFci(...)` ; `AsymmetricCryptoSecuritySettings.assignOpenSecureSessionMaxDurationByCsn/ByFci(...)`, `assignCloseSecureSessionMaxDurationByCsn/ByFci(...)` |
 | `ChannelControl` | Supprimée |
 | `CardIOException`, `ReaderIOException`, `UnexpectedCommandStatusException`, `SelectFileException` | Supprimées |
 | `CardSignatureNotVerifiableException`, `CryptoException`, `CryptoIOException`, `InconsistentDataException`, `InvalidCardSignatureException`, `InvalidCertificateException`, `InvalidPinException`, `SessionBufferOverflowException`, `UnauthorizedKeyException` | → mêmes noms sans suffixe `Exception` |
@@ -1001,10 +1006,11 @@ Cette annexe liste, pour chaque API, le devenir de chaque élément des versions
 | `LegacySam.getCounter(int)`, `getCounterCeiling(int)` | Supprimées (utiliser `getCounters()`, `getCounterCeilings()`) |
 | `LegacySam.getCounterIncrementAccess(int)` | → `getCounterIncrementAccesses() → SortedMap<Int, CounterIncrementAccess>` |
 | `LegacySam.getSamParameters() → SamParameters` | → `getSamParameters() → ByteArray?` ; `SamParameters` supprimée |
-| `LegacySam.getWorkKeyParameter(int)` / `(byte, byte)` | → `getWorkKeyParameterByRecordNumber` / `getWorkKeyParameterByKifKvc` |
-| — | Ajoutées : `LegacySam.getSystemKeyParameterRawData`, `getWorkKeyParameterRawDataByRecordNumber`, `getWorkKeyParameterRawDataByKifKvc`, `getKeyPair(commandId)`, `getComputedCardCertificate(commandId)`, `getSignature(commandId)`, `getSignedData(commandId)`, `isSignatureValid(commandId)` |
+| `LegacySam.getSystemKeyParameter(SystemKeyType)` | → `getSystemKeyParameters(systemKeyType) → KeyParameters?` |
+| `LegacySam.getWorkKeyParameter(int)` / `(byte, byte)` | → `getWorkKeyParametersByRecordNumber` / `getWorkKeyParametersByKifKvc` |
+| — | Ajoutées : `LegacySam.getSystemKeyParametersRawData`, `getWorkKeyParametersRawDataByRecordNumber`, `getWorkKeyParametersRawDataByKifKvc`, `getKeyPair(commandId)`, `getComputedCardCertificate(commandId)`, `getSignature(commandId)`, `getSignedData(commandId)`, `isSignatureValid(commandId)` |
 | `LegacySam.ProductType` | → `LegacySamProductType` |
-| `KeyParameter` (interface ; `getRawData`, `getParameterValue(int)`) | → classe de données (`kif`, `kvc`, `algorithm`, `parameterValues`) |
+| `KeyParameter` (interface ; `getRawData`, `getParameterValue(int)`) | → classe de données `KeyParameters` (`kif`, `kvc`, `algorithm`, `parameterValues`) |
 | `LegacySamSelectionExtension.setUnlockData(String, ProductType)` | → `setUnlockDataForProductType(unlockData, productType)` |
 | `LegacySamSelectionExtension.setStaticUnlockDataProvider(provider)` / `setDynamicUnlockDataProvider(provider)` | → `setStaticUnlockDataProviderWithDeferredReader(provider)` / `setDynamicUnlockDataProviderWithDeferredReader(provider)` |
 | `LegacySamSelectionExtension.prepareReadWorkKeyParameters(int)` / `(byte, byte)` | → `prepareReadWorkKeyParametersByRecordNumber` / `prepareReadWorkKeyParametersByKifKvc` |
@@ -1030,7 +1036,7 @@ Cette annexe liste, pour chaque API, le devenir de chaque élément des versions
 | `SignatureVerificationData.isSignatureValid()` | → `LegacySam.isSignatureValid(commandId: Int) → Boolean?` |
 | `BasicSignatureVerificationData`, `TraceableSignatureVerificationData` | → classes de données implémentant `SignatureVerificationData` |
 | `TraceableSignatureVerificationData.withSamTraceabilityMode(int offset, SamTraceabilityMode mode, LegacySamRevocationServiceSpi service)`, `withoutBusyMode()` | → propriétés `traceabilityOffset = 0`, `samTraceabilityMode: SamTraceabilityMode? = null`, `samRevocationService: LegacySamRevocationServiceSpi? = null`, `busyMode = true` |
-| `SecuritySetting.setControlSamResource(samReader, controlSam)` | → classe de données `SecuritySetting` (`samReader`, `controlSam`) |
+| `SecuritySetting.setControlSamResource(samReader, controlSam)` | → classe de données `SecuritySettings` (`samReader`, `controlSam`) ; paramètre `securitySetting` → `securitySettings` dans `createSecureWriteTransactionManager` et `createAsyncTransactionCreatorManager` |
 | `ReaderIOException`, `SamIOException`, `UnexpectedCommandStatusException` | Supprimées |
 | `InconsistentDataException`, `InvalidSignatureException`, `SamRevokedException` | → `InconsistentData`, `InvalidSignature`, `SamRevoked` |
 
