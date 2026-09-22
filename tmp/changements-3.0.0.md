@@ -249,7 +249,7 @@ Une **attaque relai** consiste à relayer le dialogue avec une carte vers un emp
 
 - **Surface d'attaque visée** : **attaque applicative** (relai logiciel des APDU), par opposition aux attaques au niveau du transport RF physique qui relèvent de contre-mesures matérielles.
 - **Ordre de grandeur** des bornes : la **milliseconde** (`ms`).
-- **Lieu de mesure** : l'**implémentation de la Terminal Reader API** mesure la durée effective de chaque échange APDU et la compare à la borne déclarée sur la requête. Les bornes de durée de session sécurisée et d'opération SV sont déclarées dans la Calypso Card API ; **la manière dont elles sont mesurées n'est pas encore spécifiée**.
+- **Lieu de mesure** : l'**implémentation de la Terminal Reader API** mesure la durée effective de chaque échange APDU et la compare à la borne déclarée sur la requête. Les bornes de durée Calypso sont déclarées dans la Calypso Card API et portent chacune sur **le seul échange d'une commande** (*Open Secure Session*, *Close Secure Session*, *SV Reload* / *SV Debit* / *SV Undebit*).
 - **Comportement post-dépassement** : la Card API lève l'erreur **`ApduExchangeDurationExceeded`** ; sa spécification indique que les extensions de plus haut niveau (Calypso notamment) **peuvent** (MAY) l'intercepter, annuler la session en cours et la propager à l'application sous forme d'**`InvalidCardResponse`**. Il s'agit d'une **possibilité** : la Calypso Card API ne rend pas encore ce comportement obligatoire, et ne précise pas la conséquence d'un dépassement des bornes de session et d'opération SV (cf. §19.2). Dans la Generic Card API, un dépassement lève `InvalidCardResponse`, dont le message identifie la commande fautive.
 
 ### 3.2 Card API
@@ -261,21 +261,39 @@ Une **attaque relai** consiste à relayer le dialogue avec une carte vers un emp
 
 ### 3.3 Calypso Card API
 
-Toutes les nouvelles opérations prennent un paramètre `csnMin` qui est un **seuil** sur le CSN (Card Serial Number) : la règle s'applique à **toute carte dont le CSN est supérieur ou égal à `csnMin`**.
+Chaque borne se déclare selon deux familles de réglages, chacune avec une opération dédiée :
 
-> **Règle de combinaison des `csnMin`** : lorsque plusieurs appels sont effectués avec des `csnMin` différents, chaque appel définit une **plage** délimitée par son `csnMin` et le `csnMin` immédiatement supérieur déclaré (ou +∞). Pour une carte donnée, c'est la **plage à laquelle son CSN appartient** qui détermine la borne appliquée.
+- **par CSN** (`…ByCsn(maxDuration: Long, csnMin: Long)`) : `csnMin` est un **seuil** sur le CSN (Calypso Serial Number, c'est-à-dire l'Application Serial Number, comparé comme entier non signé sur 64 bits) ;
+- **par FCI** (`…ByFci(maxDuration: Long, fciRegex: String)`) : `fciRegex` est une expression régulière appliquée au **FCI complet** retourné par *Select Application* (hors mot d'état), représenté en hexadécimal majuscule sans séparateur.
 
-- **`SymmetricCryptoSecuritySetting`** — deux nouvelles opérations :
-  - `assignOpenSecureSessionMaxDuration(maxDuration: Long, csnMin: Long, dfName: ByteArray? = null) → Self` — durée maximale d'une session sécurisée ;
-  - `assignSvOperationMaxDuration(maxDuration: Long, csnMin: Long, dfName: ByteArray? = null) → Self` — durée maximale d'une opération Stored Value.
-- **`AsymmetricCryptoSecuritySetting`** — une nouvelle opération :
-  - `assignOpenSecureSessionMaxDuration(maxDuration: Long, csnMin: Long, dfName: ByteArray? = null) → Self`.
+- **`SymmetricCryptoSecuritySetting`** — six nouvelles opérations :
+  - `assignOpenSecureSessionMaxDurationByCsn(maxDuration: Long, csnMin: Long) → Self` et `assignOpenSecureSessionMaxDurationByFci(maxDuration: Long, fciRegex: String) → Self` — durée maximale de l'échange de la commande *Open Secure Session* ;
+  - `assignCloseSecureSessionMaxDurationByCsn(maxDuration: Long, csnMin: Long) → Self` et `assignCloseSecureSessionMaxDurationByFci(maxDuration: Long, fciRegex: String) → Self` — durée maximale de l'échange de la commande *Close Secure Session* ;
+  - `assignSvCommandMaxDurationByCsn(maxDuration: Long, csnMin: Long) → Self` et `assignSvCommandMaxDurationByFci(maxDuration: Long, fciRegex: String) → Self` — durée maximale de l'échange de l'une des commandes *SV Reload*, *SV Debit* ou *SV Undebit*.
+- **`AsymmetricCryptoSecuritySetting`** — quatre nouvelles opérations :
+  - `assignOpenSecureSessionMaxDurationByCsn(maxDuration: Long, csnMin: Long) → Self` et `assignOpenSecureSessionMaxDurationByFci(maxDuration: Long, fciRegex: String) → Self` — durée maximale de l'échange de la commande *Open Secure Session* ;
+  - `assignCloseSecureSessionMaxDurationByCsn(maxDuration: Long, csnMin: Long) → Self` et `assignCloseSecureSessionMaxDurationByFci(maxDuration: Long, fciRegex: String) → Self` — durée maximale de l'échange de la commande *Close Secure Session*.
 
-Le paramètre `dfName` est **facultatif** : omis (`null`), le réglage s'applique à tous les DF ; fourni, il le restreint au DF désigné. `maxDuration` est placé en tête, car c'est la valeur que l'opération assigne.
+> **Règle de résolution** (pour une carte donnée, par type d'opération bornée) :
+> 1. **Réglages par CSN** : chaque appel définit une **plage** délimitée par son `csnMin` et le `csnMin` immédiatement supérieur déclaré (ou +∞). Si le CSN de la carte appartient à une plage dont la `maxDuration` est différente de `Long.MAX_VALUE`, cette valeur s'applique.
+> 2. **Réglages par FCI** : sinon, les réglages par FCI sont évalués **dans l'ordre de déclaration** et le premier dont l'expression correspond au FCI s'applique ; une `maxDuration` égale à `Long.MAX_VALUE` signifie alors « pas de borne ».
+> 3. Sinon, aucune borne ne s'applique.
 
-> La spécification ne précise pas encore ce qui est mesuré pour ces bornes (début et fin de la mesure de la durée de session ou d'opération SV), ni la conséquence d'un dépassement (cf. §3.1 et §19.2).
+Conséquences et précisions :
 
-> Cette forme remplace les deux surcharges par opération (avec et sans `dfName`) de la version de travail précédente de ce document (cf. Thème 10, noms d'opérations uniques).
+- les réglages par CSN agissent comme des **dérogations** : une borne par défaut s'exprime par un dernier réglage par FCI d'expression `.*`, et non par un réglage par CSN au seuil le plus bas, qui masquerait tous les réglages par FCI ; `Long.MAX_VALUE` sur une plage de CSN rend la main aux réglages par FCI pour les cartes de cette plage ;
+- la correspondance porte sur la **chaîne entière** (ancrage implicite aux deux extrémités) ; un octet correspond à `..` ;
+- pour rester portable (Java, .NET, Swift/ICU, Rust), l'expression est limitée à un **sous-ensemble commun** : caractères littéraux, `.`, classes `[...]`, quantificateurs `*`, `+`, `?`, `{n}`, `{n,}`, `{n,m}`, alternative `|` et groupes `(...)` ; références arrière, assertions de voisinage, ancres et options en ligne sont exclues ;
+- une expression invalide ou hors du sous-ensemble, ou une `maxDuration` non strictement positive, est rejetée **dès l'appel** (pré-condition de nature *Argument*) ;
+- un nouvel appel avec un `csnMin` déjà déclaré remplace la valeur précédente ; un nouvel appel avec une `fciRegex` identique remplace la valeur en **conservant sa position** dans l'ordre d'évaluation ;
+- sans FCI disponible, aucun réglage par FCI ne correspond ;
+- **intégrité du FCI** : le FCI est obtenu lors de la sélection, hors session, donc sans authentification. Si l'expression filtre sur les données de la *startup info*, l'intégrateur **doit** exécuter un `prepareGetData(FCI_FOR_CURRENT_DF)` en session afin de s'assurer de l'intégrité du FCI obtenu lors de la sélection. `prepareGetData` est désormais autorisée en session **pour ce seul tag** ; si la valeur retournée diffère de la réponse au *Select Application*, l'erreur `InconsistentData` est levée par `processCommands` (et non par `prepareGetData`).
+
+`maxDuration` est placé en tête, car c'est la valeur que l'opération assigne.
+
+> **Durée mesurée** : chaque borne porte sur le **seul échange de la commande** concernée, de l'émission de la commande à la réception de sa réponse ; les autres commandes de la session sécurisée ou de l'opération SV ne sont pas comptées. La spécification ne précise pas encore la conséquence d'un dépassement (cf. §3.1 et §19.2).
+
+> L'expression régulière sur le FCI couvre à elle seule le nom du DF, les informations de démarrage (familles de produits, masquage d'octets) et même un préfixe du numéro de série (tag `C7`), avec un ordre de priorité choisi par l'intégrateur. Cette forme remplace les critères `dfName` / `startupInfo` des versions de travail précédentes de ce document.
 
 ### 3.4 Generic Card API
 
@@ -655,8 +673,7 @@ Les APIs Terminaux étaient jusqu'ici définies par des interfaces Java. Ce mod�
 | **Interfaces sans opération** | interface vide | **interface marqueur** | `ScheduledCardSelectionsResponse`, `CardSelectionExtension` |
 | **Erreurs** | classes `…Exception` (vérifiées ou non) | erreurs nommées **sans suffixe**, portant `message: String` et `cause: Any?` | `CardCommunicationException` → `CardCommunication` |
 | **Suffixes techniques** | `…Spi`, `…Api` sur les types de données de la Card API et des APIs crypto | supprimés pour les **données** ; conservés pour les interfaces de contrat | `ApduRequestSpi` → `ApduRequest`, `SvCommandSecurityDataApi` → `SvCommandSecurityData` |
-| **Noms d'opérations uniques** | surcharges (même nom, paramètres différents) | **un nom unique par opération** dans une interface et sa hiérarchie ; suffixes `By…`, `With…`, `For…` ou paramètres à valeur par défaut | `prepareSelectFile` → `prepareSelectFileByLid` / `prepareSelectFileByControl` |
-| **Paramètres facultatifs** | surcharges | paramètre en fin de liste avec **valeur par défaut** `= null` | `assignOpenSecureSessionMaxDuration(maxDuration, csnMin, dfName: ByteArray? = null)` |
+| **Noms d'opérations uniques** | surcharges (même nom, paramètres différents) | **un nom unique par opération** dans une interface et sa hiérarchie ; suffixes `By…`, `With…`, `For…` | `prepareSelectFile` → `prepareSelectFileByLid` / `prepareSelectFileByControl` |
 | **Type universel** | `Object`, `Throwable` | `Any` | `onReaderError(context, readerName, error: Any)` |
 | **Réflexion** | `Class<E>` | supprimée | `getCryptoExtension(Class<E>)` → `getCryptoExtension()` (cf. Thème 14) |
 | **Sérialisation** | `extends Serializable` | supprimée de la notation | `ApduResponseApi`, `CardResponseApi` |
@@ -838,7 +855,7 @@ Le présent document soumet à la validation du **TC Terminal de la CNA** :
 1. **Le principe** des quatorze thèmes d'évolution (§2 à §15) et la cohérence d'ensemble du chantier (versions 3.0.0 pour Reader / Card / Calypso Card, 1.0.0 pour Definitions, 2.0.0 pour Legacy SAM / Generic Card / Storage Card, 0.2.0 pour Crypto Symmetric, 0.3.0 pour Crypto Asymmetric).
 2. **Les choix de conception** documentés dans les sections « Justification », en particulier :
    - le modèle multicanal explicite reposant sur la `SmartCard(Spi)` comme cible nommée et la hiérarchie à trois niveaux des gestionnaires de transactions (§2) ;
-   - le bornage de durée au niveau APDU, session Calypso et commande générique, avec seuil `csnMin` (§3) ;
+   - le bornage de durée au niveau APDU, session Calypso et commande générique, avec réglages par CSN et par FCI (§3) ;
    - la fusion du patron Observateur en une seule SPI `CardReaderEventHandler` (§4) ;
    - l'énumération `SecureSessionState` (§5) ;
    - l'extraction de `RfTechnology` et `CardType` dans la Terminal Definitions API et les paramètres de détection `CardDetectionSettings` (§7) ;
@@ -858,10 +875,10 @@ Le présent document soumet à la validation du **TC Terminal de la CNA** :
 
 - la **stabilité du contenu initial** des énumérations `RfTechnology` et `CardType` (§7.2), en particulier la représentation d'ISO 14443-4 par une seule valeur `ISO_14443_4` ;
 - la **suppression intégrale** de `ConfigurableCardReader` sans phase de dépréciation (§7.3) ;
-- la **sémantique du `csnMin`** comme seuil sur le CSN pour les bornes de durée (§3.3) ;
-- l'**application des bornes de durée Calypso** (§3.1, §3.3) : la spécification ne définit ni ce qui est mesuré pour la durée de session et d'opération SV, ni le comportement en cas de dépassement ; l'annulation de la session n'est qu'une possibilité offerte par la Card API (MAY). Le TC est invité à se prononcer sur l'opportunité de rendre ce comportement normatif dans la Calypso Card API ;
+- la **règle de résolution des bornes de durée** Calypso : priorité des réglages par CSN sur les réglages par FCI, `Long.MAX_VALUE` comme valeur de renvoi, sous-ensemble portable d'expressions régulières (§3.3) ;
+- l'**application des bornes de durée Calypso** (§3.1, §3.3) : la spécification définit ce qui est mesuré (le seul échange de la commande concernée) mais pas le comportement en cas de dépassement ; l'annulation de la session n'est qu'une possibilité offerte par la Card API (MAY). Le TC est invité à se prononcer sur l'opportunité de rendre ce comportement normatif dans la Calypso Card API ;
 - la **gradation à trois niveaux** des gestionnaires de transactions (§2.2) ;
-- le **remplacement des surcharges** par des noms d'opérations uniques et des paramètres à valeur par défaut (§11.2), qui modifie de nombreux noms d'opérations pour les intégrateurs Java ;
+- le **remplacement des surcharges** par des noms d'opérations uniques (§11.2), qui modifie de nombreux noms d'opérations pour les intégrateurs Java ;
 - le **remplacement des interfaces « builder »** par des classes de données (§11.2, §12), dont la réalisation Java reste à définir ;
 - le **passage de `SvOperation.DEBIT` à `DEBIT_UNDEBIT`** et la suppression des surcharges SV sans données (§13).
 
@@ -970,7 +987,7 @@ Cette annexe liste, pour chaque API, le devenir de chaque élément des versions
 | — | Ajoutée : `prepareSvUndebit(amount, date, time)` |
 | `SvAction` | Supprimée |
 | `SvOperation.DEBIT` | → `SvOperation.DEBIT_UNDEBIT` |
-| — | Ajoutées : `SymmetricCryptoSecuritySetting.assignOpenSecureSessionMaxDuration(...)`, `assignSvOperationMaxDuration(...)` ; `AsymmetricCryptoSecuritySetting.assignOpenSecureSessionMaxDuration(...)` |
+| — | Ajoutées : `SymmetricCryptoSecuritySetting.assignOpenSecureSessionMaxDurationByCsn/ByFci(...)`, `assignCloseSecureSessionMaxDurationByCsn/ByFci(...)`, `assignSvCommandMaxDurationByCsn/ByFci(...)` ; `AsymmetricCryptoSecuritySetting.assignOpenSecureSessionMaxDurationByCsn/ByFci(...)`, `assignCloseSecureSessionMaxDurationByCsn/ByFci(...)` |
 | `ChannelControl` | Supprimée |
 | `CardIOException`, `ReaderIOException`, `UnexpectedCommandStatusException`, `SelectFileException` | Supprimées |
 | `CardSignatureNotVerifiableException`, `CryptoException`, `CryptoIOException`, `InconsistentDataException`, `InvalidCardSignatureException`, `InvalidCertificateException`, `InvalidPinException`, `SessionBufferOverflowException`, `UnauthorizedKeyException` | → mêmes noms sans suffixe `Exception` |
