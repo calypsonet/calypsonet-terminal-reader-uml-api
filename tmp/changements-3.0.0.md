@@ -15,7 +15,7 @@ La référence « avant » est constituée des **dernières versions publiées**
 | Terminal Reader API | CNA-TR-API | `keypop-reader-java-api` **2.1.0** | **3.0.0** |
 | Terminal Card API *(interne)* | CNA-TC-API | `keypop-card-java-api` **2.0.1** | **3.0.0** |
 | Terminal Calypso Card API | CNA-TCC-API | `keypop-calypso-card-java-api` **2.2.0** | **3.0.0** |
-| Terminal Definitions API *(nouvelle)* | CNA-TD-API | — | **1.0.0** |
+| Terminal Reader Definitions API *(nouvelle)* | CNA-TRD-API | — | **1.0.0** |
 | Terminal Calypso Crypto Legacy SAM API | CNA-TCCL-API | `keypop-calypso-crypto-legacysam-java-api` **1.0.0** | **2.0.0** |
 | Terminal Calypso Crypto Symmetric API | CNA-TCCS-API | `keypop-calypso-crypto-symmetric-java-api` **0.1.1** | **0.2.0** |
 | Terminal Calypso Crypto Asymmetric API | CNA-TCCA-API | `keypop-calypso-crypto-asymmetric-java-api` **0.2.0** | **0.3.0** |
@@ -36,20 +36,20 @@ L'alignement des implémentations Java Keypop sur ces versions et la rédaction 
 
 > **Visibilité des APIs vis-à-vis des audiences**
 >
-> - La **Reader API**, la **Calypso Card API**, la **Terminal Definitions API**, la **Legacy SAM API**, la **Generic Card API** et la **Storage Card API** sont des APIs **publiques**, manipulées directement par l'**intégrateur** (le code applicatif).
+> - La **Reader API**, la **Calypso Card API**, la **Terminal Reader Definitions API**, la **Legacy SAM API**, la **Generic Card API** et la **Storage Card API** sont des APIs **publiques**, manipulées directement par l'**intégrateur** (le code applicatif).
 > - La **Card API** est une API **interne** : elle sert de contrat d'intégration entre les implémentations de lecteurs et les extensions de cartes. **L'intégrateur n'y a pas accès**.
 > - Les **Crypto Symmetric API** et **Crypto Asymmetric API** définissent les contrats (SPI) entre la Calypso Card API et les modules cryptographiques ; l'intégrateur ne les manipule qu'indirectement, à travers les modules crypto qu'il instancie (par exemple la Legacy SAM API).
 >
 > Le présent document décrit les évolutions de toutes les APIs impactées car elles sont solidaires sur le plan de la conception. Les évolutions des APIs internes ou de contrat ne nécessitent **aucune action** de la part de l'intégrateur ; elles sont absorbées par les implémentations Keypop.
 
-> **Nouvelle API : Terminal Definitions API**
+> **Nouvelle API : Terminal Reader Definitions API**
 >
 > La version 3.0.0 introduit une nouvelle API **socle** dédiée à l'hébergement des **types énumérés transverses** aux APIs Terminaux. Elle est créée à l'occasion du Thème 6 pour accueillir `RfTechnology` et `CardType`, mais sa vocation est plus large : elle est **destinée à recevoir potentiellement d'autres énumérations** qui constituent des **constantes globales** partagées par plusieurs APIs Terminaux. La Terminal Reader API **dépend** désormais de cette nouvelle API.
 >
 > Concrètement, cela se traduit par :
 >
-> - un **nouveau dépôt** : `calypsonet-terminal-definitions-uml-api` (version `1.0.0-SNAPSHOT`) ;
-> - un **nouveau module Java Keypop** : `keypop-definitions-jvm-api` (à créer, conformément à la convention de nommage Keypop) ;
+> - un **nouveau dépôt** : `calypsonet-terminal-reader-definitions-uml-api` (version `1.0.0-SNAPSHOT`) ;
+> - un **nouveau module Java Keypop** : `keypop-reader-definitions-jvm-api` (à créer, conformément à la convention de nommage Keypop) ;
 > - une **dépendance** déclarée du module `keypop-reader-java-api` vers ce nouveau module.
 
 > **Nouvelle forme des livrables : des spécifications normatives indépendantes du langage**
@@ -70,7 +70,7 @@ Chaque dépôt `calypsonet-terminal-*-uml-api` hébergé sur [github.com/calypso
 | **Terminal Reader API** | [calypsonet-terminal-reader-uml-api](https://github.com/calypsonet/calypsonet-terminal-reader-uml-api) | 3.0.0-SNAPSHOT |
 | **Terminal Card API** *(interne)* | [calypsonet-terminal-card-uml-api](https://github.com/calypsonet/calypsonet-terminal-card-uml-api) | 3.0.0-SNAPSHOT |
 | **Terminal Calypso Card API** | [calypsonet-terminal-calypso-card-uml-api](https://github.com/calypsonet/calypsonet-terminal-calypso-card-uml-api) | 3.0.0-SNAPSHOT |
-| **Terminal Definitions API** *(nouveau)* | [calypsonet-terminal-definitions-uml-api](https://github.com/calypsonet/calypsonet-terminal-definitions-uml-api) | 1.0.0-SNAPSHOT |
+| **Terminal Reader Definitions API** *(nouveau)* | [calypsonet-terminal-reader-definitions-uml-api](https://github.com/calypsonet/calypsonet-terminal-reader-definitions-uml-api) | 1.0.0-SNAPSHOT |
 | **Terminal Calypso Crypto Legacy SAM API** | [calypsonet-terminal-calypso-crypto-legacysam-uml-api](https://github.com/calypsonet/calypsonet-terminal-calypso-crypto-legacysam-uml-api) | 2.0.0-SNAPSHOT |
 | **Terminal Calypso Crypto Symmetric API** | [calypsonet-terminal-calypso-crypto-symmetric-uml-api](https://github.com/calypsonet/calypsonet-terminal-calypso-crypto-symmetric-uml-api) | 0.2.0-SNAPSHOT |
 | **Terminal Calypso Crypto Asymmetric API** | [calypsonet-terminal-calypso-crypto-asymmetric-uml-api](https://github.com/calypsonet/calypsonet-terminal-calypso-crypto-asymmetric-uml-api) | 0.3.0-SNAPSHOT |
@@ -115,7 +115,7 @@ Chaque dépôt `calypsonet-terminal-*-uml-api` hébergé sur [github.com/calypso
 
 ## 1. Vue d'ensemble
 
-La nouvelle génération des APIs Terminaux introduit des ruptures de compatibilité sur l'ensemble des APIs existantes, **crée une nouvelle API socle** (`Terminal Definitions API`), et s'accompagne d'un **changement de forme** des livrables (spécifications normatives indépendantes du langage). Les changements sont regroupés en quatorze thèmes :
+La nouvelle génération des APIs Terminaux introduit des ruptures de compatibilité sur l'ensemble des APIs existantes, **crée une nouvelle API socle** (`Terminal Reader Definitions API`), et s'accompagne d'un **changement de forme** des livrables (spécifications normatives indépendantes du langage). Les changements sont regroupés en quatorze thèmes :
 
 | # | Thème | Reader | Card | Calypso Card | Definitions | Legacy SAM | Crypto Sym. | Crypto Asym. | Generic Card | Storage Card |
 |---|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -470,19 +470,19 @@ Deux moteurs convergent :
 1. **Fin des chaînes libres pour les protocoles**. Les versions en production configuraient l'activation de protocoles et le filtrage de sélection à l'aide de **chaînes de caractères** (`physicalProtocolName`, `logicalProtocolName`) : valeurs non normalisées, fautes de frappe non détectées, documentation dispersée.
 2. **Arrivée du support ECP** (Enhanced Contactless Polling), mécanisme défini par la **spécification Apple ECP** permettant la détection rapide de cartes (notamment Calypso) en mode transit sur iPhone, qui nécessite l'envoi d'une **trame de polling spécifique** au démarrage de la détection. La trame est traitée comme une donnée binaire opaque construite par l'application.
 
-### 7.2 Nouvelle API socle — Terminal Definitions API
+### 7.2 Nouvelle API socle — Terminal Reader Definitions API
 
-Les énumérations `RfTechnology` et `CardType` sont placées dans une **nouvelle API socle**, la **Terminal Definitions API**, qui n'expose ni interface de service, ni SPI ; sa seule vocation est d'héberger les **types énumérés transverses** partagés entre APIs Terminaux.
+Les énumérations `RfTechnology` et `CardType` sont placées dans une **nouvelle API socle**, la **Terminal Reader Definitions API**, qui n'expose ni interface de service, ni SPI ; sa seule vocation est d'héberger les **types énumérés transverses** partagés entre APIs Terminaux.
 
 #### Conséquences structurelles
 
-- **Nouveau dépôt** : `calypsonet-terminal-definitions-uml-api` (version `1.0.0-SNAPSHOT`).
-- **Nouveau module Java Keypop** : `keypop-definitions-jvm-api` (à créer).
-- **Dépendance** publique et transitive de la Terminal Reader API vers la Terminal Definitions API (les énumérations apparaissent dans les propriétés `BasicCardSelector.cardType`, `IsoCardSelector.cardType`, `CardDetectionSettings.rfTechnologies` et `…CardSelectionResult.cardType`).
+- **Nouveau dépôt** : `calypsonet-terminal-reader-definitions-uml-api` (version `1.0.0-SNAPSHOT`).
+- **Nouveau module Java Keypop** : `keypop-reader-definitions-jvm-api` (à créer).
+- **Dépendance** publique et transitive de la Terminal Reader API vers la Terminal Reader Definitions API (les énumérations apparaissent dans les propriétés `BasicCardSelector.cardType`, `IsoCardSelector.cardType`, `CardDetectionSettings.rfTechnologies` et `…CardSelectionResult.cardType`).
 
 #### Contenu initial
 
-- **`DefinitionsApiProperties`** — constante `VERSION` du module ;
+- **`ReaderDefinitionsApiProperties`** — constante `VERSION` du module ;
 - **`RfTechnology`** : `ISO_14443_AB`, `INNOVATRON_B_PRIME`, `FELICA`, `ISO_15693` ;
 - **`CardType`** : `ISO_7816_3`, `ISO_14443_4`, `ISO_14443_3A_MIFARE_CLASSIC_1K`, `ISO_14443_3A_MIFARE_CLASSIC_4K`, `ISO_14443_3A_MIFARE_ULTRALIGHT`, `ISO_14443_3B_ST25_SRT512`, `INNOVATRON_B_PRIME`, `FELICA`, `ISO_15693`, `UNKNOWN`.
 
@@ -523,7 +523,7 @@ Toutes les informations de détection sont regroupées dans la **classe de donn�
 - **Évolutivité** : ajouter un paramètre de polling revient à ajouter une propriété à valeur par défaut à `CardDetectionSettings`, sans toucher la signature de `startCardDetection`.
 - **Séparation entrée / sortie** : `RfTechnology` en entrée (polling), `CardType` en sortie (résultat) et comme critère de sélection.
 - **Déclaration unique et typée** : en production, le protocole devait être déclaré deux fois (`activateProtocol` côté lecteur, `filterByCardProtocol` côté sélecteur) ; il n'est plus déclaré qu'une fois, de manière typée.
-- **Réutilisabilité transverse** grâce à l'extraction des énumérations dans la Terminal Definitions API.
+- **Réutilisabilité transverse** grâce à l'extraction des énumérations dans la Terminal Reader Definitions API.
 
 ---
 
@@ -860,7 +860,7 @@ Le présent document soumet à la validation du **TC Terminal de la CNA** :
    - le bornage de durée au niveau APDU, session Calypso et commande générique, avec réglages par CSN et par FCI (§3) ;
    - la fusion du patron Observateur en une seule SPI `CardReaderEventHandler` (§4) ;
    - l'énumération `SecureSessionState` (§5) ;
-   - l'extraction de `RfTechnology` et `CardType` dans la Terminal Definitions API et les paramètres de détection `CardDetectionSettings` (§7) ;
+   - l'extraction de `RfTechnology` et `CardType` dans la Terminal Reader Definitions API et les paramètres de détection `CardDetectionSettings` (§7) ;
    - le modèle `commandId` généralisé (§8) ;
    - la découverte normalisée des lecteurs par `CardReaderProvider` (§9) ;
    - la **hiérarchie de gestionnaires de sélection par mode** et les trois types de résultat (§10) ;
@@ -870,7 +870,7 @@ Le présent document soumet à la validation du **TC Terminal de la CNA** :
    - la tolérance du fichier absent en session (§14) ;
    - l'accès à l'extension crypto avec clause d'identité (§15).
 3. **Le contenu détaillé des neuf spécifications** et de leurs diagrammes (cf. [Documents de référence](#documents-de-référence)).
-4. **L'introduction** de la nouvelle API socle Definitions.
+4. **L'introduction** de la nouvelle API socle Reader Definitions.
 5. **Le principe** d'une procédure de migration dédiée (cf. §18).
 
 ### 19.2 Points d'attention pour la revue
@@ -889,7 +889,7 @@ Le présent document soumet à la validation du **TC Terminal de la CNA** :
 Une fois les versions validées par le TC Terminal :
 
 1. **Finalisation des spécifications** : passage des dépôts de leurs versions `…-SNAPSHOT` à leurs versions finales ; retrait ou spécification des éléments en cours d'étude (§17).
-2. **Création du nouveau module Java** `keypop-definitions-jvm-api`, et **alignement des modules Java Keypop** existants (`keypop-reader-java-api`, `keypop-card-java-api`, `keypop-calypso-card-java-api`, `keypop-calypso-crypto-legacysam-java-api`, `keypop-calypso-crypto-symmetric-java-api`, `keypop-calypso-crypto-asymmetric-java-api`, `keypop-genericcard-jvm-api`, `keypop-storagecard-java-api`) sur leurs nouvelles versions.
+2. **Création du nouveau module Java** `keypop-reader-definitions-jvm-api`, et **alignement des modules Java Keypop** existants (`keypop-reader-java-api`, `keypop-card-java-api`, `keypop-calypso-card-java-api`, `keypop-calypso-crypto-legacysam-java-api`, `keypop-calypso-crypto-symmetric-java-api`, `keypop-calypso-crypto-asymmetric-java-api`, `keypop-genericcard-jvm-api`, `keypop-storagecard-java-api`) sur leurs nouvelles versions.
 3. **Rédaction et publication du guide technique de migration** (cf. §18).
 4. **Communication** de la disponibilité des nouvelles versions aux intégrateurs et aux groupes de travail CNA concernés.
 
@@ -1094,11 +1094,11 @@ Cette annexe liste, pour chaque API, le devenir de chaque élément des versions
 | `SCAuthenticationFailedException` (extends `CardCommunicationException`) | → `SCAuthenticationFailed` (sans erreur parente) |
 | `SCCardCommunicationException`, `SCInvalidCardResponseException`, `SCReaderCommunicationException` | → `SCCardCommunication`, `SCInvalidCardResponse`, `SCReaderCommunication` (parents inchangés) |
 
-### A.9 Terminal Definitions API (nouvelle, 1.0.0)
+### A.9 Terminal Reader Definitions API (nouvelle, 1.0.0)
 
 | Élément | Contenu |
 |---|---|
-| `DefinitionsApiProperties` | constante `VERSION` |
+| `ReaderDefinitionsApiProperties` | constante `VERSION` |
 | `RfTechnology` | `ISO_14443_AB`, `INNOVATRON_B_PRIME`, `FELICA`, `ISO_15693` |
 | `CardType` | `ISO_7816_3`, `ISO_14443_4`, `ISO_14443_3A_MIFARE_CLASSIC_1K`, `ISO_14443_3A_MIFARE_CLASSIC_4K`, `ISO_14443_3A_MIFARE_ULTRALIGHT`, `ISO_14443_3B_ST25_SRT512`, `INNOVATRON_B_PRIME`, `FELICA`, `ISO_15693`, `UNKNOWN` |
 

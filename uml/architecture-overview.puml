@@ -36,7 +36,7 @@ hide <<grey>> stereotype
 component "Terminal Application" as App
 component "Card Extensions\n(e.g. Calypso Card API)" as Ext
 component "Terminal Reader API\n(this specification)" as TR <<yellow>>
-component "Terminal Definitions API\n(global constants)" as Def
+component "Terminal Reader Definitions API\n(global constants)" as Def
 component "Reader Driver\nImplementation(s)" as Drv
 component "Card Reader\nHardware" as HW
 

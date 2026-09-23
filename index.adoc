@@ -26,7 +26,7 @@ include::assets/legal/_license-cc-by-nd-4.0.adoc[]
 // ============================================================================
 //
 // Referenced specifications
-:ver-cna-td: 1.0
+:ver-cna-trd: 1.0
 //
 // ============================================================================
 // Shared / fixed — identical across every spec
@@ -299,8 +299,8 @@ is backward-compatible per that API's evolution policy.
 |===
 | Reference | Document
 
-| [[ref_cna_td]] [CNA-TD-API]
-| https://docs.terminal-api.calypsonet.org/calypsonet-terminal-definitions-uml-api/[_CNA Terminal API -- Definitions_] (SP-CNATerminalAPI-Definitions), version {ver-cna-td}, {organization}. Provides the `RfTechnology` and `CardType` enumerations referenced by this specification.
+| [[ref_cna_trd]] [CNA-TRD-API]
+| https://docs.terminal-api.calypsonet.org/calypsonet-terminal-reader-definitions-uml-api/[_CNA Terminal API -- Reader Definitions_] (SP-CNATerminalAPI-ReaderDefinitions), version {ver-cna-trd}, {organization}. Provides the `RfTechnology` and `CardType` enumerations referenced by this specification.
 |===
 
 ==== Normative References
@@ -590,7 +590,7 @@ is rejected as soon as one of them does not match.
 | Name | Type | Default | Since | Description
 
 | `cardType`
-| `CardType?` (<<ref_cna_td,CNA-TD-API>>)
+| `CardType?` (<<ref_cna_trd,CNA-TRD-API>>)
 | `null`
 | 3.0
 | Restricts the selection to cards whose detected type matches this value. The value `UNKNOWN` MAY be
@@ -631,7 +631,7 @@ is rejected as soon as one of them does not match.
   be detected.
 
 | `rfTechnologies`
-| `Set<RfTechnology>` (<<ref_cna_td,CNA-TD-API>>)
+| `Set<RfTechnology>` (<<ref_cna_trd,CNA-TRD-API>>)
 | `setOf(RfTechnology.ISO_14443_AB)`
 | 3.0
 | The set of RF technologies the reader activates during polling. Not relevant for contact readers, where
@@ -714,7 +714,7 @@ match.
 | Name | Type | Default | Since | Description
 
 | `cardType`
-| `CardType?` (<<ref_cna_td,CNA-TD-API>>)
+| `CardType?` (<<ref_cna_trd,CNA-TRD-API>>)
 | `null`
 | 3.0
 | Restricts the selection to cards whose detected type matches this value. The value `UNKNOWN` MAY be
@@ -769,11 +769,11 @@ are active in parallel; the one placed on the basic channel, if any, is identifi
 | Name | Type | Default | Since | Description
 
 | `cardType`
-| `CardType` (<<ref_cna_td,CNA-TD-API>>)
+| `CardType` (<<ref_cna_trd,CNA-TRD-API>>)
 | --
 | 3.0
-| Type of the detected card, as defined by the `CardType` enumeration of the Terminal Definitions API
-  (see <<ref_cna_td,CNA-TD-API>>). `UNKNOWN` when the card type could not be identified. The value is
+| Type of the detected card, as defined by the `CardType` enumeration of the Terminal Reader Definitions API
+  (see <<ref_cna_trd,CNA-TRD-API>>). `UNKNOWN` when the card type could not be identified. The value is
   intrinsically tied to the lifecycle of this result.
 
 | `smartCards`
@@ -807,11 +807,11 @@ expose the data collected during their selection (see <<sec_smartcard_lifecycle,
 | Name | Type | Default | Since | Description
 
 | `cardType`
-| `CardType` (<<ref_cna_td,CNA-TD-API>>)
+| `CardType` (<<ref_cna_trd,CNA-TRD-API>>)
 | --
 | 3.0
-| Type of the detected card, as defined by the `CardType` enumeration of the Terminal Definitions API
-  (see <<ref_cna_td,CNA-TD-API>>). `UNKNOWN` when the card type could not be identified. The value is
+| Type of the detected card, as defined by the `CardType` enumeration of the Terminal Reader Definitions API
+  (see <<ref_cna_trd,CNA-TRD-API>>). `UNKNOWN` when the card type could not be identified. The value is
   intrinsically tied to the lifecycle of this result.
 
 | `smartCards`
@@ -850,11 +850,11 @@ identified by the `selectionId` supplied to `prepareSelection`. `selectionId` an
 | Name | Type | Default | Since | Description
 
 | `cardType`
-| `CardType` (<<ref_cna_td,CNA-TD-API>>)
+| `CardType` (<<ref_cna_trd,CNA-TRD-API>>)
 | --
 | 3.0
-| Type of the detected card, as defined by the `CardType` enumeration of the Terminal Definitions API
-  (see <<ref_cna_td,CNA-TD-API>>). `UNKNOWN` when the card type could not be identified. The value is
+| Type of the detected card, as defined by the `CardType` enumeration of the Terminal Reader Definitions API
+  (see <<ref_cna_trd,CNA-TRD-API>>). `UNKNOWN` when the card type could not be identified. The value is
   intrinsically tied to the lifecycle of this result.
 
 | `selectionId`
