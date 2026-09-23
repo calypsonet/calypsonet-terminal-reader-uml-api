@@ -250,7 +250,7 @@ Une **attaque relai** consiste à relayer le dialogue avec une carte vers un emp
 - **Surface d'attaque visée** : **attaque applicative** (relai logiciel des APDU), par opposition aux attaques au niveau du transport RF physique qui relèvent de contre-mesures matérielles.
 - **Ordre de grandeur** des bornes : la **milliseconde** (`ms`).
 - **Lieu de mesure** : l'**implémentation de la Terminal Reader API** mesure la durée effective de chaque échange APDU et la compare à la borne déclarée sur la requête. Les bornes de durée Calypso sont déclarées dans la Calypso Card API et portent chacune sur **le seul échange d'une commande** (*Open Secure Session*, *Close Secure Session*, *SV Reload* / *SV Debit* / *SV Undebit*).
-- **Comportement post-dépassement** : la Card API lève l'erreur **`ApduExchangeDurationExceeded`** ; sa spécification indique que les extensions de plus haut niveau (Calypso notamment) **peuvent** (MAY) l'intercepter, annuler la session en cours et la propager à l'application sous forme d'**`InvalidCardResponse`**. Il s'agit d'une **possibilité** : la Calypso Card API ne rend pas encore ce comportement obligatoire, et ne précise pas la conséquence d'un dépassement des bornes de session et d'opération SV (cf. §19.2). Dans la Generic Card API, un dépassement lève `InvalidCardResponse`, dont le message identifie la commande fautive.
+- **Comportement post-dépassement** : la Card API lève l'erreur **`ApduExchangeDurationExceeded`**, que les extensions de plus haut niveau interceptent et propagent à l'application sous forme d'**`InvalidCardResponse`**. La Calypso Card API précise désormais ce comportement : si une **session sécurisée est ouverte, elle est automatiquement annulée** avant la remontée de l'erreur, de sorte qu'aucune modification de la session ne soit validée par la carte ; **hors session** (commande SV), il n'y a rien à annuler et seule l'erreur remonte à la couche billettique, qui décide de la suite selon son contexte. Dans la Generic Card API, un dépassement lève `InvalidCardResponse`, dont le message identifie la commande fautive.
 
 ### 3.2 Card API
 
@@ -291,7 +291,7 @@ Conséquences et précisions :
 
 `maxDuration` est placé en tête, car c'est la valeur que l'opération assigne.
 
-> **Durée mesurée** : chaque borne porte sur le **seul échange de la commande** concernée, de l'émission de la commande à la réception de sa réponse ; les autres commandes de la session sécurisée ou de l'opération SV ne sont pas comptées. La spécification ne précise pas encore la conséquence d'un dépassement (cf. §3.1 et §19.2).
+> **Durée mesurée** : chaque borne porte sur le **seul échange de la commande** concernée, de l'émission de la commande à la réception de sa réponse ; les autres commandes de la session sécurisée ou de l'opération SV ne sont pas comptées. **Conséquence d'un dépassement** : la session sécurisée ouverte est automatiquement annulée, et l'erreur remonte sous forme d'`InvalidCardResponse` ; hors session, seule l'erreur remonte (cf. §3.1).
 
 > L'expression régulière sur le FCI couvre à elle seule le nom du DF, les informations de démarrage (familles de produits, masquage d'octets) et même un préfixe du numéro de série (tag `C7`), avec un ordre de priorité choisi par l'intégrateur. Cette forme remplace les critères `dfName` / `startupInfo` des versions de travail précédentes de ce document.
 
@@ -878,7 +878,7 @@ Le présent document soumet à la validation du **TC Terminal de la CNA** :
 - la **stabilité du contenu initial** des énumérations `RfTechnology` et `CardType` (§7.2), en particulier la représentation d'ISO 14443-4 par une seule valeur `ISO_14443_4` ;
 - la **suppression intégrale** de `ConfigurableCardReader` sans phase de dépréciation (§7.3) ;
 - la **règle de résolution des bornes de durée** Calypso : priorité des réglages par CSN sur les réglages par FCI, `Long.MAX_VALUE` comme valeur de renvoi, sous-ensemble portable d'expressions régulières (§3.3) ;
-- l'**application des bornes de durée Calypso** (§3.1, §3.3) : la spécification définit ce qui est mesuré (le seul échange de la commande concernée) mais pas le comportement en cas de dépassement ; l'annulation de la session n'est qu'une possibilité offerte par la Card API (MAY). Le TC est invité à se prononcer sur l'opportunité de rendre ce comportement normatif dans la Calypso Card API ;
+- l'**application des bornes de durée Calypso** (§3.1, §3.3) : ce qui est mesuré (le seul échange de la commande concernée) et la conséquence d'un dépassement (annulation automatique de la session ouverte, remontée de l'erreur hors session) sont désormais spécifiés ;
 - la **gradation à trois niveaux** des gestionnaires de transactions (§2.2) ;
 - le **remplacement des surcharges** par des noms d'opérations uniques (§11.2), qui modifie de nombreux noms d'opérations pour les intégrateurs Java ;
 - le **remplacement des interfaces « builder »** par des classes de données (§11.2, §12), dont la réalisation Java reste à définir ;

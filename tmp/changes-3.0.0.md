@@ -250,7 +250,7 @@ A **relay attack** consists in relaying the dialogue with a card to a remote loc
 - **Targeted attack surface**: **application-level attack** (software relay of APDUs), as opposed to attacks at the physical RF transport level, which are covered by hardware countermeasures.
 - **Order of magnitude** of the bounds: the **millisecond** (`ms`).
 - **Measurement location**: the **Terminal Reader API implementation** measures the effective duration of each APDU exchange and compares it with the bound declared on the request. The Calypso duration bounds are declared in the Calypso Card API and each covers **a single command exchange** (_Open Secure Session_, _Close Secure Session_, _SV Reload_ / _SV Debit_ / _SV Undebit_).
-- **Behaviour after an overrun**: the Card API raises the **`ApduExchangeDurationExceeded`** error; its specification states that higher-level extensions (notably Calypso) **may** (MAY) intercept it, cancel any ongoing session and propagate the failure to the application as an **`InvalidCardResponse`**. This is a **possibility**: the Calypso Card API does not make this behaviour mandatory yet, and does not specify the consequence of exceeding the session and SV operation bounds (see §19.2). In the Generic Card API, an overrun raises `InvalidCardResponse`, whose message identifies the offending command.
+- **Behaviour after an overrun**: the Card API raises the **`ApduExchangeDurationExceeded`** error, which the higher-level extensions intercept and propagate to the application as an **`InvalidCardResponse`**. The Calypso Card API now specifies this behaviour: if a **secure session is open, it is automatically cancelled** before the error is propagated, so that no modification performed during the session is validated by the card; **outside a session** (SV command), there is nothing to cancel and only the error is propagated to the ticketing layer, which decides what to do according to its own context. In the Generic Card API, an overrun raises `InvalidCardResponse`, whose message identifies the offending command.
 
 ### 3.2 Card API
 
@@ -291,7 +291,7 @@ Consequences and details:
 
 `maxDuration` comes first, as it is the value the operation assigns.
 
-> **Measured duration**: each bound covers the **relevant command exchange alone**, from the transmission of the command to the reception of its response; the other commands of the secure session or of the SV operation are not counted. The specification does not yet define the consequence of an overrun (see §3.1 and §19.2).
+> **Measured duration**: each bound covers the **relevant command exchange alone**, from the transmission of the command to the reception of its response; the other commands of the secure session or of the SV operation are not counted. **Consequence of an overrun**: an open secure session is automatically cancelled and the error is propagated as an `InvalidCardResponse`; outside a session, only the error is propagated (see §3.1).
 
 > The regular expression on the FCI alone covers the DF name, the startup information (product families, byte masking) and even a prefix of the serial number (tag `C7`), with a priority order chosen by the integrator. This form replaces the `dfName` / `startupInfo` criteria of the previous working versions of this document.
 
@@ -878,7 +878,7 @@ This document submits to the validation of the **CNA TC Terminal**:
 - the **stability of the initial content** of the `RfTechnology` and `CardType` enumerations (§7.2), in particular the representation of ISO 14443-4 by a single `ISO_14443_4` value;
 - the **complete removal** of `ConfigurableCardReader` without a deprecation phase (§7.3);
 - the Calypso **duration bound resolution rule**: priority of CSN-based over FCI-based settings, `Long.MAX_VALUE` as the deferral value, portable subset of regular expressions (§3.3);
-- the **enforcement of the Calypso duration bounds** (§3.1, §3.3): the specification defines what is measured (the relevant command exchange alone) but not the behaviour on overrun; cancelling the session is only a possibility offered by the Card API (MAY). The TC is invited to decide whether this behaviour should be made normative in the Calypso Card API;
+- the **enforcement of the Calypso duration bounds** (§3.1, §3.3): both what is measured (the relevant command exchange alone) and the consequence of an overrun (automatic cancellation of an open session, error propagation outside a session) are now specified;
 - the **three-level gradation** of transaction managers (§2.2);
 - the **replacement of overloads** by unique operation names (§11.2), which changes many operation names for Java integrators;
 - the **replacement of "builder" interfaces** by data classes (§11.2, §12), whose Java implementation remains to be defined;
