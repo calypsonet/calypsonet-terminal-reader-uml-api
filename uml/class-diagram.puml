@@ -56,7 +56,7 @@ hide <<grey>> stereotype
 
 legend top
     * __External public API references__
-    *** <back:yellow>**Calypsonet Terminal Definitions API**</back>
+    *** <back:yellow>**Calypsonet Terminal Reader Definitions API**</back>
     * __Text__
     *** <color:blue><b>New element added since the last version
     *** <color:red><s><b>Element marked as deprecated since the last version

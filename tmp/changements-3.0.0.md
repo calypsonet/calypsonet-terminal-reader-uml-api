@@ -15,7 +15,7 @@ La référence « avant » est constituée des **dernières versions publiées**
 | Terminal Reader API | CNA-TR-API | `keypop-reader-java-api` **2.1.0** | **3.0.0** |
 | Terminal Card API *(interne)* | CNA-TC-API | `keypop-card-java-api` **2.0.1** | **3.0.0** |
 | Terminal Calypso Card API | CNA-TCC-API | `keypop-calypso-card-java-api` **2.2.0** | **3.0.0** |
-| Terminal Definitions API *(nouvelle)* | CNA-TD-API | — | **1.0.0** |
+| Terminal Reader Definitions API *(nouvelle)* | CNA-TRD-API | — | **1.0.0** |
 | Terminal Calypso Crypto Legacy SAM API | CNA-TCCL-API | `keypop-calypso-crypto-legacysam-java-api` **1.0.0** | **2.0.0** |
 | Terminal Calypso Crypto Symmetric API | CNA-TCCS-API | `keypop-calypso-crypto-symmetric-java-api` **0.1.1** | **0.2.0** |
 | Terminal Calypso Crypto Asymmetric API | CNA-TCCA-API | `keypop-calypso-crypto-asymmetric-java-api` **0.2.0** | **0.3.0** |
@@ -36,20 +36,20 @@ L'alignement des implémentations Java Keypop sur ces versions et la rédaction 
 
 > **Visibilité des APIs vis-à-vis des audiences**
 >
-> - La **Reader API**, la **Calypso Card API**, la **Terminal Definitions API**, la **Legacy SAM API**, la **Generic Card API** et la **Storage Card API** sont des APIs **publiques**, manipulées directement par l'**intégrateur** (le code applicatif).
+> - La **Reader API**, la **Calypso Card API**, la **Terminal Reader Definitions API**, la **Legacy SAM API**, la **Generic Card API** et la **Storage Card API** sont des APIs **publiques**, manipulées directement par l'**intégrateur** (le code applicatif).
 > - La **Card API** est une API **interne** : elle sert de contrat d'intégration entre les implémentations de lecteurs et les extensions de cartes. **L'intégrateur n'y a pas accès**.
 > - Les **Crypto Symmetric API** et **Crypto Asymmetric API** définissent les contrats (SPI) entre la Calypso Card API et les modules cryptographiques ; l'intégrateur ne les manipule qu'indirectement, à travers les modules crypto qu'il instancie (par exemple la Legacy SAM API).
 >
 > Le présent document décrit les évolutions de toutes les APIs impactées car elles sont solidaires sur le plan de la conception. Les évolutions des APIs internes ou de contrat ne nécessitent **aucune action** de la part de l'intégrateur ; elles sont absorbées par les implémentations Keypop.
 
-> **Nouvelle API : Terminal Definitions API**
+> **Nouvelle API : Terminal Reader Definitions API**
 >
 > La version 3.0.0 introduit une nouvelle API **socle** dédiée à l'hébergement des **types énumérés transverses** aux APIs Terminaux. Elle est créée à l'occasion du Thème 6 pour accueillir `RfTechnology` et `CardType`, mais sa vocation est plus large : elle est **destinée à recevoir potentiellement d'autres énumérations** qui constituent des **constantes globales** partagées par plusieurs APIs Terminaux. La Terminal Reader API **dépend** désormais de cette nouvelle API.
 >
 > Concrètement, cela se traduit par :
 >
-> - un **nouveau dépôt** : `calypsonet-terminal-definitions-uml-api` (version `1.0.0-SNAPSHOT`) ;
-> - un **nouveau module Java Keypop** : `keypop-definitions-jvm-api` (à créer, conformément à la convention de nommage Keypop) ;
+> - un **nouveau dépôt** : `calypsonet-terminal-reader-definitions-uml-api` (version `1.0.0-SNAPSHOT`) ;
+> - un **nouveau module Java Keypop** : `keypop-reader-definitions-jvm-api` (à créer, conformément à la convention de nommage Keypop) ;
 > - une **dépendance** déclarée du module `keypop-reader-java-api` vers ce nouveau module.
 
 > **Nouvelle forme des livrables : des spécifications normatives indépendantes du langage**
@@ -70,7 +70,7 @@ Chaque dépôt `calypsonet-terminal-*-uml-api` hébergé sur [github.com/calypso
 | **Terminal Reader API** | [calypsonet-terminal-reader-uml-api](https://github.com/calypsonet/calypsonet-terminal-reader-uml-api) | 3.0.0-SNAPSHOT |
 | **Terminal Card API** *(interne)* | [calypsonet-terminal-card-uml-api](https://github.com/calypsonet/calypsonet-terminal-card-uml-api) | 3.0.0-SNAPSHOT |
 | **Terminal Calypso Card API** | [calypsonet-terminal-calypso-card-uml-api](https://github.com/calypsonet/calypsonet-terminal-calypso-card-uml-api) | 3.0.0-SNAPSHOT |
-| **Terminal Definitions API** *(nouveau)* | [calypsonet-terminal-definitions-uml-api](https://github.com/calypsonet/calypsonet-terminal-definitions-uml-api) | 1.0.0-SNAPSHOT |
+| **Terminal Reader Definitions API** *(nouveau)* | [calypsonet-terminal-reader-definitions-uml-api](https://github.com/calypsonet/calypsonet-terminal-reader-definitions-uml-api) | 1.0.0-SNAPSHOT |
 | **Terminal Calypso Crypto Legacy SAM API** | [calypsonet-terminal-calypso-crypto-legacysam-uml-api](https://github.com/calypsonet/calypsonet-terminal-calypso-crypto-legacysam-uml-api) | 2.0.0-SNAPSHOT |
 | **Terminal Calypso Crypto Symmetric API** | [calypsonet-terminal-calypso-crypto-symmetric-uml-api](https://github.com/calypsonet/calypsonet-terminal-calypso-crypto-symmetric-uml-api) | 0.2.0-SNAPSHOT |
 | **Terminal Calypso Crypto Asymmetric API** | [calypsonet-terminal-calypso-crypto-asymmetric-uml-api](https://github.com/calypsonet/calypsonet-terminal-calypso-crypto-asymmetric-uml-api) | 0.3.0-SNAPSHOT |
@@ -115,7 +115,7 @@ Chaque dépôt `calypsonet-terminal-*-uml-api` hébergé sur [github.com/calypso
 
 ## 1. Vue d'ensemble
 
-La nouvelle génération des APIs Terminaux introduit des ruptures de compatibilité sur l'ensemble des APIs existantes, **crée une nouvelle API socle** (`Terminal Definitions API`), et s'accompagne d'un **changement de forme** des livrables (spécifications normatives indépendantes du langage). Les changements sont regroupés en quatorze thèmes :
+La nouvelle génération des APIs Terminaux introduit des ruptures de compatibilité sur l'ensemble des APIs existantes, **crée une nouvelle API socle** (`Terminal Reader Definitions API`), et s'accompagne d'un **changement de forme** des livrables (spécifications normatives indépendantes du langage). Les changements sont regroupés en quatorze thèmes :
 
 | # | Thème | Reader | Card | Calypso Card | Definitions | Legacy SAM | Crypto Sym. | Crypto Asym. | Generic Card | Storage Card |
 |---|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -249,8 +249,8 @@ Une **attaque relai** consiste à relayer le dialogue avec une carte vers un emp
 
 - **Surface d'attaque visée** : **attaque applicative** (relai logiciel des APDU), par opposition aux attaques au niveau du transport RF physique qui relèvent de contre-mesures matérielles.
 - **Ordre de grandeur** des bornes : la **milliseconde** (`ms`).
-- **Lieu de mesure** : l'**implémentation de la Terminal Reader API** mesure la durée effective de chaque échange APDU et la compare à la borne déclarée sur la requête. Les bornes de durée de session sécurisée et d'opération SV sont déclarées dans la Calypso Card API ; **la manière dont elles sont mesurées n'est pas encore spécifiée**.
-- **Comportement post-dépassement** : la Card API lève l'erreur **`ApduExchangeDurationExceeded`** ; sa spécification indique que les extensions de plus haut niveau (Calypso notamment) **peuvent** (MAY) l'intercepter, annuler la session en cours et la propager à l'application sous forme d'**`InvalidCardResponse`**. Il s'agit d'une **possibilité** : la Calypso Card API ne rend pas encore ce comportement obligatoire, et ne précise pas la conséquence d'un dépassement des bornes de session et d'opération SV (cf. §19.2). Dans la Generic Card API, un dépassement lève `InvalidCardResponse`, dont le message identifie la commande fautive.
+- **Lieu de mesure** : l'**implémentation de la Terminal Reader API** mesure la durée effective de chaque échange APDU et la compare à la borne déclarée sur la requête. Les bornes de durée Calypso sont déclarées dans la Calypso Card API et portent chacune sur **le seul échange d'une commande** (*Open Secure Session*, *Close Secure Session*, *SV Reload* / *SV Debit* / *SV Undebit*).
+- **Comportement post-dépassement** : la Card API lève l'erreur **`ApduExchangeDurationExceeded`**, que les extensions de plus haut niveau interceptent et propagent à l'application sous forme d'**`InvalidCardResponse`**. La Calypso Card API précise désormais ce comportement : si une **session sécurisée est ouverte, elle est automatiquement annulée** avant la remontée de l'erreur, de sorte qu'aucune modification de la session ne soit validée par la carte ; **hors session** (commande SV), il n'y a rien à annuler et seule l'erreur remonte à la couche billettique, qui décide de la suite selon son contexte. Dans la Generic Card API, un dépassement lève `InvalidCardResponse`, dont le message identifie la commande fautive.
 
 ### 3.2 Card API
 
@@ -261,21 +261,39 @@ Une **attaque relai** consiste à relayer le dialogue avec une carte vers un emp
 
 ### 3.3 Calypso Card API
 
-Toutes les nouvelles opérations prennent un paramètre `csnMin` qui est un **seuil** sur le CSN (Card Serial Number) : la règle s'applique à **toute carte dont le CSN est supérieur ou égal à `csnMin`**.
+Chaque borne se déclare selon deux familles de réglages, chacune avec une opération dédiée :
 
-> **Règle de combinaison des `csnMin`** : lorsque plusieurs appels sont effectués avec des `csnMin` différents, chaque appel définit une **plage** délimitée par son `csnMin` et le `csnMin` immédiatement supérieur déclaré (ou +∞). Pour une carte donnée, c'est la **plage à laquelle son CSN appartient** qui détermine la borne appliquée.
+- **par CSN** (`…ByCsn(maxDuration: Long, csnMin: Long)`) : `csnMin` est un **seuil** sur le CSN (Calypso Serial Number, c'est-à-dire l'Application Serial Number, comparé comme entier non signé sur 64 bits) ;
+- **par FCI** (`…ByFci(maxDuration: Long, fciRegex: String)`) : `fciRegex` est une expression régulière appliquée au **FCI complet** retourné par *Select Application* (hors mot d'état), représenté en hexadécimal majuscule sans séparateur.
 
-- **`SymmetricCryptoSecuritySetting`** — deux nouvelles opérations :
-  - `assignOpenSecureSessionMaxDuration(maxDuration: Long, csnMin: Long, dfName: ByteArray? = null) → Self` — durée maximale d'une session sécurisée ;
-  - `assignSvOperationMaxDuration(maxDuration: Long, csnMin: Long, dfName: ByteArray? = null) → Self` — durée maximale d'une opération Stored Value.
-- **`AsymmetricCryptoSecuritySetting`** — une nouvelle opération :
-  - `assignOpenSecureSessionMaxDuration(maxDuration: Long, csnMin: Long, dfName: ByteArray? = null) → Self`.
+- **`SymmetricCryptoSecuritySettings`** — six nouvelles opérations :
+  - `assignOpenSecureSessionMaxDurationByCsn(maxDuration: Long, csnMin: Long) → Self` et `assignOpenSecureSessionMaxDurationByFci(maxDuration: Long, fciRegex: String) → Self` — durée maximale de l'échange de la commande *Open Secure Session* ;
+  - `assignCloseSecureSessionMaxDurationByCsn(maxDuration: Long, csnMin: Long) → Self` et `assignCloseSecureSessionMaxDurationByFci(maxDuration: Long, fciRegex: String) → Self` — durée maximale de l'échange de la commande *Close Secure Session* ;
+  - `assignSvCommandMaxDurationByCsn(maxDuration: Long, csnMin: Long) → Self` et `assignSvCommandMaxDurationByFci(maxDuration: Long, fciRegex: String) → Self` — durée maximale de l'échange de l'une des commandes *SV Reload*, *SV Debit* ou *SV Undebit*.
+- **`AsymmetricCryptoSecuritySettings`** — quatre nouvelles opérations :
+  - `assignOpenSecureSessionMaxDurationByCsn(maxDuration: Long, csnMin: Long) → Self` et `assignOpenSecureSessionMaxDurationByFci(maxDuration: Long, fciRegex: String) → Self` — durée maximale de l'échange de la commande *Open Secure Session* ;
+  - `assignCloseSecureSessionMaxDurationByCsn(maxDuration: Long, csnMin: Long) → Self` et `assignCloseSecureSessionMaxDurationByFci(maxDuration: Long, fciRegex: String) → Self` — durée maximale de l'échange de la commande *Close Secure Session*.
 
-Le paramètre `dfName` est **facultatif** : omis (`null`), le réglage s'applique à tous les DF ; fourni, il le restreint au DF désigné. `maxDuration` est placé en tête, car c'est la valeur que l'opération assigne.
+> **Règle de résolution** (pour une carte donnée, par type d'opération bornée) :
+> 1. **Réglages par CSN** : chaque appel définit une **plage** délimitée par son `csnMin` et le `csnMin` immédiatement supérieur déclaré (ou +∞). Si le CSN de la carte appartient à une plage dont la `maxDuration` est différente de `Long.MAX_VALUE`, cette valeur s'applique.
+> 2. **Réglages par FCI** : sinon, les réglages par FCI sont évalués **dans l'ordre de déclaration** et le premier dont l'expression correspond au FCI s'applique ; une `maxDuration` égale à `Long.MAX_VALUE` signifie alors « pas de borne ».
+> 3. Sinon, aucune borne ne s'applique.
 
-> La spécification ne précise pas encore ce qui est mesuré pour ces bornes (début et fin de la mesure de la durée de session ou d'opération SV), ni la conséquence d'un dépassement (cf. §3.1 et §19.2).
+Conséquences et précisions :
 
-> Cette forme remplace les deux surcharges par opération (avec et sans `dfName`) de la version de travail précédente de ce document (cf. Thème 10, noms d'opérations uniques).
+- les réglages par CSN agissent comme des **dérogations** : une borne par défaut s'exprime par un dernier réglage par FCI d'expression `.*`, et non par un réglage par CSN au seuil le plus bas, qui masquerait tous les réglages par FCI ; `Long.MAX_VALUE` sur une plage de CSN rend la main aux réglages par FCI pour les cartes de cette plage ;
+- la correspondance porte sur la **chaîne entière** (ancrage implicite aux deux extrémités) ; un octet correspond à `..` ;
+- pour rester portable (Java, .NET, Swift/ICU, Rust), l'expression est limitée à un **sous-ensemble commun** : caractères littéraux, `.`, classes `[...]`, quantificateurs `*`, `+`, `?`, `{n}`, `{n,}`, `{n,m}`, alternative `|` et groupes `(...)` ; références arrière, assertions de voisinage, ancres et options en ligne sont exclues ;
+- une expression invalide ou hors du sous-ensemble, ou une `maxDuration` non strictement positive, est rejetée **dès l'appel** (pré-condition de nature *Argument*) ;
+- un nouvel appel avec un `csnMin` déjà déclaré remplace la valeur précédente ; un nouvel appel avec une `fciRegex` identique remplace la valeur en **conservant sa position** dans l'ordre d'évaluation ;
+- sans FCI disponible, aucun réglage par FCI ne correspond ;
+- **intégrité du FCI** : le FCI est obtenu lors de la sélection, hors session, donc sans authentification. Si l'expression filtre sur les données de la *startup info*, l'intégrateur **doit** exécuter un `prepareGetData(FCI_FOR_CURRENT_DF)` en session afin de s'assurer de l'intégrité du FCI obtenu lors de la sélection. `prepareGetData` est désormais autorisée en session **pour ce seul tag** ; si la valeur retournée diffère de la réponse au *Select Application*, l'erreur `InconsistentData` est levée par `processCommands` (et non par `prepareGetData`).
+
+`maxDuration` est placé en tête, car c'est la valeur que l'opération assigne.
+
+> **Durée mesurée** : chaque borne porte sur le **seul échange de la commande** concernée, de l'émission de la commande à la réception de sa réponse ; les autres commandes de la session sécurisée ou de l'opération SV ne sont pas comptées. **Conséquence d'un dépassement** : la session sécurisée ouverte est automatiquement annulée, et l'erreur remonte sous forme d'`InvalidCardResponse` ; hors session, seule l'erreur remonte (cf. §3.1).
+
+> L'expression régulière sur le FCI couvre à elle seule le nom du DF, les informations de démarrage (familles de produits, masquage d'octets) et même un préfixe du numéro de série (tag `C7`), avec un ordre de priorité choisi par l'intégrateur. Cette forme remplace les critères `dfName` / `startupInfo` des versions de travail précédentes de ce document.
 
 ### 3.4 Generic Card API
 
@@ -385,6 +403,8 @@ Ce thème regroupe les renommages et suppressions motivés par la clarté ou la 
   - `CalypsoCardApiFactory.createSearchCommandData()` (cf. Thème 11).
 - **Renommages** d'opérations surchargées (cf. Thème 10) : `prepareSelectFile(short)` → `prepareSelectFileByLid`, `prepareSelectFile(SelectFileControl)` → `prepareSelectFileByControl` (paramètre harmonisé `selectFileControl`), dans `CalypsoCardSelectionExtension` et `TransactionManager`.
 - **Énumérations imbriquées renommées** : `CalypsoCard.ProductType` → `CalypsoCardProductType`, `ElementaryFile.Type` → `ElementaryFileType`.
+- **Collections nommées au pluriel** : les paramètres `counterNumberToDecValueMap` / `counterNumberToIncValueMap` de `prepareDecreaseCounters` / `prepareIncreaseCounters` deviennent `decrementValues` / `incrementValues` ; les propriétés `kif` / `kvc` de `DirectoryHeader` deviennent `kifByAccessLevel` / `kvcByAccessLevel`.
+- **Réglages de sécurité renommés au pluriel** : `SymmetricCryptoSecuritySetting` → `SymmetricCryptoSecuritySettings`, `AsymmetricCryptoSecuritySetting` → `AsymmetricCryptoSecuritySettings` ; les opérations de fabrique suivent (`createSymmetricCryptoSecuritySettings`, `createAsymmetricCryptoSecuritySettings`), ainsi que le paramètre `securitySettings` des opérations `createSecure…TransactionManager`.
 
 ### 6.4 Legacy SAM API
 
@@ -402,7 +422,7 @@ Ce thème regroupe les renommages et suppressions motivés par la clarté ou la 
 | `setDynamicUnlockDataProvider(provider)` | `setDynamicUnlockDataProviderWithDeferredReader(provider)` |
 | `setDynamicUnlockDataProvider(provider, targetSamReader)` | `setDynamicUnlockDataProvider(provider, targetSamReader)` *(cas nominal, nom inchangé)* |
 | `prepareReadWorkKeyParameters(int)` / `(byte, byte)` | `prepareReadWorkKeyParametersByRecordNumber` / `prepareReadWorkKeyParametersByKifKvc` |
-| `getWorkKeyParameter(int)` / `(byte, byte)` | `getWorkKeyParameterByRecordNumber` / `getWorkKeyParameterByKifKvc` |
+| `getWorkKeyParameter(int)` / `(byte, byte)` | `getWorkKeyParametersByRecordNumber` / `getWorkKeyParametersByKifKvc` |
 | `prepareTransferWorkKeyDiversified(…, diversifier)` | `prepareTransferWorkKeyDiversifiedWithSpecificDiversifier(…, diversifier)` |
 | `LegacySam.ProductType` | `LegacySamProductType` |
 
@@ -450,19 +470,19 @@ Deux moteurs convergent :
 1. **Fin des chaînes libres pour les protocoles**. Les versions en production configuraient l'activation de protocoles et le filtrage de sélection à l'aide de **chaînes de caractères** (`physicalProtocolName`, `logicalProtocolName`) : valeurs non normalisées, fautes de frappe non détectées, documentation dispersée.
 2. **Arrivée du support ECP** (Enhanced Contactless Polling), mécanisme défini par la **spécification Apple ECP** permettant la détection rapide de cartes (notamment Calypso) en mode transit sur iPhone, qui nécessite l'envoi d'une **trame de polling spécifique** au démarrage de la détection. La trame est traitée comme une donnée binaire opaque construite par l'application.
 
-### 7.2 Nouvelle API socle — Terminal Definitions API
+### 7.2 Nouvelle API socle — Terminal Reader Definitions API
 
-Les énumérations `RfTechnology` et `CardType` sont placées dans une **nouvelle API socle**, la **Terminal Definitions API**, qui n'expose ni interface de service, ni SPI ; sa seule vocation est d'héberger les **types énumérés transverses** partagés entre APIs Terminaux.
+Les énumérations `RfTechnology` et `CardType` sont placées dans une **nouvelle API socle**, la **Terminal Reader Definitions API**, qui n'expose ni interface de service, ni SPI ; sa seule vocation est d'héberger les **types énumérés transverses** partagés entre APIs Terminaux.
 
 #### Conséquences structurelles
 
-- **Nouveau dépôt** : `calypsonet-terminal-definitions-uml-api` (version `1.0.0-SNAPSHOT`).
-- **Nouveau module Java Keypop** : `keypop-definitions-jvm-api` (à créer).
-- **Dépendance** publique et transitive de la Terminal Reader API vers la Terminal Definitions API (les énumérations apparaissent dans les propriétés `BasicCardSelector.cardType`, `IsoCardSelector.cardType`, `CardDetectionSettings.rfTechnologies` et `…CardSelectionResult.cardType`).
+- **Nouveau dépôt** : `calypsonet-terminal-reader-definitions-uml-api` (version `1.0.0-SNAPSHOT`).
+- **Nouveau module Java Keypop** : `keypop-reader-definitions-jvm-api` (à créer).
+- **Dépendance** publique et transitive de la Terminal Reader API vers la Terminal Reader Definitions API (les énumérations apparaissent dans les propriétés `BasicCardSelector.cardType`, `IsoCardSelector.cardType`, `CardDetectionSettings.rfTechnologies` et `…CardSelectionResult.cardType`).
 
 #### Contenu initial
 
-- **`DefinitionsApiProperties`** — constante `VERSION` du module ;
+- **`ReaderDefinitionsApiProperties`** — constante `VERSION` du module ;
 - **`RfTechnology`** : `ISO_14443_AB`, `INNOVATRON_B_PRIME`, `FELICA`, `ISO_15693` ;
 - **`CardType`** : `ISO_7816_3`, `ISO_14443_4`, `ISO_14443_3A_MIFARE_CLASSIC_1K`, `ISO_14443_3A_MIFARE_CLASSIC_4K`, `ISO_14443_3A_MIFARE_ULTRALIGHT`, `ISO_14443_3B_ST25_SRT512`, `INNOVATRON_B_PRIME`, `FELICA`, `ISO_15693`, `UNKNOWN`.
 
@@ -503,7 +523,7 @@ Toutes les informations de détection sont regroupées dans la **classe de donn�
 - **Évolutivité** : ajouter un paramètre de polling revient à ajouter une propriété à valeur par défaut à `CardDetectionSettings`, sans toucher la signature de `startCardDetection`.
 - **Séparation entrée / sortie** : `RfTechnology` en entrée (polling), `CardType` en sortie (résultat) et comme critère de sélection.
 - **Déclaration unique et typée** : en production, le protocole devait être déclaré deux fois (`activateProtocol` côté lecteur, `filterByCardProtocol` côté sélecteur) ; il n'est plus déclaré qu'une fois, de manière typée.
-- **Réutilisabilité transverse** grâce à l'extraction des énumérations dans la Terminal Definitions API.
+- **Réutilisabilité transverse** grâce à l'extraction des énumérations dans la Terminal Reader Definitions API.
 
 ---
 
@@ -655,8 +675,7 @@ Les APIs Terminaux étaient jusqu'ici définies par des interfaces Java. Ce mod�
 | **Interfaces sans opération** | interface vide | **interface marqueur** | `ScheduledCardSelectionsResponse`, `CardSelectionExtension` |
 | **Erreurs** | classes `…Exception` (vérifiées ou non) | erreurs nommées **sans suffixe**, portant `message: String` et `cause: Any?` | `CardCommunicationException` → `CardCommunication` |
 | **Suffixes techniques** | `…Spi`, `…Api` sur les types de données de la Card API et des APIs crypto | supprimés pour les **données** ; conservés pour les interfaces de contrat | `ApduRequestSpi` → `ApduRequest`, `SvCommandSecurityDataApi` → `SvCommandSecurityData` |
-| **Noms d'opérations uniques** | surcharges (même nom, paramètres différents) | **un nom unique par opération** dans une interface et sa hiérarchie ; suffixes `By…`, `With…`, `For…` ou paramètres à valeur par défaut | `prepareSelectFile` → `prepareSelectFileByLid` / `prepareSelectFileByControl` |
-| **Paramètres facultatifs** | surcharges | paramètre en fin de liste avec **valeur par défaut** `= null` | `assignOpenSecureSessionMaxDuration(maxDuration, csnMin, dfName: ByteArray? = null)` |
+| **Noms d'opérations uniques** | surcharges (même nom, paramètres différents) | **un nom unique par opération** dans une interface et sa hiérarchie ; suffixes `By…`, `With…`, `For…` | `prepareSelectFile` → `prepareSelectFileByLid` / `prepareSelectFileByControl` |
 | **Type universel** | `Object`, `Throwable` | `Any` | `onReaderError(context, readerName, error: Any)` |
 | **Réflexion** | `Class<E>` | supprimée | `getCryptoExtension(Class<E>)` → `getCryptoExtension()` (cf. Thème 14) |
 | **Sérialisation** | `extends Serializable` | supprimée de la notation | `ApduResponseApi`, `CardResponseApi` |
@@ -696,18 +715,18 @@ Plusieurs types de données des versions en production mêlaient **données** et
 - **`FileData` est supprimée**, avec ses opérations `getContent()`, `getContent(numRecord)`, `getContent(numRecord, dataOffset, dataLength)`, `getAllRecordsContent()`, `getContentAsCounterValue(numCounter)` et `getAllCountersValue()` :
   - les enregistrements sont exposés directement par la propriété `ElementaryFile.records: SortedMap<Int, ByteArray>` (à la place de `ElementaryFile.getData()`) ;
   - les valeurs de compteurs sont obtenues par `CalypsoCard.getCounterValuesBySfi(sfi: Byte) → SortedMap<Int, Int>?` et `CalypsoCard.getCounterValuesByLid(lid: Short) → SortedMap<Int, Int>?`.
-- **`DirectoryHeader`** : `getKif(WriteAccessLevel)` et `getKvc(WriteAccessLevel)` deviennent les propriétés `kif: Map<WriteAccessLevel, Byte>` et `kvc: Map<WriteAccessLevel, Byte>`.
+- **`DirectoryHeader`** : `getKif(WriteAccessLevel)` et `getKvc(WriteAccessLevel)` deviennent les propriétés `kifByAccessLevel: Map<WriteAccessLevel, Byte>` et `kvcByAccessLevel: Map<WriteAccessLevel, Byte>`.
 - **`SearchCommandData`** devient une classe de données d'entrée (`sfi`, `searchData`, `startAtRecord = 1`, `offset = 0`, `repeatedOffset = false`, `mask: ByteArray? = null`, `fetchFirstMatchingResult = false`) ; le résultat est lu par `CalypsoCard.getMatchingRecordNumbers(commandId)` (cf. Thème 7) ; `CalypsoCardApiFactory.createSearchCommandData()` disparaît.
 - **`SvLoadLogRecord` et `SvDebitLogRecord`** deviennent des classes de données sans la propriété `rawData`, redondante avec les champs décodés. Les valeurs brutes restent accessibles par trois nouvelles opérations de `CalypsoCard` : `getSvLoadLogRecordRawData() → ByteArray?`, `getSvDebitLogLastRecordRawData() → ByteArray?` et `getSvDebitLogAllRecordsRawData() → List<ByteArray>` ; chaque objet décodé renvoyé correspond au décodage de la valeur brute au moment de l'appel.
 - `DirectoryHeader`, `ElementaryFile` et `FileHeader` deviennent des classes de données.
 
 ### 12.3 Legacy SAM API
 
-- **`KeyParameter`** devient une classe de données (`kif`, `kvc`, `algorithm`, `parameterValues: SortedMap<Int, Byte>`), sans `rawData` ; `getParameterValue(parameterNumber)` est remplacée par la propriété `parameterValues`. Les valeurs brutes sont accessibles par `LegacySam.getSystemKeyParameterRawData(systemKeyType)`, `getWorkKeyParameterRawDataByRecordNumber(recordNumber)` et `getWorkKeyParameterRawDataByKifKvc(kif, kvc)`.
+- **`KeyParameter`** devient la classe de données **`KeyParameters`**, renommée au pluriel comme les getters `getSystemKeyParameters` / `getWorkKeyParameters…` qui la renvoient (`kif`, `kvc`, `algorithm`, `parameterValues: SortedMap<Int, Byte>`), sans `rawData` ; `getParameterValue(parameterNumber)` est remplacée par la propriété `parameterValues`. Les valeurs brutes sont accessibles par `LegacySam.getSystemKeyParametersRawData(systemKeyType)`, `getWorkKeyParametersRawDataByRecordNumber(recordNumber)` et `getWorkKeyParametersRawDataByKifKvc(kif, kvc)`.
 - **`SamParameters`** est supprimée : `LegacySam.getSamParameters()` renvoie directement `ByteArray?`.
 - **Compteurs** : `getCounter(counterNumber)` et `getCounterCeiling(counterNumber)` sont supprimées (les tables `getCounters()` et `getCounterCeilings()` suffisent) ; `getCounterIncrementAccess(counterNumber)` est remplacée par `getCounterIncrementAccesses() → SortedMap<Int, CounterIncrementAccess>`.
 - **Données de commande** : `LegacyCardCertificateComputationData`, `BasicSignatureComputationData`, `TraceableSignatureComputationData`, `BasicSignatureVerificationData` et `TraceableSignatureVerificationData` deviennent des classes de données d'entrée (propriétés et valeurs par défaut au lieu de setters ; `withSamTraceabilityMode(offset, mode)` devient `samTraceabilityMode` / `traceabilityOffset`, `withoutBusyMode()` devient `busyMode = false`) ; leurs résultats sont lus sur la `LegacySam` par `commandId` (cf. §8.5). `KeyPairContainer` est supprimée. Les opérations `create…Data()` et `createKeyPairContainer()` disparaissent de `LegacySamApiFactory`.
-- **`SecuritySetting`** devient une classe de données (`samReader`, `controlSam`) à la place de `setControlSamResource(samReader, controlSam)` ; `LegacySamApiFactory.createSecuritySetting()` disparaît.
+- **`SecuritySetting`** devient la classe de données **`SecuritySettings`** (`samReader`, `controlSam`), renommée au pluriel comme les réglages de sécurité de la Calypso Card API, à la place de `setControlSamResource(samReader, controlSam)` ; `LegacySamApiFactory.createSecuritySetting()` disparaît.
 
 ### 12.4 Card API
 
@@ -814,7 +833,7 @@ Les spécifications apportent en outre des clarifications qui ne changent pas le
 
 Les éléments suivants figurent en gris dans le diagramme de la Legacy SAM API ; ils ne font **pas** partie du périmètre normatif soumis à validation :
 
-- `LegacySamApiFactory.createSecureReadTransactionManager(samReader, sam, securitySetting)` et l'interface `SecureReadTransactionManager` ;
+- `LegacySamApiFactory.createSecureReadTransactionManager(samReader, sam, securitySettings)` et l'interface `SecureReadTransactionManager` ;
 - `FreeTransactionManager.preparePlainLoadWorkKey(...)` et `preparePlainExportWorkKey(...)` ;
 - `LegacySamSelectionExtension.prepareReadCaadRecord(...)` / `prepareReadCaadRecords(...)` et leurs équivalents sur `ReadTransactionManager` ;
 - `SecureWriteTransactionManager.prepareWriteCaadRecord(...)`.
@@ -838,10 +857,10 @@ Le présent document soumet à la validation du **TC Terminal de la CNA** :
 1. **Le principe** des quatorze thèmes d'évolution (§2 à §15) et la cohérence d'ensemble du chantier (versions 3.0.0 pour Reader / Card / Calypso Card, 1.0.0 pour Definitions, 2.0.0 pour Legacy SAM / Generic Card / Storage Card, 0.2.0 pour Crypto Symmetric, 0.3.0 pour Crypto Asymmetric).
 2. **Les choix de conception** documentés dans les sections « Justification », en particulier :
    - le modèle multicanal explicite reposant sur la `SmartCard(Spi)` comme cible nommée et la hiérarchie à trois niveaux des gestionnaires de transactions (§2) ;
-   - le bornage de durée au niveau APDU, session Calypso et commande générique, avec seuil `csnMin` (§3) ;
+   - le bornage de durée au niveau APDU, session Calypso et commande générique, avec réglages par CSN et par FCI (§3) ;
    - la fusion du patron Observateur en une seule SPI `CardReaderEventHandler` (§4) ;
    - l'énumération `SecureSessionState` (§5) ;
-   - l'extraction de `RfTechnology` et `CardType` dans la Terminal Definitions API et les paramètres de détection `CardDetectionSettings` (§7) ;
+   - l'extraction de `RfTechnology` et `CardType` dans la Terminal Reader Definitions API et les paramètres de détection `CardDetectionSettings` (§7) ;
    - le modèle `commandId` généralisé (§8) ;
    - la découverte normalisée des lecteurs par `CardReaderProvider` (§9) ;
    - la **hiérarchie de gestionnaires de sélection par mode** et les trois types de résultat (§10) ;
@@ -851,17 +870,17 @@ Le présent document soumet à la validation du **TC Terminal de la CNA** :
    - la tolérance du fichier absent en session (§14) ;
    - l'accès à l'extension crypto avec clause d'identité (§15).
 3. **Le contenu détaillé des neuf spécifications** et de leurs diagrammes (cf. [Documents de référence](#documents-de-référence)).
-4. **L'introduction** de la nouvelle API socle Definitions.
+4. **L'introduction** de la nouvelle API socle Reader Definitions.
 5. **Le principe** d'une procédure de migration dédiée (cf. §18).
 
 ### 19.2 Points d'attention pour la revue
 
 - la **stabilité du contenu initial** des énumérations `RfTechnology` et `CardType` (§7.2), en particulier la représentation d'ISO 14443-4 par une seule valeur `ISO_14443_4` ;
 - la **suppression intégrale** de `ConfigurableCardReader` sans phase de dépréciation (§7.3) ;
-- la **sémantique du `csnMin`** comme seuil sur le CSN pour les bornes de durée (§3.3) ;
-- l'**application des bornes de durée Calypso** (§3.1, §3.3) : la spécification ne définit ni ce qui est mesuré pour la durée de session et d'opération SV, ni le comportement en cas de dépassement ; l'annulation de la session n'est qu'une possibilité offerte par la Card API (MAY). Le TC est invité à se prononcer sur l'opportunité de rendre ce comportement normatif dans la Calypso Card API ;
+- la **règle de résolution des bornes de durée** Calypso : priorité des réglages par CSN sur les réglages par FCI, `Long.MAX_VALUE` comme valeur de renvoi, sous-ensemble portable d'expressions régulières (§3.3) ;
+- l'**application des bornes de durée Calypso** (§3.1, §3.3) : ce qui est mesuré (le seul échange de la commande concernée) et la conséquence d'un dépassement (annulation automatique de la session ouverte, remontée de l'erreur hors session) sont désormais spécifiés ;
 - la **gradation à trois niveaux** des gestionnaires de transactions (§2.2) ;
-- le **remplacement des surcharges** par des noms d'opérations uniques et des paramètres à valeur par défaut (§11.2), qui modifie de nombreux noms d'opérations pour les intégrateurs Java ;
+- le **remplacement des surcharges** par des noms d'opérations uniques (§11.2), qui modifie de nombreux noms d'opérations pour les intégrateurs Java ;
 - le **remplacement des interfaces « builder »** par des classes de données (§11.2, §12), dont la réalisation Java reste à définir ;
 - le **passage de `SvOperation.DEBIT` à `DEBIT_UNDEBIT`** et la suppression des surcharges SV sans données (§13).
 
@@ -870,7 +889,7 @@ Le présent document soumet à la validation du **TC Terminal de la CNA** :
 Une fois les versions validées par le TC Terminal :
 
 1. **Finalisation des spécifications** : passage des dépôts de leurs versions `…-SNAPSHOT` à leurs versions finales ; retrait ou spécification des éléments en cours d'étude (§17).
-2. **Création du nouveau module Java** `keypop-definitions-jvm-api`, et **alignement des modules Java Keypop** existants (`keypop-reader-java-api`, `keypop-card-java-api`, `keypop-calypso-card-java-api`, `keypop-calypso-crypto-legacysam-java-api`, `keypop-calypso-crypto-symmetric-java-api`, `keypop-calypso-crypto-asymmetric-java-api`, `keypop-genericcard-jvm-api`, `keypop-storagecard-java-api`) sur leurs nouvelles versions.
+2. **Création du nouveau module Java** `keypop-reader-definitions-jvm-api`, et **alignement des modules Java Keypop** existants (`keypop-reader-java-api`, `keypop-card-java-api`, `keypop-calypso-card-java-api`, `keypop-calypso-crypto-legacysam-java-api`, `keypop-calypso-crypto-symmetric-java-api`, `keypop-calypso-crypto-asymmetric-java-api`, `keypop-genericcard-jvm-api`, `keypop-storagecard-java-api`) sur leurs nouvelles versions.
 3. **Rédaction et publication du guide technique de migration** (cf. §18).
 4. **Communication** de la disponibilité des nouvelles versions aux intégrateurs et aux groupes de travail CNA concernés.
 
@@ -950,8 +969,11 @@ Cette annexe liste, pour chaque API, le devenir de chaque élément des versions
 | `CalypsoCard.getDirectoryHeader()`, `getFileBySfi`, `getFileByLid`, `getSvLoadLogRecord`, `getSvDebitLogLastRecord` | → retours nullables explicites |
 | — | Ajoutées : `CalypsoCard.getCounterValuesBySfi`, `getCounterValuesByLid`, `getMatchingRecordNumbers(commandId)`, `getSvLoadLogRecordRawData`, `getSvDebitLogLastRecordRawData`, `getSvDebitLogAllRecordsRawData` |
 | `CalypsoCard.ProductType` | → `CalypsoCardProductType` |
+| `TransactionManager.prepareDecreaseCounters(sfi, counterNumberToDecValueMap)`, `prepareIncreaseCounters(sfi, counterNumberToIncValueMap)` | → paramètres renommés `decrementValues`, `incrementValues` |
+| `SymmetricCryptoSecuritySetting`, `AsymmetricCryptoSecuritySetting` | → `SymmetricCryptoSecuritySettings`, `AsymmetricCryptoSecuritySettings` |
+| `CalypsoCardApiFactory.createSymmetricCryptoSecuritySetting(...)`, `createAsymmetricCryptoSecuritySetting(...)` | → `createSymmetricCryptoSecuritySettings(...)`, `createAsymmetricCryptoSecuritySettings(...)` ; paramètre `securitySetting` → `securitySettings` dans `createSecure…TransactionManager` |
 | `CalypsoCardSelectionExtension.prepareSelectFile(short)` / `prepareSelectFile(SelectFileControl selectControl)` | → `prepareSelectFileByLid(lid)` / `prepareSelectFileByControl(selectFileControl)` |
-| `DirectoryHeader` (interface ; `getKif(level)`, `getKvc(level)`) | → classe de données ; `kif`, `kvc` : `Map<WriteAccessLevel, Byte>` |
+| `DirectoryHeader` (interface ; `getKif(level)`, `getKvc(level)`) | → classe de données ; `kifByAccessLevel`, `kvcByAccessLevel` : `Map<WriteAccessLevel, Byte>` |
 | `ElementaryFile` (interface ; `getData()`) | → classe de données (`sfi`, `header?`, `records: SortedMap<Int, ByteArray>`) |
 | `ElementaryFile.Type` | → `ElementaryFileType` |
 | `FileData` (toutes opérations) | Supprimée (cf. §12.2) |
@@ -970,7 +992,7 @@ Cette annexe liste, pour chaque API, le devenir de chaque élément des versions
 | — | Ajoutée : `prepareSvUndebit(amount, date, time)` |
 | `SvAction` | Supprimée |
 | `SvOperation.DEBIT` | → `SvOperation.DEBIT_UNDEBIT` |
-| — | Ajoutées : `SymmetricCryptoSecuritySetting.assignOpenSecureSessionMaxDuration(...)`, `assignSvOperationMaxDuration(...)` ; `AsymmetricCryptoSecuritySetting.assignOpenSecureSessionMaxDuration(...)` |
+| — | Ajoutées : `SymmetricCryptoSecuritySettings.assignOpenSecureSessionMaxDurationByCsn/ByFci(...)`, `assignCloseSecureSessionMaxDurationByCsn/ByFci(...)`, `assignSvCommandMaxDurationByCsn/ByFci(...)` ; `AsymmetricCryptoSecuritySettings.assignOpenSecureSessionMaxDurationByCsn/ByFci(...)`, `assignCloseSecureSessionMaxDurationByCsn/ByFci(...)` |
 | `ChannelControl` | Supprimée |
 | `CardIOException`, `ReaderIOException`, `UnexpectedCommandStatusException`, `SelectFileException` | Supprimées |
 | `CardSignatureNotVerifiableException`, `CryptoException`, `CryptoIOException`, `InconsistentDataException`, `InvalidCardSignatureException`, `InvalidCertificateException`, `InvalidPinException`, `SessionBufferOverflowException`, `UnauthorizedKeyException` | → mêmes noms sans suffixe `Exception` |
@@ -984,10 +1006,11 @@ Cette annexe liste, pour chaque API, le devenir de chaque élément des versions
 | `LegacySam.getCounter(int)`, `getCounterCeiling(int)` | Supprimées (utiliser `getCounters()`, `getCounterCeilings()`) |
 | `LegacySam.getCounterIncrementAccess(int)` | → `getCounterIncrementAccesses() → SortedMap<Int, CounterIncrementAccess>` |
 | `LegacySam.getSamParameters() → SamParameters` | → `getSamParameters() → ByteArray?` ; `SamParameters` supprimée |
-| `LegacySam.getWorkKeyParameter(int)` / `(byte, byte)` | → `getWorkKeyParameterByRecordNumber` / `getWorkKeyParameterByKifKvc` |
-| — | Ajoutées : `LegacySam.getSystemKeyParameterRawData`, `getWorkKeyParameterRawDataByRecordNumber`, `getWorkKeyParameterRawDataByKifKvc`, `getKeyPair(commandId)`, `getComputedCardCertificate(commandId)`, `getSignature(commandId)`, `getSignedData(commandId)`, `isSignatureValid(commandId)` |
+| `LegacySam.getSystemKeyParameter(SystemKeyType)` | → `getSystemKeyParameters(systemKeyType) → KeyParameters?` |
+| `LegacySam.getWorkKeyParameter(int)` / `(byte, byte)` | → `getWorkKeyParametersByRecordNumber` / `getWorkKeyParametersByKifKvc` |
+| — | Ajoutées : `LegacySam.getSystemKeyParametersRawData`, `getWorkKeyParametersRawDataByRecordNumber`, `getWorkKeyParametersRawDataByKifKvc`, `getKeyPair(commandId)`, `getComputedCardCertificate(commandId)`, `getSignature(commandId)`, `getSignedData(commandId)`, `isSignatureValid(commandId)` |
 | `LegacySam.ProductType` | → `LegacySamProductType` |
-| `KeyParameter` (interface ; `getRawData`, `getParameterValue(int)`) | → classe de données (`kif`, `kvc`, `algorithm`, `parameterValues`) |
+| `KeyParameter` (interface ; `getRawData`, `getParameterValue(int)`) | → classe de données `KeyParameters` (`kif`, `kvc`, `algorithm`, `parameterValues`) |
 | `LegacySamSelectionExtension.setUnlockData(String, ProductType)` | → `setUnlockDataForProductType(unlockData, productType)` |
 | `LegacySamSelectionExtension.setStaticUnlockDataProvider(provider)` / `setDynamicUnlockDataProvider(provider)` | → `setStaticUnlockDataProviderWithDeferredReader(provider)` / `setDynamicUnlockDataProviderWithDeferredReader(provider)` |
 | `LegacySamSelectionExtension.prepareReadWorkKeyParameters(int)` / `(byte, byte)` | → `prepareReadWorkKeyParametersByRecordNumber` / `prepareReadWorkKeyParametersByKifKvc` |
@@ -1013,7 +1036,7 @@ Cette annexe liste, pour chaque API, le devenir de chaque élément des versions
 | `SignatureVerificationData.isSignatureValid()` | → `LegacySam.isSignatureValid(commandId: Int) → Boolean?` |
 | `BasicSignatureVerificationData`, `TraceableSignatureVerificationData` | → classes de données implémentant `SignatureVerificationData` |
 | `TraceableSignatureVerificationData.withSamTraceabilityMode(int offset, SamTraceabilityMode mode, LegacySamRevocationServiceSpi service)`, `withoutBusyMode()` | → propriétés `traceabilityOffset = 0`, `samTraceabilityMode: SamTraceabilityMode? = null`, `samRevocationService: LegacySamRevocationServiceSpi? = null`, `busyMode = true` |
-| `SecuritySetting.setControlSamResource(samReader, controlSam)` | → classe de données `SecuritySetting` (`samReader`, `controlSam`) |
+| `SecuritySetting.setControlSamResource(samReader, controlSam)` | → classe de données `SecuritySettings` (`samReader`, `controlSam`) ; paramètre `securitySetting` → `securitySettings` dans `createSecureWriteTransactionManager` et `createAsyncTransactionCreatorManager` |
 | `ReaderIOException`, `SamIOException`, `UnexpectedCommandStatusException` | Supprimées |
 | `InconsistentDataException`, `InvalidSignatureException`, `SamRevokedException` | → `InconsistentData`, `InvalidSignature`, `SamRevoked` |
 
@@ -1071,11 +1094,11 @@ Cette annexe liste, pour chaque API, le devenir de chaque élément des versions
 | `SCAuthenticationFailedException` (extends `CardCommunicationException`) | → `SCAuthenticationFailed` (sans erreur parente) |
 | `SCCardCommunicationException`, `SCInvalidCardResponseException`, `SCReaderCommunicationException` | → `SCCardCommunication`, `SCInvalidCardResponse`, `SCReaderCommunication` (parents inchangés) |
 
-### A.9 Terminal Definitions API (nouvelle, 1.0.0)
+### A.9 Terminal Reader Definitions API (nouvelle, 1.0.0)
 
 | Élément | Contenu |
 |---|---|
-| `DefinitionsApiProperties` | constante `VERSION` |
+| `ReaderDefinitionsApiProperties` | constante `VERSION` |
 | `RfTechnology` | `ISO_14443_AB`, `INNOVATRON_B_PRIME`, `FELICA`, `ISO_15693` |
 | `CardType` | `ISO_7816_3`, `ISO_14443_4`, `ISO_14443_3A_MIFARE_CLASSIC_1K`, `ISO_14443_3A_MIFARE_CLASSIC_4K`, `ISO_14443_3A_MIFARE_ULTRALIGHT`, `ISO_14443_3B_ST25_SRT512`, `INNOVATRON_B_PRIME`, `FELICA`, `ISO_15693`, `UNKNOWN` |
 
