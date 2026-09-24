@@ -266,13 +266,11 @@ Each bound is declared according to two families of settings, each with a dedica
 - **by CSN** (`…ByCsn(maxDuration: Long, csnMin: Long)`): `csnMin` is a **threshold** on the CSN (Calypso Serial Number, i.e. the Application Serial Number, compared as an unsigned 64-bit integer);
 - **by FCI** (`…ByFci(maxDuration: Long, fciRegex: String)`): `fciRegex` is a regular expression applied to the **whole FCI** returned by *Select Application* (excluding the status word), represented as an uppercase hexadecimal string without separators.
 
-- **`SymmetricCryptoSecuritySettings`** — six new operations:
-  - `assignOpenSecureSessionMaxDurationByCsn(maxDuration: Long, csnMin: Long) → Self` and `assignOpenSecureSessionMaxDurationByFci(maxDuration: Long, fciRegex: String) → Self` — maximum duration of the _Open Secure Session_ command exchange;
-  - `assignCloseSecureSessionMaxDurationByCsn(maxDuration: Long, csnMin: Long) → Self` and `assignCloseSecureSessionMaxDurationByFci(maxDuration: Long, fciRegex: String) → Self` — maximum duration of the _Close Secure Session_ command exchange;
-  - `assignSvCommandMaxDurationByCsn(maxDuration: Long, csnMin: Long) → Self` and `assignSvCommandMaxDurationByFci(maxDuration: Long, fciRegex: String) → Self` — maximum duration of the exchange of one of the _SV Reload_, _SV Debit_ or _SV Undebit_ commands.
-- **`AsymmetricCryptoSecuritySettings`** — four new operations:
+- **New parent interface `SecuritySettings`** (`calypso.card.transaction`), extended by `SymmetricCryptoSecuritySettings` and `AsymmetricCryptoSecuritySettings`. It carries the settings shared by every secure transaction, whatever the cryptographic nature of the session — four new operations:
   - `assignOpenSecureSessionMaxDurationByCsn(maxDuration: Long, csnMin: Long) → Self` and `assignOpenSecureSessionMaxDurationByFci(maxDuration: Long, fciRegex: String) → Self` — maximum duration of the _Open Secure Session_ command exchange;
   - `assignCloseSecureSessionMaxDurationByCsn(maxDuration: Long, csnMin: Long) → Self` and `assignCloseSecureSessionMaxDurationByFci(maxDuration: Long, fciRegex: String) → Self` — maximum duration of the _Close Secure Session_ command exchange.
+- **`SymmetricCryptoSecuritySettings`** — two new specific operations:
+  - `assignSvCommandMaxDurationByCsn(maxDuration: Long, csnMin: Long) → Self` and `assignSvCommandMaxDurationByFci(maxDuration: Long, fciRegex: String) → Self` — maximum duration of the exchange of one of the _SV Reload_, _SV Debit_ or _SV Undebit_ commands.
 
 > **Resolution rule** (for a given card, per kind of bounded operation):
 > 1. **CSN-based settings**: each call defines a **range** bounded by its `csnMin` and the immediately higher declared `csnMin` (or +∞). If the card's CSN belongs to a range whose `maxDuration` differs from `Long.MAX_VALUE`, this value applies.
@@ -788,7 +786,7 @@ The tolerance is **explicitly enabled by the integrator**: the default behaviour
 
 ### 14.2 Calypso Card API
 
-- **Two new security settings**: `authorizeFileNotFoundError() → Self` and `authorizeRecordNotFoundError() → Self`, in `SymmetricCryptoSecuritySettings` and `AsymmetricCryptoSecuritySettings`. They allow the card to answer `6A82h` or `6A83h` **inside a session** without failing the transaction: the affected command is simply not applied to the `CalypsoCard` and the session continues. They are disabled by default.
+- **Two new security settings**: `authorizeFileNotFoundError() → Self` and `authorizeRecordNotFoundError() → Self`, carried by the parent interface `SecuritySettings` and therefore available in `SymmetricCryptoSecuritySettings` as well as in `AsymmetricCryptoSecuritySettings`. They allow the card to answer `6A82h` or `6A83h` **inside a session** without failing the transaction: the affected command is simply not applied to the `CalypsoCard` and the session continues. They are disabled by default.
 - **Reads** (`prepareReadBinary`, `prepareReadCounter`, `prepareReadRecords`) and **file selection** (`prepareSelectFileByLid`, `prepareSelectFileByControl`): **outside a session**, a missing file has never caused processing to fail, and this *best-effort* mode is unchanged; **inside a session**, processing fails unless the corresponding setting has been enabled. An invalid offset keeps the two modes *best-effort* (outside a session) and *strict* (inside a session).
 - **The `SelectFileException` error is removed**.
 - The in-session usage restrictions of `prepareGetData`, `prepareReadRecord`, `prepareReadRecordsPartially` and `prepareSearchRecords` are **unchanged**.
@@ -994,8 +992,8 @@ This annex lists, for each API, what becomes of each element of the Java version
 | — | Added: `prepareSvUndebit(amount, date, time)` |
 | `SvAction` | Removed |
 | `SvOperation.DEBIT` | → `SvOperation.DEBIT_UNDEBIT` |
-| — | Added: `authorizeFileNotFoundError()`, `authorizeRecordNotFoundError()` in `SymmetricCryptoSecuritySettings` and `AsymmetricCryptoSecuritySettings` |
-| — | Added: `SymmetricCryptoSecuritySettings.assignOpenSecureSessionMaxDurationByCsn/ByFci(...)`, `assignCloseSecureSessionMaxDurationByCsn/ByFci(...)`, `assignSvCommandMaxDurationByCsn/ByFci(...)`; `AsymmetricCryptoSecuritySettings.assignOpenSecureSessionMaxDurationByCsn/ByFci(...)`, `assignCloseSecureSessionMaxDurationByCsn/ByFci(...)` |
+| — | Added: `SecuritySettings` interface, parent of `SymmetricCryptoSecuritySettings` and `AsymmetricCryptoSecuritySettings`, carrying `assignOpenSecureSessionMaxDurationByCsn/ByFci(...)`, `assignCloseSecureSessionMaxDurationByCsn/ByFci(...)`, `authorizeFileNotFoundError()` and `authorizeRecordNotFoundError()` |
+| — | Added: `SymmetricCryptoSecuritySettings.assignSvCommandMaxDurationByCsn/ByFci(...)`; the session bounds are inherited from `SecuritySettings` |
 | `ChannelControl` | Removed |
 | `CardIOException`, `ReaderIOException`, `UnexpectedCommandStatusException`, `SelectFileException` | Removed |
 | `CardSignatureNotVerifiableException`, `CryptoException`, `CryptoIOException`, `InconsistentDataException`, `InvalidCardSignatureException`, `InvalidCertificateException`, `InvalidPinException`, `SessionBufferOverflowException`, `UnauthorizedKeyException` | → same names without the `Exception` suffix |
