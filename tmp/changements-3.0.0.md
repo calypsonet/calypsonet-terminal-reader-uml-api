@@ -92,7 +92,7 @@ Chaque dépôt `calypsonet-terminal-*-uml-api` hébergé sur [github.com/calypso
 
 1. [Vue d'ensemble](#1-vue-densemble)
 2. [Thème 1 — Support des canaux logiques multiples](#2-thème-1--support-des-canaux-logiques-multiples)
-3. [Thème 2 — Contre-mesure de la faille de sécurité par attaque relai](#3-thème-2--contre-mesure-de-la-faille-de-sécurité-par-attaque-relai)
+3. [Thème 2 — Contre-mesures temporelles : attaque relai et émulation de carte](#3-thème-2--contre-mesures-temporelles--attaque-relai-et-émulation-de-carte)
 4. [Thème 3 — Simplification de la gestion de l'observation](#4-thème-3--simplification-de-la-gestion-de-lobservation)
 5. [Thème 4 — Connaissance de l'état courant de la session sécurisée](#5-thème-4--connaissance-de-létat-courant-de-la-session-sécurisée)
 6. [Thème 5 — Améliorations sémantiques (renommages et suppressions)](#6-thème-5--améliorations-sémantiques-renommages-et-suppressions)
@@ -120,7 +120,7 @@ La nouvelle génération des APIs Terminaux introduit des ruptures de compatibil
 | # | Thème | Reader | Card | Calypso Card | Definitions | Legacy SAM | Crypto Sym. | Crypto Asym. | Generic Card | Storage Card |
 |---|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | 1 | Canaux logiques multiples | ● | ● | ● | — | — | — | — | ● | — |
-| 2 | Contre-mesure attaque relai | — | ● | ● | — | — | — | — | ● | — |
+| 2 | Contre-mesures relai et émulation | — | ● | ● | — | — | — | — | ● | ● |
 | 3 | Simplification de l'observation | ● | — | — | — | — | — | — | — | — |
 | 4 | État courant de la session sécurisée | — | — | ● | — | — | — | — | — | — |
 | 5 | Améliorations sémantiques | ● | ● | ● | — | ● | ● | ● | ● | ● |
@@ -239,22 +239,25 @@ La hiérarchie à trois niveaux permet à **chaque API consommatrice de s'ancrer
 
 ---
 
-## 3. Thème 2 — Contre-mesure de la faille de sécurité par attaque relai
+## 3. Thème 2 — Contre-mesures temporelles : attaque relai et émulation de carte
 
 ### 3.1 Motivation
 
-Une **attaque relai** consiste à relayer le dialogue avec une carte vers un emplacement distant, ce qui rend possible une opération frauduleuse à l'insu du porteur. Le relai ajoute un délai de transmission : un échange anormalement long peut donc révéler que la carte n'est pas réellement présente devant le lecteur. Les nouvelles versions introduisent un mécanisme de **mesure et de bornage des durées d'échange APDU** et de **bornage de la durée de session sécurisée**.
+Deux menaces se détectent par la **durée des échanges**, et les nouvelles versions introduisent un mécanisme commun pour les deux.
+
+- L'**attaque relai** consiste à relayer le dialogue avec une carte vers un emplacement distant, ce qui rend possible une opération frauduleuse à l'insu du porteur. Le relai ajoute un délai de transmission : un échange anormalement long peut donc révéler que la carte n'est pas réellement présente devant le lecteur.
+- L'**émulation de carte** consiste à faire répondre un matériel RFID générique à la place de la carte attendue. Ce matériel traite la commande par logiciel, là où la puce répond de façon câblée : un échange anormalement long révèle alors que la réponse ne vient pas du produit attendu. Cette menace concerne surtout les **cartes de stockage**, dépourvues de mécanisme cryptographique. Les nouvelles versions introduisent un mécanisme de **mesure et de bornage des durées d'échange APDU** et de **bornage de la durée de session sécurisée**.
 
 #### Modèle de menace retenu
 
-- **Surface d'attaque visée** : **attaque applicative** (relai logiciel des APDU), par opposition aux attaques au niveau du transport RF physique qui relèvent de contre-mesures matérielles.
-- **Ordre de grandeur** des bornes : la **milliseconde** (`ms`).
+- **Surface d'attaque visée** : **attaque applicative** (relai logiciel des APDU, émulation de carte par un matériel générique), par opposition aux attaques au niveau du transport RF physique qui relèvent de contre-mesures matérielles.
+- **Unité** des bornes et des durées mesurées : la **microseconde** (`µs`). La milliseconde est trop grossière pour les échanges les plus courts, notamment la lecture d'une carte de stockage, qui dure environ 2 ms. La **résolution effective de la mesure dépend de l'implémentation**, qui doit la documenter.
 - **Lieu de mesure** : l'**implémentation de la Terminal Reader API** mesure la durée effective de chaque échange APDU et la compare à la borne déclarée sur la requête. Les bornes de durée Calypso sont déclarées dans la Calypso Card API et portent chacune sur **le seul échange d'une commande** (*Open Secure Session*, *Close Secure Session*, *SV Reload* / *SV Debit* / *SV Undebit*).
 - **Comportement post-dépassement** : la Card API lève l'erreur **`ApduExchangeDurationExceeded`**, que les extensions de plus haut niveau interceptent et propagent à l'application sous forme d'**`InvalidCardResponse`**. La Calypso Card API précise désormais ce comportement : si une **session sécurisée est ouverte, elle est automatiquement annulée** avant la remontée de l'erreur, de sorte qu'aucune modification de la session ne soit validée par la carte ; **hors session** (commande SV), il n'y a rien à annuler et seule l'erreur remonte à la couche billettique, qui décide de la suite selon son contexte. Dans la Generic Card API, un dépassement lève `InvalidCardResponse`, dont le message identifie la commande fautive.
 
 ### 3.2 Card API
 
-- **Côté requête** : `ApduRequest.apduExchangeMaxDuration: Long? = null` — durée maximale tolérée pour l'échange (en millisecondes) ; `null` signifie « pas de borne ».
+- **Côté requête** : `ApduRequest.apduExchangeMaxDuration: Long? = null` — durée maximale tolérée pour l'échange (en microsecondes) ; `null` signifie « pas de borne ».
 - **Côté réponse** : `ApduResponse.apduExchangeDuration: Long?` — durée effective de l'échange ; `null` signifie « durée non mesurée ».
 - **Nouvelle erreur** `ApduExchangeDurationExceeded` — levée par `ProxyReaderApi.transmitCardRequest(...)` lorsque la durée effective dépasse la borne déclarée. Elle porte, comme les autres erreurs APDU, `cardResponse` et `isCardResponseComplete`.
 - La spécification de la Card API documente désormais ce mécanisme comme **solution pratique pour mettre en œuvre des contre-mesures anti-relai** (chapitre *APDU exchange execution-time control*).
@@ -299,9 +302,19 @@ Conséquences et précisions :
 
 > La Generic Card API expose ainsi la contre-mesure relai **au niveau de chaque commande individuelle**, cohérent avec son modèle d'usage (séquences d'APDU sans transaction sécurisée explicite).
 
-### 3.5 Justification
+### 3.5 Storage Card API
 
-Une attaque relai introduit un délai significatif et systématique sur les échanges APDU ; surveiller ce délai au niveau du lecteur (Card API), au niveau de la session Calypso (Calypso Card API) et au niveau de chaque commande générique (Generic Card API) permet de couvrir l'ensemble des scénarios d'usage des APIs Terminal.
+- **Nouvelle classe de données `StorageCardSecuritySettings`** (`storagecard.transaction`), avec la propriété `readCommandMaxDurations: Map<StorageCardProductType, Long> = emptyMap()` : durée maximale, en microsecondes, de l'échange d'**une seule commande de lecture**, pour chaque type de produit. Un type absent n'est pas borné. Une même instance peut être partagée par toutes les transactions d'un terminal.
+- **Opération de fabrique modifiée** : `createStorageCardTransactionManager(reader, card, securitySettings) → StorageCardTransactionManager`. Une instance par défaut de `StorageCardSecuritySettings` désactive tout bornage.
+- **Portée** : la borne s'applique aux commandes de lecture préparées sur le gestionnaire de transaction (`prepareReadBlock`, `prepareReadBlocks`, `prepareSt25ReadSystemBlock`) ; elle ne s'applique ni à la sélection, ni aux écritures, ni à l'authentification. Un dépassement lève `SCInvalidCardResponse`, qui porte déjà `blockAddress` et `commandId`.
+
+> **Menace visée** : pour les cartes de stockage, il ne s'agit pas du relais mais de l'**émulation de carte** par un matériel RFID générique, qui ne répond pas à une commande de lecture dans le même temps que la puce du produit attendu.
+
+> Les cartes de stockage n'ont ni FCI ni session sécurisée : le **type de produit** suffit à segmenter le parc, là où la Calypso Card API utilise le CSN et le FCI.
+
+### 3.6 Justification
+
+Le relai comme l'émulation introduisent un écart de durée significatif et systématique sur les échanges APDU ; surveiller cet écart au niveau du lecteur (Card API), des commandes bornées d'une transaction Calypso (Calypso Card API), de chaque commande générique (Generic Card API) et de chaque lecture de carte de stockage (Storage Card API) couvre l'ensemble des scénarios d'usage des API Terminaux.
 
 ---
 
@@ -822,7 +835,7 @@ Les spécifications apportent en outre des clarifications qui ne changent pas le
 
 - **Card API — règles de construction des APDU** : les commandes doivent être strictement conformes à ISO/IEC 7816-3 ; une commande de cas 4 doit inclure le champ `Le`, dont la valeur `00h` est **recommandée** (elle était auparavant présentée comme obligatoire).
 - **Card API — limitations** : la transmission des commandes *Select Application* par nom de DF (réservée à la `CardSelectionRequest`) et *Get Response* (les status words `61XYh` et `6CXYh` sont traités automatiquement par l'implémentation du lecteur) ne peut pas être demandée.
-- **Card API — anti-relai** : le mécanisme de contrôle du temps d'exécution des échanges APDU est explicitement présenté comme solution de contre-mesure anti-relai (cf. Thème 2).
+- **Card API — contre-mesures temporelles** : le mécanisme de contrôle du temps d'exécution des échanges APDU est explicitement présenté comme solution de contre-mesure face au relai et à l'émulation (cf. Thème 2).
 - **Reader API — cycle de vie des `SmartCard`** : désormais normatif (cf. §2.3.2).
 - **Toutes les APIs — natures des pré-conditions** : un critère explicite distingue *Range* (position dans une collection ou une image mémoire exposée par l'API) et *Argument* (toute autre valeur invalide, y compris les valeurs bornées par le protocole de la carte ou du SAM).
 - **Storage Card API — périmètre** : la section *Scope* liste explicitement les produits supportés (MIFARE Ultralight, MIFARE Classic 1K, MIFARE Classic 4K, ST25 SRT512), identifiés par les valeurs de `StorageCardProductType`.
@@ -857,7 +870,7 @@ Le présent document soumet à la validation du **TC Terminal de la CNA** :
 1. **Le principe** des quatorze thèmes d'évolution (§2 à §15) et la cohérence d'ensemble du chantier (versions 3.0.0 pour Reader / Card / Calypso Card, 1.0.0 pour Definitions, 2.0.0 pour Legacy SAM / Generic Card / Storage Card, 0.2.0 pour Crypto Symmetric, 0.3.0 pour Crypto Asymmetric).
 2. **Les choix de conception** documentés dans les sections « Justification », en particulier :
    - le modèle multicanal explicite reposant sur la `SmartCard(Spi)` comme cible nommée et la hiérarchie à trois niveaux des gestionnaires de transactions (§2) ;
-   - le bornage de durée au niveau APDU, session Calypso et commande générique, avec réglages par CSN et par FCI (§3) ;
+   - le bornage de durée au niveau APDU, session Calypso, commande générique et lecture de carte de stockage, avec réglages par CSN et par FCI (§3) ;
    - la fusion du patron Observateur en une seule SPI `CardReaderEventHandler` (§4) ;
    - l'énumération `SecureSessionState` (§5) ;
    - l'extraction de `RfTechnology` et `CardType` dans la Terminal Reader Definitions API et les paramètres de détection `CardDetectionSettings` (§7) ;
@@ -1090,6 +1103,7 @@ Cette annexe liste, pour chaque API, le devenir de chaque élément des versions
 | `StorageCardTransactionManager` (extends `CardTransactionManager<…>`) | → non générique, retours `Self` |
 | `StorageCardTransactionManager.prepareReadSystemBlock()`, `prepareWriteSystemBlock(byte[])` *(dépréciées)* | Supprimées |
 | `StorageCardTransactionManager.prepareSt25WriteSystemBlock(byte[])` | → `prepareSt25WriteSystemBlock(commandId: Int, data: ByteArray)` |
+| — | Ajoutées : classe de données `StorageCardSecuritySettings` (`readCommandMaxDurations`) ; paramètre `securitySettings` ajouté à `StorageCardApiFactory.createStorageCardTransactionManager(...)` |
 | `StorageCardTransactionManager.prepareWriteBlocks(int, byte[])` | → `prepareWriteBlocks(commandId: Int, fromBlockAddress: Int, data: ByteArray)` |
 | `StorageCardException` (`getBlockAddress`) | Supprimée ; les erreurs portent `blockAddress: Int?` et `commandId: Int?` |
 | `SCAuthenticationFailedException` (extends `CardCommunicationException`) | → `SCAuthenticationFailed` (sans erreur parente) |
