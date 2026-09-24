@@ -103,7 +103,7 @@ Each `calypsonet-terminal-*-uml-api` repository hosted on [github.com/calypsonet
 11. [Theme 10 — Implementation-language-independent specification](#11-theme-10--implementation-language-independent-specification)
 12. [Theme 11 — Data exposed without computation and access to raw data](#12-theme-11--data-exposed-without-computation-and-access-to-raw-data)
 13. [Theme 12 — Stored Value (SV) operations](#13-theme-12--stored-value-sv-operations)
-14. [Theme 13 — Tolerance of a missing file (`6A82h`) in a secure session](#14-theme-13--tolerance-of-a-missing-file-6a82h-in-a-secure-session)
+14. [Theme 13 — Tolerance of a missing file or record in a secure session](#14-theme-13--tolerance-of-a-missing-file-or-record-in-a-secure-session)
 15. [Theme 14 — Crypto extensions and command interleaving](#15-theme-14--crypto-extensions-and-command-interleaving)
 16. [Normative clarifications](#16-normative-clarifications)
 17. [Elements under study](#17-elements-under-study)
@@ -131,7 +131,7 @@ The new generation of the Terminal APIs introduces compatibility breaks on all e
 | 10 | Language-independent specification | ● | ● | ● | ● | ● | ● | ● | ● | ● |
 | 11 | Data without computation, raw data | — | ● | ● | — | ● | ● | ● | — | ● |
 | 12 | Stored Value operations | — | — | ● | — | — | — | — | — | — |
-| 13 | Missing file tolerated in session | — | — | ● | — | — | — | — | — | — |
+| 13 | Missing file or record tolerated | — | — | ● | — | — | — | — | — | — |
 | 14 | Crypto extensions and interleaving | — | — | ● | — | ● | — | — | — | — |
 
 Cross-cutting consequences:
@@ -778,16 +778,18 @@ The model now follows the card specification exactly: three commands, two *SV Ge
 
 ---
 
-## 14. Theme 13 — Tolerance of a missing file (`6A82h`) in a secure session
+## 14. Theme 13 — Tolerance of a missing file or record in a secure session
 
 ### 14.1 Motivation
 
-All Calypso cards now tolerate the `6A82h` status word (*File Not Found*) in a secure session for read commands (*Select File*, *Get Data*, *Read Binary*, *Read Records*, *Read Record Multiple*, *Search Record Multiple*).
+All Calypso cards now tolerate the `6A82h` (*File Not Found*) and `6A83h` (*Record Not Found*) status words in a secure session for read commands (*Select File*, *Get Data*, *Read Binary*, *Read Records*, *Read Record Multiple*, *Search Record Multiple*). On a heterogeneous card fleet, the presence of a file or of a record is not always known in advance, and an unsuccessful read should not cancel the session.
+
+The tolerance is **explicitly enabled by the integrator**: the default behaviour, stricter, remains the failure of the transaction inside a session.
 
 ### 14.2 Calypso Card API
 
-- **Reads** (`prepareReadBinary`, `prepareReadCounter`, `prepareReadRecords`): processing no longer fails if the targeted file is missing, **inside a secure session as well as outside**; the `CalypsoCard` is simply not filled. The other anomalies (invalid offset, missing record or counter) keep the two modes *best-effort* (outside a session) and *strict* (inside a session).
-- **File selection** (`prepareSelectFileByLid`, `prepareSelectFileByControl`): a missing file no longer causes processing to fail, inside a session or not.
+- **Two new security settings**: `authorizeFileNotFoundError() → Self` and `authorizeRecordNotFoundError() → Self`, in `SymmetricCryptoSecuritySettings` and `AsymmetricCryptoSecuritySettings`. They allow the card to answer `6A82h` or `6A83h` **inside a session** without failing the transaction: the affected command is simply not applied to the `CalypsoCard` and the session continues. They are disabled by default.
+- **Reads** (`prepareReadBinary`, `prepareReadCounter`, `prepareReadRecords`) and **file selection** (`prepareSelectFileByLid`, `prepareSelectFileByControl`): **outside a session**, a missing file has never caused processing to fail, and this *best-effort* mode is unchanged; **inside a session**, processing fails unless the corresponding setting has been enabled. An invalid offset keeps the two modes *best-effort* (outside a session) and *strict* (inside a session).
 - **The `SelectFileException` error is removed**.
 - The in-session usage restrictions of `prepareGetData`, `prepareReadRecord`, `prepareReadRecordsPartially` and `prepareSearchRecords` are **unchanged**.
 
@@ -992,6 +994,7 @@ This annex lists, for each API, what becomes of each element of the Java version
 | — | Added: `prepareSvUndebit(amount, date, time)` |
 | `SvAction` | Removed |
 | `SvOperation.DEBIT` | → `SvOperation.DEBIT_UNDEBIT` |
+| — | Added: `authorizeFileNotFoundError()`, `authorizeRecordNotFoundError()` in `SymmetricCryptoSecuritySettings` and `AsymmetricCryptoSecuritySettings` |
 | — | Added: `SymmetricCryptoSecuritySettings.assignOpenSecureSessionMaxDurationByCsn/ByFci(...)`, `assignCloseSecureSessionMaxDurationByCsn/ByFci(...)`, `assignSvCommandMaxDurationByCsn/ByFci(...)`; `AsymmetricCryptoSecuritySettings.assignOpenSecureSessionMaxDurationByCsn/ByFci(...)`, `assignCloseSecureSessionMaxDurationByCsn/ByFci(...)` |
 | `ChannelControl` | Removed |
 | `CardIOException`, `ReaderIOException`, `UnexpectedCommandStatusException`, `SelectFileException` | Removed |

@@ -103,7 +103,7 @@ Chaque dépôt `calypsonet-terminal-*-uml-api` hébergé sur [github.com/calypso
 11. [Thème 10 — Spécification indépendante du langage d'implémentation](#11-thème-10--spécification-indépendante-du-langage-dimplémentation)
 12. [Thème 11 — Données exposées sans calcul et accès aux données brutes](#12-thème-11--données-exposées-sans-calcul-et-accès-aux-données-brutes)
 13. [Thème 12 — Opérations Stored Value (SV)](#13-thème-12--opérations-stored-value-sv)
-14. [Thème 13 — Tolérance du fichier absent (`6A82h`) en session sécurisée](#14-thème-13--tolérance-du-fichier-absent-6a82h-en-session-sécurisée)
+14. [Thème 13 — Tolérance du fichier ou de l'enregistrement absent en session sécurisée](#14-thème-13--tolérance-du-fichier-ou-de-lenregistrement-absent-en-session-sécurisée)
 15. [Thème 14 — Extensions crypto et entrelacement des commandes](#15-thème-14--extensions-crypto-et-entrelacement-des-commandes)
 16. [Clarifications normatives](#16-clarifications-normatives)
 17. [Éléments en cours d'étude](#17-éléments-en-cours-détude)
@@ -131,7 +131,7 @@ La nouvelle génération des APIs Terminaux introduit des ruptures de compatibil
 | 10 | Spécification indépendante du langage | ● | ● | ● | ● | ● | ● | ● | ● | ● |
 | 11 | Données sans calcul, données brutes | — | ● | ● | — | ● | ● | ● | — | ● |
 | 12 | Opérations Stored Value | — | — | ● | — | — | — | — | — | — |
-| 13 | Tolérance du fichier absent en session | — | — | ● | — | — | — | — | — | — |
+| 13 | Tolérance du fichier ou enregistrement absent | — | — | ● | — | — | — | — | — | — |
 | 14 | Extensions crypto et entrelacement | — | — | ● | — | ● | — | — | — | — |
 
 Les conséquences transverses :
@@ -778,16 +778,18 @@ Le modèle suit désormais exactement la spécification de la carte : trois comm
 
 ---
 
-## 14. Thème 13 — Tolérance du fichier absent (`6A82h`) en session sécurisée
+## 14. Thème 13 — Tolérance du fichier ou de l'enregistrement absent en session sécurisée
 
 ### 14.1 Motivation
 
-Toutes les cartes Calypso tolèrent désormais le status word `6A82h` (*File Not Found*) en session sécurisée pour les commandes de lecture (*Select File*, *Get Data*, *Read Binary*, *Read Records*, *Read Record Multiple*, *Search Record Multiple*).
+Toutes les cartes Calypso tolèrent désormais les status words `6A82h` (*File Not Found*) et `6A83h` (*Record Not Found*) en session sécurisée pour les commandes de lecture (*Select File*, *Get Data*, *Read Binary*, *Read Records*, *Read Record Multiple*, *Search Record Multiple*). Sur un parc hétérogène, la présence d'un fichier ou d'un enregistrement n'est pas toujours connue à l'avance, et une lecture infructueuse ne devrait pas annuler la session.
+
+La tolérance est **explicitement activée par l'intégrateur** : le comportement par défaut, plus strict, reste l'échec de la transaction en session.
 
 ### 14.2 Calypso Card API
 
-- **Lectures** (`prepareReadBinary`, `prepareReadCounter`, `prepareReadRecords`) : le traitement n'échoue plus si le fichier visé est absent, **dans une session sécurisée comme en dehors** ; la `CalypsoCard` n'est simplement pas remplie. Les autres anomalies (offset invalide, enregistrement ou compteur absent) conservent les deux modes *best-effort* (hors session) et *strict* (en session).
-- **Sélection de fichier** (`prepareSelectFileByLid`, `prepareSelectFileByControl`) : un fichier absent ne fait plus échouer le traitement, en session ou non.
+- **Deux nouveaux réglages de sécurité** : `authorizeFileNotFoundError() → Self` et `authorizeRecordNotFoundError() → Self`, dans `SymmetricCryptoSecuritySettings` et `AsymmetricCryptoSecuritySettings`. Ils autorisent la carte à répondre `6A82h` ou `6A83h` **en session** sans faire échouer la transaction : la commande concernée n'est simplement pas appliquée à la `CalypsoCard` et la session se poursuit. Par défaut, ils sont désactivés.
+- **Lectures** (`prepareReadBinary`, `prepareReadCounter`, `prepareReadRecords`) et **sélection de fichier** (`prepareSelectFileByLid`, `prepareSelectFileByControl`) : **hors session**, un fichier absent n'a jamais fait échouer le traitement, et ce mode *best-effort* est inchangé ; **en session**, le traitement échoue sauf si le réglage correspondant a été activé. L'offset invalide conserve les deux modes *best-effort* (hors session) et *strict* (en session).
 - **L'erreur `SelectFileException` est supprimée**.
 - Les restrictions d'usage en session de `prepareGetData`, `prepareReadRecord`, `prepareReadRecordsPartially` et `prepareSearchRecords` sont **inchangées**.
 
@@ -992,6 +994,7 @@ Cette annexe liste, pour chaque API, le devenir de chaque élément des versions
 | — | Ajoutée : `prepareSvUndebit(amount, date, time)` |
 | `SvAction` | Supprimée |
 | `SvOperation.DEBIT` | → `SvOperation.DEBIT_UNDEBIT` |
+| — | Ajoutées : `authorizeFileNotFoundError()`, `authorizeRecordNotFoundError()` dans `SymmetricCryptoSecuritySettings` et `AsymmetricCryptoSecuritySettings` |
 | — | Ajoutées : `SymmetricCryptoSecuritySettings.assignOpenSecureSessionMaxDurationByCsn/ByFci(...)`, `assignCloseSecureSessionMaxDurationByCsn/ByFci(...)`, `assignSvCommandMaxDurationByCsn/ByFci(...)` ; `AsymmetricCryptoSecuritySettings.assignOpenSecureSessionMaxDurationByCsn/ByFci(...)`, `assignCloseSecureSessionMaxDurationByCsn/ByFci(...)` |
 | `ChannelControl` | Supprimée |
 | `CardIOException`, `ReaderIOException`, `UnexpectedCommandStatusException`, `SelectFileException` | Supprimées |
