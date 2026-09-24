@@ -306,7 +306,7 @@ Consequences and details:
 
 - **New data class `StorageCardSecuritySettings`** (`storagecard.transaction`), with the property `readCommandMaxDurations: Map<StorageCardProductType, Long> = emptyMap()`: maximum duration, in microseconds, of the exchange of **a single read command**, for each product type. A product type that is absent is not bounded. One instance may be shared by every transaction of a terminal.
 - **Factory operation changed**: `createStorageCardTransactionManager(reader, card, securitySettings) → StorageCardTransactionManager`. A default `StorageCardSecuritySettings` disables every duration bound.
-- **Scope**: the bound applies to the read commands prepared on the transaction manager (`prepareReadBlock`, `prepareReadBlocks`, `prepareSt25ReadSystemBlock`); it applies neither to the selection, nor to the write and authentication commands. An overrun raises `SCInvalidCardResponse`, which already carries `blockAddress` and `commandId`.
+- **Scope**: the bound applies to the read commands prepared on the transaction manager (`prepareReadBlock`, `prepareReadBlocks`, `prepareSt25ReadSystemBlock`); it applies neither to the selection, nor to the write and authentication commands. An overrun raises `StorageCardInvalidCardResponse`, which already carries `blockAddress` and `commandId`.
 
 > **Targeted threat**: for storage cards, the threat is not the relay but **card emulation** by a generic RFID device, which does not answer a read command in the same time as the chip of the expected product.
 
@@ -462,7 +462,7 @@ New operations related to Themes 2 and 7: `prepareCommandWithId`, `prepareComman
 | `prepareMifareClassicAuthenticate(…, int keyNumber)` | `prepareMifareClassicAuthenticateWithKeyNumber(…, keyNumber)` | (same) |
 | `StorageCardTransactionManager.prepareReadSystemBlock()`, `prepareWriteSystemBlock(byte[])` *(deprecated)* | *(removed)*; `prepareSt25ReadSystemBlock()` and `prepareSt25WriteSystemBlock(commandId, data)` remain | The `St25` prefix reflects the product-specific nature of the system block. |
 | `StorageCardException` interface (`getBlockAddress()`) | *(removed)*; the errors carry `blockAddress: Int?` and `commandId: Int?` | The information is carried directly by each error. |
-| `SCAuthenticationFailedException extends CardCommunicationException` | `SCAuthenticationFailed` *(no parent error)* | An authentication failure is not a communication error. |
+| `SCAuthenticationFailedException extends CardCommunicationException` | `StorageCardAuthenticationFailed` *(no parent error)* | An authentication failure is not a communication error. |
 
 In addition, `StorageCard.getBlock`, `getBlocks` and `getSystemBlock` now explicitly return `ByteArray?` (`null` if the data has not been read).
 
@@ -1106,8 +1106,8 @@ This annex lists, for each API, what becomes of each element of the Java version
 | — | Added: `StorageCardSecuritySettings` data class (`readCommandMaxDurations`); `securitySettings` parameter added to `StorageCardApiFactory.createStorageCardTransactionManager(...)` |
 | `StorageCardTransactionManager.prepareWriteBlocks(int, byte[])` | → `prepareWriteBlocks(commandId: Int, fromBlockAddress: Int, data: ByteArray)` |
 | `StorageCardException` (`getBlockAddress`) | Removed; the errors carry `blockAddress: Int?` and `commandId: Int?` |
-| `SCAuthenticationFailedException` (extends `CardCommunicationException`) | → `SCAuthenticationFailed` (no parent error) |
-| `SCCardCommunicationException`, `SCInvalidCardResponseException`, `SCReaderCommunicationException` | → `SCCardCommunication`, `SCInvalidCardResponse`, `SCReaderCommunication` (parents unchanged) |
+| `SCAuthenticationFailedException` (extends `CardCommunicationException`) | → `StorageCardAuthenticationFailed` (no parent error) |
+| `SCCardCommunicationException`, `SCInvalidCardResponseException`, `SCReaderCommunicationException` | → `StorageCardCardCommunication`, `StorageCardInvalidCardResponse`, `StorageCardReaderCommunication` (parents unchanged) |
 
 ### A.9 Terminal Reader Definitions API (new, 1.0.0)
 

@@ -306,7 +306,7 @@ Conséquences et précisions :
 
 - **Nouvelle classe de données `StorageCardSecuritySettings`** (`storagecard.transaction`), avec la propriété `readCommandMaxDurations: Map<StorageCardProductType, Long> = emptyMap()` : durée maximale, en microsecondes, de l'échange d'**une seule commande de lecture**, pour chaque type de produit. Un type absent n'est pas borné. Une même instance peut être partagée par toutes les transactions d'un terminal.
 - **Opération de fabrique modifiée** : `createStorageCardTransactionManager(reader, card, securitySettings) → StorageCardTransactionManager`. Une instance par défaut de `StorageCardSecuritySettings` désactive tout bornage.
-- **Portée** : la borne s'applique aux commandes de lecture préparées sur le gestionnaire de transaction (`prepareReadBlock`, `prepareReadBlocks`, `prepareSt25ReadSystemBlock`) ; elle ne s'applique ni à la sélection, ni aux écritures, ni à l'authentification. Un dépassement lève `SCInvalidCardResponse`, qui porte déjà `blockAddress` et `commandId`.
+- **Portée** : la borne s'applique aux commandes de lecture préparées sur le gestionnaire de transaction (`prepareReadBlock`, `prepareReadBlocks`, `prepareSt25ReadSystemBlock`) ; elle ne s'applique ni à la sélection, ni aux écritures, ni à l'authentification. Un dépassement lève `StorageCardInvalidCardResponse`, qui porte déjà `blockAddress` et `commandId`.
 
 > **Menace visée** : pour les cartes de stockage, il ne s'agit pas du relais mais de l'**émulation de carte** par un matériel RFID générique, qui ne répond pas à une commande de lecture dans le même temps que la puce du produit attendu.
 
@@ -462,7 +462,7 @@ Nouvelles opérations liées aux Thèmes 2 et 7 : `prepareCommandWithId`, `prepa
 | `prepareMifareClassicAuthenticate(…, int keyNumber)` | `prepareMifareClassicAuthenticateWithKeyNumber(…, keyNumber)` | (idem) |
 | `StorageCardTransactionManager.prepareReadSystemBlock()`, `prepareWriteSystemBlock(byte[])` *(dépréciées)* | *(supprimées)* ; subsistent `prepareSt25ReadSystemBlock()` et `prepareSt25WriteSystemBlock(commandId, data)` | Le préfixe `St25` reflète la nature produit-spécifique du bloc système. |
 | Interface `StorageCardException` (`getBlockAddress()`) | *(supprimée)* ; les erreurs portent `blockAddress: Int?` et `commandId: Int?` | Les informations sont portées directement par chaque erreur. |
-| `SCAuthenticationFailedException extends CardCommunicationException` | `SCAuthenticationFailed` *(sans erreur parente)* | Un échec d'authentification n'est pas une erreur de communication. |
+| `SCAuthenticationFailedException extends CardCommunicationException` | `StorageCardAuthenticationFailed` *(sans erreur parente)* | Un échec d'authentification n'est pas une erreur de communication. |
 
 Par ailleurs, `StorageCard.getBlock`, `getBlocks` et `getSystemBlock` renvoient désormais explicitement `ByteArray?` (`null` si la donnée n'a pas été lue).
 
@@ -1106,8 +1106,8 @@ Cette annexe liste, pour chaque API, le devenir de chaque élément des versions
 | — | Ajoutées : classe de données `StorageCardSecuritySettings` (`readCommandMaxDurations`) ; paramètre `securitySettings` ajouté à `StorageCardApiFactory.createStorageCardTransactionManager(...)` |
 | `StorageCardTransactionManager.prepareWriteBlocks(int, byte[])` | → `prepareWriteBlocks(commandId: Int, fromBlockAddress: Int, data: ByteArray)` |
 | `StorageCardException` (`getBlockAddress`) | Supprimée ; les erreurs portent `blockAddress: Int?` et `commandId: Int?` |
-| `SCAuthenticationFailedException` (extends `CardCommunicationException`) | → `SCAuthenticationFailed` (sans erreur parente) |
-| `SCCardCommunicationException`, `SCInvalidCardResponseException`, `SCReaderCommunicationException` | → `SCCardCommunication`, `SCInvalidCardResponse`, `SCReaderCommunication` (parents inchangés) |
+| `SCAuthenticationFailedException` (extends `CardCommunicationException`) | → `StorageCardAuthenticationFailed` (sans erreur parente) |
+| `SCCardCommunicationException`, `SCInvalidCardResponseException`, `SCReaderCommunicationException` | → `StorageCardCardCommunication`, `StorageCardInvalidCardResponse`, `StorageCardReaderCommunication` (parents inchangés) |
 
 ### A.9 Terminal Reader Definitions API (nouvelle, 1.0.0)
 
