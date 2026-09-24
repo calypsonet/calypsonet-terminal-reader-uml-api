@@ -737,7 +737,7 @@ Plusieurs types de données des versions en production mêlaient **données** et
 - **`SamParameters`** est supprimée : `LegacySam.getSamParameters()` renvoie directement `ByteArray?`.
 - **Compteurs** : `getCounter(counterNumber)` et `getCounterCeiling(counterNumber)` sont supprimées (les tables `getCounters()` et `getCounterCeilings()` suffisent) ; `getCounterIncrementAccess(counterNumber)` est remplacée par `getCounterIncrementAccesses() → SortedMap<Int, CounterIncrementAccess>`.
 - **Données de commande** : `LegacyCardCertificateComputationData`, `BasicSignatureComputationData`, `TraceableSignatureComputationData`, `BasicSignatureVerificationData` et `TraceableSignatureVerificationData` deviennent des classes de données d'entrée (propriétés et valeurs par défaut au lieu de setters ; `withSamTraceabilityMode(offset, mode)` devient `samTraceabilityMode` / `traceabilityOffset`, `withoutBusyMode()` devient `busyMode = false`) ; leurs résultats sont lus sur la `LegacySam` par `commandId` (cf. §8.5). `KeyPairContainer` est supprimée. Les opérations `create…Data()` et `createKeyPairContainer()` disparaissent de `LegacySamApiFactory`.
-- **`SecuritySetting`** devient la classe de données **`SecuritySettings`** (`samReader`, `controlSam`), renommée au pluriel comme les réglages de sécurité de la Calypso Card API, à la place de `setControlSamResource(samReader, controlSam)` ; `LegacySamApiFactory.createSecuritySetting()` disparaît.
+- **`SecuritySetting`** devient la classe de données **`LegacySamSecuritySettings`** (`samReader`, `controlSam`), renommée au pluriel comme les réglages de sécurité de la Calypso Card API, et préfixée pour éviter l'homonymie avec le `SecuritySettings` de la Calypso Card API, à la place de `setControlSamResource(samReader, controlSam)` ; `LegacySamApiFactory.createSecuritySetting()` disparaît.
 
 ### 12.4 Card API
 
@@ -1050,7 +1050,7 @@ Cette annexe liste, pour chaque API, le devenir de chaque élément des versions
 | `SignatureVerificationData.isSignatureValid()` | → `LegacySam.isSignatureValid(commandId: Int) → Boolean?` |
 | `BasicSignatureVerificationData`, `TraceableSignatureVerificationData` | → classes de données implémentant `SignatureVerificationData` |
 | `TraceableSignatureVerificationData.withSamTraceabilityMode(int offset, SamTraceabilityMode mode, LegacySamRevocationServiceSpi service)`, `withoutBusyMode()` | → propriétés `traceabilityOffset = 0`, `samTraceabilityMode: SamTraceabilityMode? = null`, `samRevocationService: LegacySamRevocationServiceSpi? = null`, `busyMode = true` |
-| `SecuritySetting.setControlSamResource(samReader, controlSam)` | → classe de données `SecuritySettings` (`samReader`, `controlSam`) ; paramètre `securitySetting` → `securitySettings` dans `createSecureWriteTransactionManager` et `createAsyncTransactionCreatorManager` |
+| `SecuritySetting.setControlSamResource(samReader, controlSam)` | → classe de données `LegacySamSecuritySettings` (`samReader`, `controlSam`) ; paramètre `securitySetting` → `securitySettings` dans `createSecureWriteTransactionManager` et `createAsyncTransactionCreatorManager` |
 | `ReaderIOException`, `SamIOException`, `UnexpectedCommandStatusException` | Supprimées |
 | `InconsistentDataException`, `InvalidSignatureException`, `SamRevokedException` | → `InconsistentData`, `InvalidSignature`, `SamRevoked` |
 
