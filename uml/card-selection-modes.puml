@@ -38,7 +38,7 @@ skinparam activity {
 start
 :create the card selection manager
 of the selection mode;
-:**prepareSelection()**
+:**prepareSelectionCase()**
 build the card selection scenario;
 if (execution?) then (synchronous)
   :**processCardSelectionScenario()**;

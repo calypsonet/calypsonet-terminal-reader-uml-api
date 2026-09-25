@@ -781,7 +781,7 @@ are active in parallel; the one placed on the basic channel, if any, is identifi
 | --
 | 3.0
 | All <<type_SmartCard,`SmartCard`>> instances corresponding to successful selection cases, each active on its own
-  logical channel, indexed by the `selectionId` supplied to `prepareSelection`. Possibly empty.
+  logical channel, indexed by the `selectionCaseId` supplied to `prepareSelectionCase`. Possibly empty.
 |===
 
 [[type_MultipleCardSelectionResult]]
@@ -797,10 +797,10 @@ are active in parallel; the one placed on the basic channel, if any, is identifi
 |===
 
 Every selection case of the scenario has been tried. The result exposes the smart cards of all the successful
-selection cases, indexed by their `selectionId`. Since the card is operated on a single channel, only the smart card
+selection cases, indexed by their `selectionCaseId`. Since the card is operated on a single channel, only the smart card
 of the last successful selection case, in execution order, remains active; the others are deactivated but still
 expose the data collected during their selection (see <<sec_smartcard_lifecycle,the `SmartCard` lifecycle>>).
-`activeSelectionId` is `null` if and only if `smartCards` is empty.
+`activeSelectionCaseId` is `null` if and only if `smartCards` is empty.
 
 [cols="^.^1,^.^1,^.^1,^.^1,.^5", options="header"]
 |===
@@ -819,9 +819,9 @@ expose the data collected during their selection (see <<sec_smartcard_lifecycle,
 | --
 | 3.0
 | All <<type_SmartCard,`SmartCard`>> instances corresponding to successful selection cases, indexed by the
-  `selectionId` supplied to `prepareSelection`. Possibly empty.
+  `selectionCaseId` supplied to `prepareSelectionCase`. Possibly empty.
 
-| `activeSelectionId`
+| `activeSelectionCaseId`
 | `Int?`
 | --
 | 3.0
@@ -842,7 +842,7 @@ expose the data collected during their selection (see <<sec_smartcard_lifecycle,
 |===
 
 The execution stops at the first successful selection case, so the result exposes at most one smart card,
-identified by the `selectionId` supplied to `prepareSelection`. `selectionId` and `smartCard` are either both
+identified by the `selectionCaseId` supplied to `prepareSelectionCase`. `selectionCaseId` and `smartCard` are either both
 `null`, when no selection case succeeded, or both non-`null`.
 
 [cols="^.^1,^.^1,^.^1,^.^1,.^5", options="header"]
@@ -857,7 +857,7 @@ identified by the `selectionId` supplied to `prepareSelection`. `selectionId` an
   (see <<ref_cna_trd,CNA-TRD-API>>). `UNKNOWN` when the card type could not be identified. The value is
   intrinsically tied to the lifecycle of this result.
 
-| `selectionId`
+| `selectionCaseId`
 | `Int?`
 | --
 | 3.0
@@ -1052,7 +1052,7 @@ execution, scheduling, parsing of a scheduled response and import of a processed
 specialised manager. See <<sec_card_selection_modes,Card selection modes>> for an end-to-end view of the synchronous
 and asynchronous flows.
 
-A scenario is considered *prepared* once at least one selection case has been appended via `prepareSelection` or
+A scenario is considered *prepared* once at least one selection case has been appended via `prepareSelectionCase` or
 imported via `importCardSelectionScenario`. A prepared scenario MAY be executed multiple times; each execution
 operates on the scenario as it stood at the time of the call.
 
@@ -1111,29 +1111,29 @@ operates on the scenario as it stood at the time of the call.
 | See also       | <<op_CardSelectionManager_exportCardSelectionScenario,`exportCardSelectionScenario`>>
 |===
 
-[[op_CardSelectionManager_prepareSelection]]
-===== Prepare Selection
+[[op_CardSelectionManager_prepareSelectionCase]]
+===== Prepare Selection Case
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
 | Signature
-| `prepareSelection(` +
-`{nbsp}{nbsp}{nbsp}{nbsp}selectionId: Int,` +
+| `prepareSelectionCase(` +
+`{nbsp}{nbsp}{nbsp}{nbsp}selectionCaseId: Int,` +
 `{nbsp}{nbsp}{nbsp}{nbsp}cardSelector: CardSelector,` +
 `{nbsp}{nbsp}{nbsp}{nbsp}cardSelectionExtension: CardSelectionExtension` +
 `) -> Self`
 | Since          | 2.0
 | Description
-| Appends a selection case, identified by `selectionId`, to the scenario. Selection cases are executed in the order
+| Appends a selection case, identified by `selectionCaseId`, to the scenario. Selection cases are executed in the order
   in which they were prepared, regardless of their identifiers. The identifier is the key under which the
   corresponding <<type_SmartCard,`SmartCard`>> is exposed in the selection result.
 | Parameters
-| `selectionId` -- the identifier of the selection case, chosen by the application. +
+| `selectionCaseId` -- the identifier of the selection case, chosen by the application. +
   `cardSelector` (<<type_CardSelector,`CardSelector`>>) -- the card selector containing the filters to be used to select the card. +
   `cardSelectionExtension` (<<type_CardSelectionExtension,`CardSelectionExtension`>>) -- the card selection extension to be used to parse the card selection response.
 | Returns        | The current instance (`Self`).
 | Pre-conditions | *Argument* -- every parameter is non-`null`. +
-  *Argument* -- `selectionId` is not already used by a selection case of the scenario.
+  *Argument* -- `selectionCaseId` is not already used by a selection case of the scenario.
 | Errors         | None.
 |===
 

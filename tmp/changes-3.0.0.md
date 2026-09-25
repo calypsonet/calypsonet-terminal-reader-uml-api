@@ -544,9 +544,9 @@ All detection information is grouped in the **data class** `CardDetectionSetting
 
 Several APIs allow **several commands to be prepared** before executing them as a batch. In production, the application had no direct means of identifying **which command** caused a problem, nor of accessing the **result of a specific command**; some APIs relied on mutable container objects for this purpose (`KeyPairContainer`, `SearchCommandData.getMatchingRecordNumbers()`, `SignatureComputationData.getSignature()`, etc.).
 
-The new versions generalise a single mechanism: an **integer identifier `commandId` supplied by the application** when preparing the command, then used to retrieve the result of the command or to identify the failing command. The `commandId` parameter, **always placed first**, follows the same convention as `selectionId` in the Reader API (see Theme 9).
+The new versions generalise a single mechanism: an **integer identifier `commandId` supplied by the application** when preparing the command, then used to retrieve the result of the command or to identify the failing command. The `commandId` parameter, **always placed first**, follows the same convention as `selectionCaseId` in the Reader API (see Theme 9).
 
-> The name `commandId` replaces `idCommand` from the previous working version of this document, for consistency with `selectionId`.
+> The name `commandId` replaces `idCommand` from the previous working version of this document, for consistency with `selectionCaseId`.
 
 ### 8.2 Generic Card API
 
@@ -631,7 +631,7 @@ The selection mode is no longer a parameter: it is carried by the **type of the 
 
 - **Factory**: `createCardSelectionManager()` is replaced by `createSingleCardSelectionManager()`, `createMultipleCardSelectionManager()` and `createMultichannelCardSelectionManager()`.
 - **`CardSelectionManager`** becomes the common interface and only keeps the mode-independent operations:
-  - `prepareSelection(selectionId: Int, cardSelector: CardSelector, cardSelectionExtension: CardSelectionExtension) → Self` — the selection identifier is **chosen by the application** (instead of an index returned by the API); it must be unique within the scenario; selections are executed in preparation order;
+  - `prepareSelectionCase(selectionCaseId: Int, cardSelector: CardSelector, cardSelectionExtension: CardSelectionExtension) → Self` — the selection identifier is **chosen by the application** (instead of an index returned by the API); it must be unique within the scenario; selections are executed in preparation order;
   - `exportCardSelectionScenario() → String`;
   - `importCardSelectionScenario(cardSelectionScenario: String) → Self` — **replaces** the current scenario (instead of returning the index of the last imported selection);
   - `exportProcessedCardSelectionScenario() → String`.
@@ -642,8 +642,8 @@ The selection mode is no longer a parameter: it is carried by the **type of the 
 
 | Result | Properties |
 |---|---|
-| `SingleCardSelectionResult` | `cardType: CardType`, `selectionId: Int?`, `smartCard: SmartCard?` (both `null` if no selection succeeded) |
-| `MultipleCardSelectionResult` | `cardType: CardType`, `smartCards: Map<Int, SmartCard>`, `activeSelectionId: Int?` (only the card of the last successful selection remains active) |
+| `SingleCardSelectionResult` | `cardType: CardType`, `selectionCaseId: Int?`, `smartCard: SmartCard?` (both `null` if no selection succeeded) |
+| `MultipleCardSelectionResult` | `cardType: CardType`, `smartCards: Map<Int, SmartCard>`, `activeSelectionCaseId: Int?` (only the card of the last successful selection remains active) |
 | `MultichannelCardSelectionResult` | `cardType: CardType`, `smartCards: Map<Int, SmartCard>` (all active, one per channel) |
 
 `CardSelectionResult` (with `getSmartCards()`, `getActiveSmartCard()`, `getActiveSelectionIndex()`) and `SelectionExecutionPolicy` disappear.
@@ -933,7 +933,7 @@ This annex lists, for each API, what becomes of each element of the Java version
 | `ReaderProtocolNotSupportedException` | Removed |
 | `reader.selection.InvalidCardResponseException` | Removed (duplicate) |
 | `CardSelectionManager.setMultipleSelectionMode()`, `prepareReleaseChannel()` | Removed |
-| `CardSelectionManager.prepareSelection(CardSelector<?>, CardSelectionExtension) → int` | → `prepareSelection(selectionId: Int, cardSelector: CardSelector, cardSelectionExtension: CardSelectionExtension) → Self` |
+| `CardSelectionManager.prepareSelectionCase(CardSelector<?>, CardSelectionExtension) → int` | → `prepareSelectionCase(selectionCaseId: Int, cardSelector: CardSelector, cardSelectionExtension: CardSelectionExtension) → Self` |
 | `CardSelectionManager.importCardSelectionScenario(String) → int` | → `importCardSelectionScenario(cardSelectionScenario: String) → Self` (replaces the scenario) |
 | `CardSelectionManager.processCardSelectionScenario(CardReader)` | → `processCardSelectionScenario(reader)` on `SingleCardSelectionManager` / `MultipleCardSelectionManager`; `processCardSelectionScenario(reader, channelSelectionPolicy)` on `MultichannelCardSelectionManager` |
 | `CardSelectionManager.scheduleCardSelectionScenario(ObservableCardReader, NotificationMode)` | → `scheduleCardSelectionScenario(observableCardReader, cardPresenceNotificationPolicy)` on the single-channel managers |

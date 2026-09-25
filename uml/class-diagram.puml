@@ -137,7 +137,7 @@ package "spi" as readerSpi {
 package "selection" as selectionApi {
     ' Selection
     interface CardSelectionManager {
-        +<color:blue>prepareSelection(selectionId: Int, cardSelector: CardSelector, cardSelectionExtension: CardSelectionExtension) → Self
+        +<color:blue>prepareSelectionCase(selectionCaseId: Int, cardSelector: CardSelector, cardSelectionExtension: CardSelectionExtension) → Self
 
         +exportCardSelectionScenario() → String
         +<color:blue>importCardSelectionScenario(cardSelectionScenario: String) → Self
@@ -222,13 +222,13 @@ package "selection" as selectionApi {
     }
     class "<color:blue>SingleCardSelectionResult" as SingleCardSelectionResult <<data>> <<green>> {
         +<color:blue>val cardType: <back:yellow>CardType</back>
-        +<color:blue>val selectionId: Int?
+        +<color:blue>val selectionCaseId: Int?
         +<color:blue>val smartCard: SmartCard?
     }
     class "<color:blue>MultipleCardSelectionResult" as MultipleCardSelectionResult <<data>> <<green>> {
         +<color:blue>val cardType: <back:yellow>CardType</back>
         +<color:blue>val smartCards: Map<Int, SmartCard>
-        +<color:blue>val activeSelectionId: Int?
+        +<color:blue>val activeSelectionCaseId: Int?
     }
     class "<color:blue>MultichannelCardSelectionResult" as MultichannelCardSelectionResult <<data>> <<green>> {
         +<color:blue>val cardType: <back:yellow>CardType</back>
