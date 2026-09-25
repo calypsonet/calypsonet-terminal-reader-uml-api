@@ -525,7 +525,7 @@ Toutes les informations de détection sont regroupées dans la **classe de donn�
 ### 7.5 Reader API — `ObservableCardReader` et résultat de sélection
 
 - `startCardDetection(settings: CardDetectionSettings, eventHandler: CardReaderEventHandler) → Unit` transporte en un seul appel le gestionnaire d'événements et la configuration de détection.
-- Le type de carte détecté est exposé par la propriété **`cardType: CardType`** des résultats de sélection (`SingleCardSelectionResult`, `MultipleCardSelectionResult`, `MultichannelCardSelectionResult`, cf. Thème 9) ; `UNKNOWN` si le type n'a pas pu être identifié.
+- Le type de carte détecté est exposé par la propriété **`cardType: CardType`** des résultats de sélection (`SingleCardSelectionResult`, `SequentialCardSelectionResult`, `MultichannelCardSelectionResult`, cf. Thème 9) ; `UNKNOWN` si le type n'a pas pu être identifié.
 
 ### 7.6 Justification
 
@@ -625,11 +625,15 @@ Le mode de sélection n'est plus un paramètre : il est porté par le **type du 
 
 | Gestionnaire | Comportement | Exécution | Résultat |
 |---|---|---|---|
-| `SingleCardSelectionManager` | mono-canal ; s'arrête à la première sélection réussie | explicite ou planifiée | `SingleCardSelectionResult` |
-| `MultipleCardSelectionManager` | mono-canal ; traite toutes les sélections, quels que soient les succès intermédiaires | explicite ou planifiée | `MultipleCardSelectionResult` |
-| `MultichannelCardSelectionManager` | cartes ISO 7816-4 multicanal ; chaque sélection réussie occupe son propre canal logique | explicite | `MultichannelCardSelectionResult` |
+| `SingleCardSelectionManager` | mono-canal ; s'arrête au premier cas qui correspond : la première application de la carte, ou la carte elle-même si elle n'héberge pas d'application (carte de stockage) | explicite ou planifiée | `SingleCardSelectionResult` |
+| `SequentialCardSelectionManager` | mono-canal ; sélectionne tour à tour toutes les applications de la carte qui correspondent, seule la dernière restant active ; sans objet pour les cartes de stockage | explicite ou planifiée | `SequentialCardSelectionResult` |
+| `MultichannelCardSelectionManager` | cartes ISO 7816-4 multicanal ; toutes les applications qui correspondent restent actives simultanément, chacune sur son canal logique ; hors périmètre des cartes de stockage | explicite | `MultichannelCardSelectionResult` |
 
-- **Factory** : `createCardSelectionManager()` est remplacée par `createSingleCardSelectionManager()`, `createMultipleCardSelectionManager()` et `createMultichannelCardSelectionManager()`.
+> **Remarque du TC (Stéphane)** : les scénarios discriminent les **applications** d'une **même carte physique** ; l'API conserve le terme *card* parce qu'un cas de sélection vise aussi des cartes sans application, comme les cartes de stockage. Ce point est désormais explicité dans la spec, dans la section du `CardSelectionManager`.
+
+> Par rapport à la version de travail précédente de ce document, `MultipleCardSelectionManager` est renommée `SequentialCardSelectionManager` (de même pour son résultat et son opération de fabrique) : le qualificatif décrit le **mode d'exécution du scénario**, et non un nombre de cartes. De même, `prepareSelection` devient `prepareSelectionCase` et `selectionId` devient `selectionCaseId`.
+
+- **Factory** : `createCardSelectionManager()` est remplacée par `createSingleCardSelectionManager()`, `createSequentialCardSelectionManager()` et `createMultichannelCardSelectionManager()`.
 - **`CardSelectionManager`** devient l'interface commune et ne conserve que les opérations indépendantes du mode :
   - `prepareSelectionCase(selectionCaseId: Int, cardSelector: CardSelector, cardSelectionExtension: CardSelectionExtension) → Self` — l'identifiant de la sélection est **choisi par l'application** (au lieu d'un index renvoyé par l'API) ; il doit être unique dans le scénario ; les sélections sont exécutées dans l'ordre de préparation ;
   - `exportCardSelectionScenario() → String` ;
@@ -643,7 +647,7 @@ Le mode de sélection n'est plus un paramètre : il est porté par le **type du 
 | Résultat | Propriétés |
 |---|---|
 | `SingleCardSelectionResult` | `cardType: CardType`, `selectionCaseId: Int?`, `smartCard: SmartCard?` (`null` ensemble si aucune sélection n'a réussi) |
-| `MultipleCardSelectionResult` | `cardType: CardType`, `smartCards: Map<Int, SmartCard>`, `activeSelectionCaseId: Int?` (seule la carte de la dernière sélection réussie reste active) |
+| `SequentialCardSelectionResult` | `cardType: CardType`, `smartCards: Map<Int, SmartCard>`, `activeSelectionCaseId: Int?` (seule la carte de la dernière sélection réussie reste active) |
 | `MultichannelCardSelectionResult` | `cardType: CardType`, `smartCards: Map<Int, SmartCard>` (toutes actives, une par canal) |
 
 `CardSelectionResult` (avec `getSmartCards()`, `getActiveSmartCard()`, `getActiveSelectionIndex()`) et `SelectionExecutionPolicy` disparaissent.
@@ -916,7 +920,7 @@ Cette annexe liste, pour chaque API, le devenir de chaque élément des versions
 
 | Élément en production | Devenir |
 |---|---|
-| `ReaderApiFactory.createCardSelectionManager()` | Supprimée → `createSingleCardSelectionManager()`, `createMultipleCardSelectionManager()`, `createMultichannelCardSelectionManager()` |
+| `ReaderApiFactory.createCardSelectionManager()` | Supprimée → `createSingleCardSelectionManager()`, `createSequentialCardSelectionManager()`, `createMultichannelCardSelectionManager()` |
 | `ReaderApiFactory.createBasicCardSelector()`, `createIsoCardSelector()` | Supprimées (sélecteurs = classes de données) |
 | — | Ajoutée : `ReaderApiFactory.getCardReaderProvider() → CardReaderProvider` ; interface `CardReaderProvider` |
 | `ConfigurableCardReader` (`activateProtocol`, `deactivateProtocol`, `getCurrentProtocol`) | Supprimée |
@@ -933,13 +937,13 @@ Cette annexe liste, pour chaque API, le devenir de chaque élément des versions
 | `ReaderProtocolNotSupportedException` | Supprimée |
 | `reader.selection.InvalidCardResponseException` | Supprimée (doublon) |
 | `CardSelectionManager.setMultipleSelectionMode()`, `prepareReleaseChannel()` | Supprimées |
-| `CardSelectionManager.prepareSelectionCase(CardSelector<?>, CardSelectionExtension) → int` | → `prepareSelectionCase(selectionCaseId: Int, cardSelector: CardSelector, cardSelectionExtension: CardSelectionExtension) → Self` |
+| `CardSelectionManager.prepareSelection(CardSelector<?>, CardSelectionExtension) → int` | → `prepareSelectionCase(selectionCaseId: Int, cardSelector: CardSelector, cardSelectionExtension: CardSelectionExtension) → Self` |
 | `CardSelectionManager.importCardSelectionScenario(String) → int` | → `importCardSelectionScenario(cardSelectionScenario: String) → Self` (remplace le scénario) |
-| `CardSelectionManager.processCardSelectionScenario(CardReader)` | → `processCardSelectionScenario(reader)` sur `SingleCardSelectionManager` / `MultipleCardSelectionManager` ; `processCardSelectionScenario(reader, channelSelectionPolicy)` sur `MultichannelCardSelectionManager` |
+| `CardSelectionManager.processCardSelectionScenario(CardReader)` | → `processCardSelectionScenario(reader)` sur `SingleCardSelectionManager` / `SequentialCardSelectionManager` ; `processCardSelectionScenario(reader, channelSelectionPolicy)` sur `MultichannelCardSelectionManager` |
 | `CardSelectionManager.scheduleCardSelectionScenario(ObservableCardReader, NotificationMode)` | → `scheduleCardSelectionScenario(observableCardReader, cardPresenceNotificationPolicy)` sur les gestionnaires mono-canal |
 | `CardSelectionManager.parseScheduledCardSelectionsResponse(...)` | → sur les gestionnaires mono-canal, renvoie le résultat typé |
 | `CardSelectionManager.importProcessedCardSelectionScenario(String)` | → sur chaque gestionnaire, renvoie le résultat typé |
-| `CardSelectionResult` (`getSmartCards`, `getActiveSmartCard`, `getActiveSelectionIndex`) | Supprimée → `SingleCardSelectionResult`, `MultipleCardSelectionResult`, `MultichannelCardSelectionResult` |
+| `CardSelectionResult` (`getSmartCards`, `getActiveSmartCard`, `getActiveSelectionIndex`) | Supprimée → `SingleCardSelectionResult`, `SequentialCardSelectionResult`, `MultichannelCardSelectionResult` |
 | — | Ajoutée : `ChannelSelectionPolicy` |
 | `CardSelector<T>` (`filterByCardProtocol`, `filterByPowerOnData`) | → interface scellée `CardSelector` ; `filterByCardProtocol` supprimée ; `filterByPowerOnData` → propriété `powerOnDataRegex` ; ajout de la propriété `cardType` |
 | `BasicCardSelector` (interface) | → classe de données (`cardType?`, `powerOnDataRegex?`) |
