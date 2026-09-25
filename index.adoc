@@ -453,7 +453,7 @@ Synchronous (explicit)::
 The card is already present on a <<type_CardReader,`CardReader`>>. The application runs the scenario itself with the
 `processCardSelectionScenario` operation of its manager and obtains the corresponding result immediately
 (<<type_SingleCardSelectionResult,`SingleCardSelectionResult`>>,
-<<type_MultipleCardSelectionResult,`MultipleCardSelectionResult`>> or
+<<type_SequentialCardSelectionResult,`SequentialCardSelectionResult`>> or
 <<type_MultichannelCardSelectionResult,`MultichannelCardSelectionResult`>>). The *same entity* manages both the
 selection and the subsequent card processing.
 
@@ -461,7 +461,7 @@ Asynchronous (scheduled / event-driven)::
 On an <<type_ObservableCardReader,`ObservableCardReader`>>, the scenario is registered ahead of time with
 `scheduleCardSelectionScenario` -- available on the single-channel managers
 <<type_SingleCardSelectionManager,`SingleCardSelectionManager`>> and
-<<type_MultipleCardSelectionManager,`MultipleCardSelectionManager`>> only -- and executed automatically by the
+<<type_SequentialCardSelectionManager,`SequentialCardSelectionManager`>> only -- and executed automatically by the
 reader upon card insertion. The outcome is delivered as a <<type_CardReaderEvent,`CardReaderEvent`>> to the
 <<type_CardReaderEventHandler,`CardReaderEventHandler`>> -- its type (`CARD_MATCHED` or `CARD_INSERTED`) depending on
 the <<type_CardPresenceNotificationPolicy,`CardPresenceNotificationPolicy`>> -- and decoded with the
@@ -781,26 +781,26 @@ are active in parallel; the one placed on the basic channel, if any, is identifi
 | --
 | 3.0
 | All <<type_SmartCard,`SmartCard`>> instances corresponding to successful selection cases, each active on its own
-  logical channel, indexed by the `selectionId` supplied to `prepareSelection`. Possibly empty.
+  logical channel, indexed by the `selectionCaseId` supplied to `prepareSelectionCase`. Possibly empty.
 |===
 
-[[type_MultipleCardSelectionResult]]
-==== Multiple Card Selection Result
+[[type_SequentialCardSelectionResult]]
+==== Sequential Card Selection Result
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Name       | `MultipleCardSelectionResult`
+| Name       | `SequentialCardSelectionResult`
 | Kind       | Data
 | Namespace  | `reader.selection`
 | Since      | 3.0
-| Purpose    | Result of a selection scenario executed by a <<type_MultipleCardSelectionManager,`MultipleCardSelectionManager`>>.
+| Purpose    | Result of a selection scenario executed by a <<type_SequentialCardSelectionManager,`SequentialCardSelectionManager`>>.
 |===
 
 Every selection case of the scenario has been tried. The result exposes the smart cards of all the successful
-selection cases, indexed by their `selectionId`. Since the card is operated on a single channel, only the smart card
+selection cases, indexed by their `selectionCaseId`. Since the card is operated on a single channel, only the smart card
 of the last successful selection case, in execution order, remains active; the others are deactivated but still
 expose the data collected during their selection (see <<sec_smartcard_lifecycle,the `SmartCard` lifecycle>>).
-`activeSelectionId` is `null` if and only if `smartCards` is empty.
+`activeSelectionCaseId` is `null` if and only if `smartCards` is empty.
 
 [cols="^.^1,^.^1,^.^1,^.^1,.^5", options="header"]
 |===
@@ -819,9 +819,9 @@ expose the data collected during their selection (see <<sec_smartcard_lifecycle,
 | --
 | 3.0
 | All <<type_SmartCard,`SmartCard`>> instances corresponding to successful selection cases, indexed by the
-  `selectionId` supplied to `prepareSelection`. Possibly empty.
+  `selectionCaseId` supplied to `prepareSelectionCase`. Possibly empty.
 
-| `activeSelectionId`
+| `activeSelectionCaseId`
 | `Int?`
 | --
 | 3.0
@@ -842,7 +842,7 @@ expose the data collected during their selection (see <<sec_smartcard_lifecycle,
 |===
 
 The execution stops at the first successful selection case, so the result exposes at most one smart card,
-identified by the `selectionId` supplied to `prepareSelection`. `selectionId` and `smartCard` are either both
+identified by the `selectionCaseId` supplied to `prepareSelectionCase`. `selectionCaseId` and `smartCard` are either both
 `null`, when no selection case succeeded, or both non-`null`.
 
 [cols="^.^1,^.^1,^.^1,^.^1,.^5", options="header"]
@@ -857,7 +857,7 @@ identified by the `selectionId` supplied to `prepareSelection`. `selectionId` an
   (see <<ref_cna_trd,CNA-TRD-API>>). `UNKNOWN` when the card type could not be identified. The value is
   intrinsically tied to the lifecycle of this result.
 
-| `selectionId`
+| `selectionCaseId`
 | `Int?`
 | --
 | 3.0
@@ -1019,9 +1019,12 @@ identifier and backed by a <<type_CardSelectionExtension,`CardSelectionExtension
 specific card and MAY define additional commands to be executed after the successful selection. Selection cases are
 executed in the order in which they were prepared, regardless of their identifiers. When a selection case fails, the
 manager tries the next selection case defined in the scenario, until no further selection case is available.
-All the selection cases of a scenario target the same card presented to the reader: the terms *single* and
-*multiple* in the names of the managers refer to the number of successful selections retained in the result,
-not to a number of cards.
+All the selection cases of a scenario target the *same card* presented to the reader. What a scenario
+discriminates is, in practice, the *applications* hosted by that card -- for example the Calypso applications of a
+multi-application card. The qualifiers *single*, *sequential* and *multichannel* in the names of the managers
+therefore describe how the scenario is executed and how many selections are retained, never a number of cards. The
+term *card* is kept throughout the API because a selection case also targets cards that host no application, such
+as storage cards, where the selection targets the card itself.
 
 The selection mode is not a parameter of the execution: it is carried by the type of the manager, each specialised
 manager being obtained from its own factory operation and producing its own result type.
@@ -1035,10 +1038,10 @@ manager being obtained from its own factory operation and producing its own resu
 | Explicit or scheduled
 | <<type_SingleCardSelectionResult,`SingleCardSelectionResult`>>
 
-| <<type_MultipleCardSelectionManager,`MultipleCardSelectionManager`>>
+| <<type_SequentialCardSelectionManager,`SequentialCardSelectionManager`>>
 | Single-channel. Processes every selection case regardless of intermediate successes.
 | Explicit or scheduled
-| <<type_MultipleCardSelectionResult,`MultipleCardSelectionResult`>>
+| <<type_SequentialCardSelectionResult,`SequentialCardSelectionResult`>>
 
 | <<type_MultichannelCardSelectionManager,`MultichannelCardSelectionManager`>>
 | ISO/IEC 7816-4 multi-channel cards. Places each successful selection case on its own logical channel, according to
@@ -1052,7 +1055,7 @@ execution, scheduling, parsing of a scheduled response and import of a processed
 specialised manager. See <<sec_card_selection_modes,Card selection modes>> for an end-to-end view of the synchronous
 and asynchronous flows.
 
-A scenario is considered *prepared* once at least one selection case has been appended via `prepareSelection` or
+A scenario is considered *prepared* once at least one selection case has been appended via `prepareSelectionCase` or
 imported via `importCardSelectionScenario`. A prepared scenario MAY be executed multiple times; each execution
 operates on the scenario as it stood at the time of the call.
 
@@ -1091,7 +1094,7 @@ operates on the scenario as it stood at the time of the call.
 | Errors         | None.
 | See also
 | <<op_SingleCardSelectionManager_importProcessedCardSelectionScenario,`SingleCardSelectionManager.importProcessedCardSelectionScenario`>> +
-  <<op_MultipleCardSelectionManager_importProcessedCardSelectionScenario,`MultipleCardSelectionManager.importProcessedCardSelectionScenario`>> +
+  <<op_SequentialCardSelectionManager_importProcessedCardSelectionScenario,`SequentialCardSelectionManager.importProcessedCardSelectionScenario`>> +
   <<op_MultichannelCardSelectionManager_importProcessedCardSelectionScenario,`MultichannelCardSelectionManager.importProcessedCardSelectionScenario`>>
 |===
 
@@ -1111,29 +1114,29 @@ operates on the scenario as it stood at the time of the call.
 | See also       | <<op_CardSelectionManager_exportCardSelectionScenario,`exportCardSelectionScenario`>>
 |===
 
-[[op_CardSelectionManager_prepareSelection]]
-===== Prepare Selection
+[[op_CardSelectionManager_prepareSelectionCase]]
+===== Prepare Selection Case
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
 | Signature
-| `prepareSelection(` +
-`{nbsp}{nbsp}{nbsp}{nbsp}selectionId: Int,` +
+| `prepareSelectionCase(` +
+`{nbsp}{nbsp}{nbsp}{nbsp}selectionCaseId: Int,` +
 `{nbsp}{nbsp}{nbsp}{nbsp}cardSelector: CardSelector,` +
 `{nbsp}{nbsp}{nbsp}{nbsp}cardSelectionExtension: CardSelectionExtension` +
 `) -> Self`
 | Since          | 2.0
 | Description
-| Appends a selection case, identified by `selectionId`, to the scenario. Selection cases are executed in the order
+| Appends a selection case, identified by `selectionCaseId`, to the scenario. Selection cases are executed in the order
   in which they were prepared, regardless of their identifiers. The identifier is the key under which the
   corresponding <<type_SmartCard,`SmartCard`>> is exposed in the selection result.
 | Parameters
-| `selectionId` -- the identifier of the selection case, chosen by the application. +
+| `selectionCaseId` -- the identifier of the selection case, chosen by the application. +
   `cardSelector` (<<type_CardSelector,`CardSelector`>>) -- the card selector containing the filters to be used to select the card. +
   `cardSelectionExtension` (<<type_CardSelectionExtension,`CardSelectionExtension`>>) -- the card selection extension to be used to parse the card selection response.
 | Returns        | The current instance (`Self`).
 | Pre-conditions | *Argument* -- every parameter is non-`null`. +
-  *Argument* -- `selectionId` is not already used by a selection case of the scenario.
+  *Argument* -- `selectionCaseId` is not already used by a selection case of the scenario.
 | Errors         | None.
 |===
 
@@ -1162,7 +1165,7 @@ Its permitted implementations are <<type_BasicCardSelector,`BasicCardSelector`>>
 | Namespace  | `reader.selection`
 | Extends    | <<type_CardSelectionManager,`CardSelectionManager`>>
 | Since      | 3.0
-| Purpose    | Card selection manager for ISO/IEC 7816-4 multi-channel cards, placing each successful selection case on its own logical channel. An instance is obtained via <<op_ReaderApiFactory_createMultichannelCardSelectionManager,`ReaderApiFactory.createMultichannelCardSelectionManager`>>.
+| Purpose    | Card selection manager executing every selection case of the scenario, keeping each matching application of an ISO/IEC 7816-4 multi-channel card active simultaneously, each on its own logical channel. Out of scope for storage cards. An instance is obtained via <<op_ReaderApiFactory_createMultichannelCardSelectionManager,`ReaderApiFactory.createMultichannelCardSelectionManager`>>.
 |===
 
 Each successful selection case is placed on its own logical channel of the ISO/IEC 7816-4 card, the use of the
@@ -1223,114 +1226,6 @@ explicit execution is available: scheduled selection is not supported in multi-c
   <<type_InvalidCardResponse,`InvalidCardResponse`>> -- if the card does not support multi-channel or returned invalid data.
 |===
 
-[[type_MultipleCardSelectionManager]]
-==== Multiple Card Selection Manager
-
-[cols="^.^1h,.^5", grid=rows, frame=all]
-|===
-| Name       | `MultipleCardSelectionManager`
-| Kind       | Interface
-| Namespace  | `reader.selection`
-| Extends    | <<type_CardSelectionManager,`CardSelectionManager`>>
-| Since      | 3.0
-| Purpose    | Card selection manager processing every selection case regardless of intermediate successes. An instance is obtained via <<op_ReaderApiFactory_createMultipleCardSelectionManager,`ReaderApiFactory.createMultipleCardSelectionManager`>>.
-|===
-
-Every selection case is tried, in the order in which they were prepared, whatever the outcome of the previous ones.
-Since the card is operated on a single channel, each successful selection deactivates the smart card produced by
-the previous one: in the resulting <<type_MultipleCardSelectionResult,`MultipleCardSelectionResult`>>, only the
-smart card of the last successful selection case remains active. To keep several selections active in parallel on
-a multi-channel ISO/IEC 7816-4 card, the <<type_MultichannelCardSelectionManager,`MultichannelCardSelectionManager`>>
-MUST be used instead. The scenario can be executed explicitly, on a card already present, or scheduled on an
-<<type_ObservableCardReader,`ObservableCardReader`>>.
-
-[[op_MultipleCardSelectionManager_importProcessedCardSelectionScenario]]
-===== Import Processed Card Selection Scenario
-
-[cols="^.^1h,.^5", grid=rows, frame=all]
-|===
-| Signature
-| `importProcessedCardSelectionScenario(` +
-`{nbsp}{nbsp}{nbsp}{nbsp}processedCardSelectionScenario: String` +
-`) -> MultipleCardSelectionResult`
-| Since          | 3.0
-| Description    | Imports a previously exported *processed* selection scenario and returns the corresponding result.
-| Parameters     | `processedCardSelectionScenario` -- the `String` containing the exported processed card selection scenario.
-| Returns        | A <<type_MultipleCardSelectionResult,`MultipleCardSelectionResult`>>.
-| Pre-conditions | *Argument* -- every parameter is non-`null`. +
-  *Argument* -- the string has been produced by `exportProcessedCardSelectionScenario` of a `MultipleCardSelectionManager`, is
-  well-formed and contains no more selection cases than the current scenario. +
-  *State* -- the manager has been configured with the same selection scenario as the manager that produced the
-  export. +
-  *Capability* -- the local environment possesses every card extension involved in the scenario.
-| Errors         | <<type_InvalidCardResponse,`InvalidCardResponse`>> -- if the data returned by the card could not be interpreted.
-| See also       | <<op_CardSelectionManager_exportProcessedCardSelectionScenario,`exportProcessedCardSelectionScenario`>>
-|===
-
-[[op_MultipleCardSelectionManager_parseScheduledCardSelectionsResponse]]
-===== Parse Scheduled Card Selections Response
-
-[cols="^.^1h,.^5", grid=rows, frame=all]
-|===
-| Signature
-| `parseScheduledCardSelectionsResponse(` +
-`{nbsp}{nbsp}{nbsp}{nbsp}scheduledCardSelectionsResponse: ScheduledCardSelectionsResponse` +
-`) -> MultipleCardSelectionResult`
-| Since          | 3.0
-| Description    | Analyses the responses provided by a <<type_CardReaderEvent,`CardReaderEvent`>> following the insertion of a card and the execution of the selection scenario scheduled with `scheduleCardSelectionScenario`.
-| Parameters     | `scheduledCardSelectionsResponse` (<<type_ScheduledCardSelectionsResponse,`ScheduledCardSelectionsResponse`>>) -- the card selection scenario execution response.
-| Returns        | A <<type_MultipleCardSelectionResult,`MultipleCardSelectionResult`>>.
-| Pre-conditions | *Argument* -- every parameter is non-`null`.
-| Errors         | <<type_InvalidCardResponse,`InvalidCardResponse`>> -- if the data returned by the card could not be interpreted.
-|===
-
-[[op_MultipleCardSelectionManager_processCardSelectionScenario]]
-===== Process Card Selection Scenario
-
-[cols="^.^1h,.^5", grid=rows, frame=all]
-|===
-| Signature
-| `processCardSelectionScenario(` +
-`{nbsp}{nbsp}{nbsp}{nbsp}reader: CardReader` +
-`) -> MultipleCardSelectionResult`
-| Since          | 3.0
-| Description
-| Explicitly executes the previously prepared selection scenario against the provided reader, processing every
-  selection case regardless of intermediate successes, and returns the result.
-| Parameters
-| `reader` (<<type_CardReader,`CardReader`>>) -- the reader through which the card is reached.
-| Returns        | A <<type_MultipleCardSelectionResult,`MultipleCardSelectionResult`>>.
-| Pre-conditions | *Argument* -- every parameter is non-`null`.
-| Errors
-| <<type_ReaderCommunication,`ReaderCommunication`>> -- if communication with the reader has failed. +
-  <<type_CardCommunication,`CardCommunication`>> -- if communication with the card has failed. +
-  <<type_InvalidCardResponse,`InvalidCardResponse`>> -- if the card returned invalid data during the selection process, or if the
-  status word check is enabled in the card request and the card returned an unexpected code.
-|===
-
-[[op_MultipleCardSelectionManager_scheduleCardSelectionScenario]]
-===== Schedule Card Selection Scenario
-
-[cols="^.^1h,.^5", grid=rows, frame=all]
-|===
-| Signature
-| `scheduleCardSelectionScenario(` +
-`{nbsp}{nbsp}{nbsp}{nbsp}observableCardReader: ObservableCardReader,` +
-`{nbsp}{nbsp}{nbsp}{nbsp}cardPresenceNotificationPolicy: CardPresenceNotificationPolicy` +
-`) -> Unit`
-| Since          | 3.0
-| Description
-| Schedules the execution of the prepared selection scenario as soon as a card is presented to the supplied
-  observable reader. Events are pushed to the registered event handler according to the requested notification
-  policy. The result of the execution MUST be parsed via
-  <<op_MultipleCardSelectionManager_parseScheduledCardSelectionsResponse,`parseScheduledCardSelectionsResponse`>>.
-| Parameters
-| `observableCardReader` (<<type_ObservableCardReader,`ObservableCardReader`>>) -- the reader through which the card is reached. +
-  `cardPresenceNotificationPolicy` (<<type_CardPresenceNotificationPolicy,`CardPresenceNotificationPolicy`>>) -- the desired card-presence notification policy.
-| Pre-conditions | *Argument* -- every parameter is non-`null`.
-| Errors         | None.
-|===
-
 [[type_ObservableCardReader]]
 ==== Observable Card Reader
 
@@ -1366,7 +1261,7 @@ The reader's complete insertion/processing/removal lifecycle -- including when e
 | Pre-conditions | None.
 | Errors         | None.
 | See also       | <<op_SingleCardSelectionManager_scheduleCardSelectionScenario,`SingleCardSelectionManager.scheduleCardSelectionScenario`>> +
-                   <<op_MultipleCardSelectionManager_scheduleCardSelectionScenario,`MultipleCardSelectionManager.scheduleCardSelectionScenario`>>
+                   <<op_SequentialCardSelectionManager_scheduleCardSelectionScenario,`SequentialCardSelectionManager.scheduleCardSelectionScenario`>>
 |===
 
 [[op_ObservableCardReader_endCardProcessing]]
@@ -1463,15 +1358,15 @@ object, whereas `getCardReaderProvider` gives access to the `CardReaderProvider`
 | Errors         | None.
 |===
 
-[[op_ReaderApiFactory_createMultipleCardSelectionManager]]
-===== Create Multiple Card Selection Manager
+[[op_ReaderApiFactory_createSequentialCardSelectionManager]]
+===== Create Sequential Card Selection Manager
 
 [cols="^.^1h,.^5", grid=rows, frame=all]
 |===
-| Signature      | `createMultipleCardSelectionManager() -> MultipleCardSelectionManager`
+| Signature      | `createSequentialCardSelectionManager() -> SequentialCardSelectionManager`
 | Since          | 3.0
-| Description    | Creates a <<type_MultipleCardSelectionManager,`MultipleCardSelectionManager`>>, the service used to prepare and execute a card selection scenario processing every selection case.
-| Returns        | A <<type_MultipleCardSelectionManager,`MultipleCardSelectionManager`>>.
+| Description    | Creates a <<type_SequentialCardSelectionManager,`SequentialCardSelectionManager`>>, the service used to prepare and execute a card selection scenario processing every selection case.
+| Returns        | A <<type_SequentialCardSelectionManager,`SequentialCardSelectionManager`>>.
 | Pre-conditions | None.
 | Errors         | None.
 |===
@@ -1518,7 +1413,115 @@ This interface declares no operation. It conveys the card responses to one or mo
 cases (selection step itself plus any subsequent commands). Its content MUST be interpreted through the
 `parseScheduledCardSelectionsResponse` operation of the manager that scheduled the scenario
 (<<type_SingleCardSelectionManager,`SingleCardSelectionManager`>> or
-<<type_MultipleCardSelectionManager,`MultipleCardSelectionManager`>>).
+<<type_SequentialCardSelectionManager,`SequentialCardSelectionManager`>>).
+
+[[type_SequentialCardSelectionManager]]
+==== Sequential Card Selection Manager
+
+[cols="^.^1h,.^5", grid=rows, frame=all]
+|===
+| Name       | `SequentialCardSelectionManager`
+| Kind       | Interface
+| Namespace  | `reader.selection`
+| Extends    | <<type_CardSelectionManager,`CardSelectionManager`>>
+| Since      | 3.0
+| Purpose    | Card selection manager executing every selection case of the scenario, selecting in turn each matching application of the card; only the last selected application remains active. Intended for cards hosting several applications, and therefore not applicable to storage cards. An instance is obtained via <<op_ReaderApiFactory_createSequentialCardSelectionManager,`ReaderApiFactory.createSequentialCardSelectionManager`>>.
+|===
+
+Every selection case is tried, in the order in which they were prepared, whatever the outcome of the previous ones.
+Since the card is operated on a single channel, each successful selection deactivates the smart card produced by
+the previous one: in the resulting <<type_SequentialCardSelectionResult,`SequentialCardSelectionResult`>>, only the
+smart card of the last successful selection case remains active. To keep several selections active in parallel on
+a multi-channel ISO/IEC 7816-4 card, the <<type_MultichannelCardSelectionManager,`MultichannelCardSelectionManager`>>
+MUST be used instead. The scenario can be executed explicitly, on a card already present, or scheduled on an
+<<type_ObservableCardReader,`ObservableCardReader`>>.
+
+[[op_SequentialCardSelectionManager_importProcessedCardSelectionScenario]]
+===== Import Processed Card Selection Scenario
+
+[cols="^.^1h,.^5", grid=rows, frame=all]
+|===
+| Signature
+| `importProcessedCardSelectionScenario(` +
+`{nbsp}{nbsp}{nbsp}{nbsp}processedCardSelectionScenario: String` +
+`) -> SequentialCardSelectionResult`
+| Since          | 3.0
+| Description    | Imports a previously exported *processed* selection scenario and returns the corresponding result.
+| Parameters     | `processedCardSelectionScenario` -- the `String` containing the exported processed card selection scenario.
+| Returns        | A <<type_SequentialCardSelectionResult,`SequentialCardSelectionResult`>>.
+| Pre-conditions | *Argument* -- every parameter is non-`null`. +
+  *Argument* -- the string has been produced by `exportProcessedCardSelectionScenario` of a `SequentialCardSelectionManager`, is
+  well-formed and contains no more selection cases than the current scenario. +
+  *State* -- the manager has been configured with the same selection scenario as the manager that produced the
+  export. +
+  *Capability* -- the local environment possesses every card extension involved in the scenario.
+| Errors         | <<type_InvalidCardResponse,`InvalidCardResponse`>> -- if the data returned by the card could not be interpreted.
+| See also       | <<op_CardSelectionManager_exportProcessedCardSelectionScenario,`exportProcessedCardSelectionScenario`>>
+|===
+
+[[op_SequentialCardSelectionManager_parseScheduledCardSelectionsResponse]]
+===== Parse Scheduled Card Selections Response
+
+[cols="^.^1h,.^5", grid=rows, frame=all]
+|===
+| Signature
+| `parseScheduledCardSelectionsResponse(` +
+`{nbsp}{nbsp}{nbsp}{nbsp}scheduledCardSelectionsResponse: ScheduledCardSelectionsResponse` +
+`) -> SequentialCardSelectionResult`
+| Since          | 3.0
+| Description    | Analyses the responses provided by a <<type_CardReaderEvent,`CardReaderEvent`>> following the insertion of a card and the execution of the selection scenario scheduled with `scheduleCardSelectionScenario`.
+| Parameters     | `scheduledCardSelectionsResponse` (<<type_ScheduledCardSelectionsResponse,`ScheduledCardSelectionsResponse`>>) -- the card selection scenario execution response.
+| Returns        | A <<type_SequentialCardSelectionResult,`SequentialCardSelectionResult`>>.
+| Pre-conditions | *Argument* -- every parameter is non-`null`.
+| Errors         | <<type_InvalidCardResponse,`InvalidCardResponse`>> -- if the data returned by the card could not be interpreted.
+|===
+
+[[op_SequentialCardSelectionManager_processCardSelectionScenario]]
+===== Process Card Selection Scenario
+
+[cols="^.^1h,.^5", grid=rows, frame=all]
+|===
+| Signature
+| `processCardSelectionScenario(` +
+`{nbsp}{nbsp}{nbsp}{nbsp}reader: CardReader` +
+`) -> SequentialCardSelectionResult`
+| Since          | 3.0
+| Description
+| Explicitly executes the previously prepared selection scenario against the provided reader, processing every
+  selection case regardless of intermediate successes, and returns the result.
+| Parameters
+| `reader` (<<type_CardReader,`CardReader`>>) -- the reader through which the card is reached.
+| Returns        | A <<type_SequentialCardSelectionResult,`SequentialCardSelectionResult`>>.
+| Pre-conditions | *Argument* -- every parameter is non-`null`.
+| Errors
+| <<type_ReaderCommunication,`ReaderCommunication`>> -- if communication with the reader has failed. +
+  <<type_CardCommunication,`CardCommunication`>> -- if communication with the card has failed. +
+  <<type_InvalidCardResponse,`InvalidCardResponse`>> -- if the card returned invalid data during the selection process, or if the
+  status word check is enabled in the card request and the card returned an unexpected code.
+|===
+
+[[op_SequentialCardSelectionManager_scheduleCardSelectionScenario]]
+===== Schedule Card Selection Scenario
+
+[cols="^.^1h,.^5", grid=rows, frame=all]
+|===
+| Signature
+| `scheduleCardSelectionScenario(` +
+`{nbsp}{nbsp}{nbsp}{nbsp}observableCardReader: ObservableCardReader,` +
+`{nbsp}{nbsp}{nbsp}{nbsp}cardPresenceNotificationPolicy: CardPresenceNotificationPolicy` +
+`) -> Unit`
+| Since          | 3.0
+| Description
+| Schedules the execution of the prepared selection scenario as soon as a card is presented to the supplied
+  observable reader. Events are pushed to the registered event handler according to the requested notification
+  policy. The result of the execution MUST be parsed via
+  <<op_SequentialCardSelectionManager_parseScheduledCardSelectionsResponse,`parseScheduledCardSelectionsResponse`>>.
+| Parameters
+| `observableCardReader` (<<type_ObservableCardReader,`ObservableCardReader`>>) -- the reader through which the card is reached. +
+  `cardPresenceNotificationPolicy` (<<type_CardPresenceNotificationPolicy,`CardPresenceNotificationPolicy`>>) -- the desired card-presence notification policy.
+| Pre-conditions | *Argument* -- every parameter is non-`null`.
+| Errors         | None.
+|===
 
 [[type_SingleCardSelectionManager]]
 ==== Single Card Selection Manager
@@ -1530,7 +1533,7 @@ cases (selection step itself plus any subsequent commands). Its content MUST be 
 | Namespace  | `reader.selection`
 | Extends    | <<type_CardSelectionManager,`CardSelectionManager`>>
 | Since      | 3.0
-| Purpose    | Card selection manager stopping at the first successful selection case. An instance is obtained via <<op_ReaderApiFactory_createSingleCardSelectionManager,`ReaderApiFactory.createSingleCardSelectionManager`>>.
+| Purpose    | Card selection manager executing the scenario up to the first matching selection case: the first matching card application -- for example the Calypso application of a Calypso card -- or the card itself when it hosts no application, as a storage card. An instance is obtained via <<op_ReaderApiFactory_createSingleCardSelectionManager,`ReaderApiFactory.createSingleCardSelectionManager`>>.
 |===
 
 The selection cases are tried in the order in which they were prepared; the execution stops as soon as one of them

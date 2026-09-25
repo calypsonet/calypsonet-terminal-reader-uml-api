@@ -78,7 +78,7 @@ interface "ReaderApiFactory" as ReaderApiFactory <<blue>> {
     +<color:blue>getCardReaderProvider() → CardReaderProvider
 
     +<color:blue>createSingleCardSelectionManager() → SingleCardSelectionManager
-    +<color:blue>createMultipleCardSelectionManager() → MultipleCardSelectionManager
+    +<color:blue>createSequentialCardSelectionManager() → SequentialCardSelectionManager
     +<color:blue>createMultichannelCardSelectionManager() → MultichannelCardSelectionManager
 }
 
@@ -137,7 +137,7 @@ package "spi" as readerSpi {
 package "selection" as selectionApi {
     ' Selection
     interface CardSelectionManager {
-        +<color:blue>prepareSelection(selectionId: Int, cardSelector: CardSelector, cardSelectionExtension: CardSelectionExtension) → Self
+        +<color:blue>prepareSelectionCase(selectionCaseId: Int, cardSelector: CardSelector, cardSelectionExtension: CardSelectionExtension) → Self
 
         +exportCardSelectionScenario() → String
         +<color:blue>importCardSelectionScenario(cardSelectionScenario: String) → Self
@@ -155,15 +155,15 @@ package "selection" as selectionApi {
         +<color:blue>importProcessedCardSelectionScenario(processedCardSelectionScenario: String) → SingleCardSelectionResult
         {method} <size:10><color:#7F8C8D>    ⚠ errors: InvalidCardResponse</color></size>
     }
-    interface "<color:blue>MultipleCardSelectionManager" as MultipleCardSelectionManager <<blue>> extends CardSelectionManager {
-        +<color:blue>processCardSelectionScenario(reader: CardReader) → MultipleCardSelectionResult
+    interface "<color:blue>SequentialCardSelectionManager" as SequentialCardSelectionManager <<blue>> extends CardSelectionManager {
+        +<color:blue>processCardSelectionScenario(reader: CardReader) → SequentialCardSelectionResult
         {method} <size:10><color:#7F8C8D>    ⚠ errors: ReaderCommunication, CardCommunication, InvalidCardResponse</color></size>
 
         +<color:blue>scheduleCardSelectionScenario(observableCardReader: ObservableCardReader, cardPresenceNotificationPolicy: CardPresenceNotificationPolicy) → Unit
-        +<color:blue>parseScheduledCardSelectionsResponse(scheduledCardSelectionsResponse: ScheduledCardSelectionsResponse) → MultipleCardSelectionResult
+        +<color:blue>parseScheduledCardSelectionsResponse(scheduledCardSelectionsResponse: ScheduledCardSelectionsResponse) → SequentialCardSelectionResult
         {method} <size:10><color:#7F8C8D>    ⚠ errors: InvalidCardResponse</color></size>
 
-        +<color:blue>importProcessedCardSelectionScenario(processedCardSelectionScenario: String) → MultipleCardSelectionResult
+        +<color:blue>importProcessedCardSelectionScenario(processedCardSelectionScenario: String) → SequentialCardSelectionResult
         {method} <size:10><color:#7F8C8D>    ⚠ errors: InvalidCardResponse</color></size>
     }
     interface "<color:blue>MultichannelCardSelectionManager" as MultichannelCardSelectionManager <<blue>> extends CardSelectionManager {
@@ -222,13 +222,13 @@ package "selection" as selectionApi {
     }
     class "<color:blue>SingleCardSelectionResult" as SingleCardSelectionResult <<data>> <<green>> {
         +<color:blue>val cardType: <back:yellow>CardType</back>
-        +<color:blue>val selectionId: Int?
+        +<color:blue>val selectionCaseId: Int?
         +<color:blue>val smartCard: SmartCard?
     }
-    class "<color:blue>MultipleCardSelectionResult" as MultipleCardSelectionResult <<data>> <<green>> {
+    class "<color:blue>SequentialCardSelectionResult" as SequentialCardSelectionResult <<data>> <<green>> {
         +<color:blue>val cardType: <back:yellow>CardType</back>
         +<color:blue>val smartCards: Map<Int, SmartCard>
-        +<color:blue>val activeSelectionId: Int?
+        +<color:blue>val activeSelectionCaseId: Int?
     }
     class "<color:blue>MultichannelCardSelectionResult" as MultichannelCardSelectionResult <<data>> <<green>> {
         +<color:blue>val cardType: <back:yellow>CardType</back>
@@ -281,7 +281,7 @@ CardReaderProvider ..> CardReader #C_LINK : provide >
 
 SingleCardSelectionResult ..> SmartCard #C_USE : use >
 
-MultipleCardSelectionResult ..> SmartCard #C_USE : use >
+SequentialCardSelectionResult ..> SmartCard #C_USE : use >
 
 MultichannelCardSelectionResult ..> SmartCard #C_USE : use >
 
@@ -296,10 +296,10 @@ SingleCardSelectionManager .up.....> CardReader #C_USE : use >
 SingleCardSelectionManager .up....> ScheduledCardSelectionsResponse #C_USE : use >
 SingleCardSelectionManager ..> CardPresenceNotificationPolicy #C_USE : use >
 
-MultipleCardSelectionManager ...> MultipleCardSelectionResult #C_LINK : provide >
-MultipleCardSelectionManager .up.....> CardReader #C_USE : use >
-MultipleCardSelectionManager .up....> ScheduledCardSelectionsResponse #C_USE : use >
-MultipleCardSelectionManager ..> CardPresenceNotificationPolicy #C_USE : use >
+SequentialCardSelectionManager ...> SequentialCardSelectionResult #C_LINK : provide >
+SequentialCardSelectionManager .up.....> CardReader #C_USE : use >
+SequentialCardSelectionManager .up....> ScheduledCardSelectionsResponse #C_USE : use >
+SequentialCardSelectionManager ..> CardPresenceNotificationPolicy #C_USE : use >
 
 MultichannelCardSelectionManager ...> MultichannelCardSelectionResult #C_LINK : provide >
 MultichannelCardSelectionManager .up.....> CardReader #C_USE : use >

@@ -92,7 +92,7 @@ Chaque dépôt `calypsonet-terminal-*-uml-api` hébergé sur [github.com/calypso
 
 1. [Vue d'ensemble](#1-vue-densemble)
 2. [Thème 1 — Support des canaux logiques multiples](#2-thème-1--support-des-canaux-logiques-multiples)
-3. [Thème 2 — Contre-mesure de la faille de sécurité par attaque relai](#3-thème-2--contre-mesure-de-la-faille-de-sécurité-par-attaque-relai)
+3. [Thème 2 — Contre-mesures temporelles : attaque relai et émulation de carte](#3-thème-2--contre-mesures-temporelles--attaque-relai-et-émulation-de-carte)
 4. [Thème 3 — Simplification de la gestion de l'observation](#4-thème-3--simplification-de-la-gestion-de-lobservation)
 5. [Thème 4 — Connaissance de l'état courant de la session sécurisée](#5-thème-4--connaissance-de-létat-courant-de-la-session-sécurisée)
 6. [Thème 5 — Améliorations sémantiques (renommages et suppressions)](#6-thème-5--améliorations-sémantiques-renommages-et-suppressions)
@@ -103,7 +103,7 @@ Chaque dépôt `calypsonet-terminal-*-uml-api` hébergé sur [github.com/calypso
 11. [Thème 10 — Spécification indépendante du langage d'implémentation](#11-thème-10--spécification-indépendante-du-langage-dimplémentation)
 12. [Thème 11 — Données exposées sans calcul et accès aux données brutes](#12-thème-11--données-exposées-sans-calcul-et-accès-aux-données-brutes)
 13. [Thème 12 — Opérations Stored Value (SV)](#13-thème-12--opérations-stored-value-sv)
-14. [Thème 13 — Tolérance du fichier absent (`6A82h`) en session sécurisée](#14-thème-13--tolérance-du-fichier-absent-6a82h-en-session-sécurisée)
+14. [Thème 13 — Tolérance du fichier ou de l'enregistrement absent en session sécurisée](#14-thème-13--tolérance-du-fichier-ou-de-lenregistrement-absent-en-session-sécurisée)
 15. [Thème 14 — Extensions crypto et entrelacement des commandes](#15-thème-14--extensions-crypto-et-entrelacement-des-commandes)
 16. [Clarifications normatives](#16-clarifications-normatives)
 17. [Éléments en cours d'étude](#17-éléments-en-cours-détude)
@@ -120,7 +120,7 @@ La nouvelle génération des APIs Terminaux introduit des ruptures de compatibil
 | # | Thème | Reader | Card | Calypso Card | Definitions | Legacy SAM | Crypto Sym. | Crypto Asym. | Generic Card | Storage Card |
 |---|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | 1 | Canaux logiques multiples | ● | ● | ● | — | — | — | — | ● | — |
-| 2 | Contre-mesure attaque relai | — | ● | ● | — | — | — | — | ● | — |
+| 2 | Contre-mesures relai et émulation | — | ● | ● | — | — | — | — | ● | ● |
 | 3 | Simplification de l'observation | ● | — | — | — | — | — | — | — | — |
 | 4 | État courant de la session sécurisée | — | — | ● | — | — | — | — | — | — |
 | 5 | Améliorations sémantiques | ● | ● | ● | — | ● | ● | ● | ● | ● |
@@ -131,7 +131,7 @@ La nouvelle génération des APIs Terminaux introduit des ruptures de compatibil
 | 10 | Spécification indépendante du langage | ● | ● | ● | ● | ● | ● | ● | ● | ● |
 | 11 | Données sans calcul, données brutes | — | ● | ● | — | ● | ● | ● | — | ● |
 | 12 | Opérations Stored Value | — | — | ● | — | — | — | — | — | — |
-| 13 | Tolérance du fichier absent en session | — | — | ● | — | — | — | — | — | — |
+| 13 | Tolérance du fichier ou enregistrement absent | — | — | ● | — | — | — | — | — | — |
 | 14 | Extensions crypto et entrelacement | — | — | ● | — | ● | — | — | — | — |
 
 Les conséquences transverses :
@@ -239,22 +239,25 @@ La hiérarchie à trois niveaux permet à **chaque API consommatrice de s'ancrer
 
 ---
 
-## 3. Thème 2 — Contre-mesure de la faille de sécurité par attaque relai
+## 3. Thème 2 — Contre-mesures temporelles : attaque relai et émulation de carte
 
 ### 3.1 Motivation
 
-Une **attaque relai** consiste à relayer le dialogue avec une carte vers un emplacement distant, ce qui rend possible une opération frauduleuse à l'insu du porteur. Le relai ajoute un délai de transmission : un échange anormalement long peut donc révéler que la carte n'est pas réellement présente devant le lecteur. Les nouvelles versions introduisent un mécanisme de **mesure et de bornage des durées d'échange APDU** et de **bornage de la durée de session sécurisée**.
+Deux menaces se détectent par la **durée des échanges**, et les nouvelles versions introduisent un mécanisme commun pour les deux.
+
+- L'**attaque relai** consiste à relayer le dialogue avec une carte vers un emplacement distant, ce qui rend possible une opération frauduleuse à l'insu du porteur. Le relai ajoute un délai de transmission : un échange anormalement long peut donc révéler que la carte n'est pas réellement présente devant le lecteur.
+- L'**émulation de carte** consiste à faire répondre un matériel RFID générique à la place de la carte attendue. Ce matériel traite la commande par logiciel, là où la puce répond de façon câblée : un échange anormalement long révèle alors que la réponse ne vient pas du produit attendu. Cette menace concerne surtout les **cartes de stockage**, dépourvues de mécanisme cryptographique. Les nouvelles versions introduisent un mécanisme de **mesure et de bornage des durées d'échange APDU** et de **bornage de la durée de session sécurisée**.
 
 #### Modèle de menace retenu
 
-- **Surface d'attaque visée** : **attaque applicative** (relai logiciel des APDU), par opposition aux attaques au niveau du transport RF physique qui relèvent de contre-mesures matérielles.
-- **Ordre de grandeur** des bornes : la **milliseconde** (`ms`).
+- **Surface d'attaque visée** : **attaque applicative** (relai logiciel des APDU, émulation de carte par un matériel générique), par opposition aux attaques au niveau du transport RF physique qui relèvent de contre-mesures matérielles.
+- **Unité** des bornes et des durées mesurées : la **microseconde** (`µs`). La milliseconde est trop grossière pour les échanges les plus courts, notamment la lecture d'une carte de stockage, qui dure environ 2 ms. La **résolution effective de la mesure dépend de l'implémentation**, qui doit la documenter.
 - **Lieu de mesure** : l'**implémentation de la Terminal Reader API** mesure la durée effective de chaque échange APDU et la compare à la borne déclarée sur la requête. Les bornes de durée Calypso sont déclarées dans la Calypso Card API et portent chacune sur **le seul échange d'une commande** (*Open Secure Session*, *Close Secure Session*, *SV Reload* / *SV Debit* / *SV Undebit*).
 - **Comportement post-dépassement** : la Card API lève l'erreur **`ApduExchangeDurationExceeded`**, que les extensions de plus haut niveau interceptent et propagent à l'application sous forme d'**`InvalidCardResponse`**. La Calypso Card API précise désormais ce comportement : si une **session sécurisée est ouverte, elle est automatiquement annulée** avant la remontée de l'erreur, de sorte qu'aucune modification de la session ne soit validée par la carte ; **hors session** (commande SV), il n'y a rien à annuler et seule l'erreur remonte à la couche billettique, qui décide de la suite selon son contexte. Dans la Generic Card API, un dépassement lève `InvalidCardResponse`, dont le message identifie la commande fautive.
 
 ### 3.2 Card API
 
-- **Côté requête** : `ApduRequest.apduExchangeMaxDuration: Long? = null` — durée maximale tolérée pour l'échange (en millisecondes) ; `null` signifie « pas de borne ».
+- **Côté requête** : `ApduRequest.apduExchangeMaxDuration: Long? = null` — durée maximale tolérée pour l'échange (en microsecondes) ; `null` signifie « pas de borne ».
 - **Côté réponse** : `ApduResponse.apduExchangeDuration: Long?` — durée effective de l'échange ; `null` signifie « durée non mesurée ».
 - **Nouvelle erreur** `ApduExchangeDurationExceeded` — levée par `ProxyReaderApi.transmitCardRequest(...)` lorsque la durée effective dépasse la borne déclarée. Elle porte, comme les autres erreurs APDU, `cardResponse` et `isCardResponseComplete`.
 - La spécification de la Card API documente désormais ce mécanisme comme **solution pratique pour mettre en œuvre des contre-mesures anti-relai** (chapitre *APDU exchange execution-time control*).
@@ -266,13 +269,11 @@ Chaque borne se déclare selon deux familles de réglages, chacune avec une opé
 - **par CSN** (`…ByCsn(maxDuration: Long, csnMin: Long)`) : `csnMin` est un **seuil** sur le CSN (Calypso Serial Number, c'est-à-dire l'Application Serial Number, comparé comme entier non signé sur 64 bits) ;
 - **par FCI** (`…ByFci(maxDuration: Long, fciRegex: String)`) : `fciRegex` est une expression régulière appliquée au **FCI complet** retourné par *Select Application* (hors mot d'état), représenté en hexadécimal majuscule sans séparateur.
 
-- **`SymmetricCryptoSecuritySettings`** — six nouvelles opérations :
-  - `assignOpenSecureSessionMaxDurationByCsn(maxDuration: Long, csnMin: Long) → Self` et `assignOpenSecureSessionMaxDurationByFci(maxDuration: Long, fciRegex: String) → Self` — durée maximale de l'échange de la commande *Open Secure Session* ;
-  - `assignCloseSecureSessionMaxDurationByCsn(maxDuration: Long, csnMin: Long) → Self` et `assignCloseSecureSessionMaxDurationByFci(maxDuration: Long, fciRegex: String) → Self` — durée maximale de l'échange de la commande *Close Secure Session* ;
-  - `assignSvCommandMaxDurationByCsn(maxDuration: Long, csnMin: Long) → Self` et `assignSvCommandMaxDurationByFci(maxDuration: Long, fciRegex: String) → Self` — durée maximale de l'échange de l'une des commandes *SV Reload*, *SV Debit* ou *SV Undebit*.
-- **`AsymmetricCryptoSecuritySettings`** — quatre nouvelles opérations :
+- **Nouvelle interface parente `SecuritySettings`** (`calypso.card.transaction`), dont héritent `SymmetricCryptoSecuritySettings` et `AsymmetricCryptoSecuritySettings`. Elle porte les réglages communs à toute transaction sécurisée, quelle que soit la nature cryptographique de la session — quatre nouvelles opérations :
   - `assignOpenSecureSessionMaxDurationByCsn(maxDuration: Long, csnMin: Long) → Self` et `assignOpenSecureSessionMaxDurationByFci(maxDuration: Long, fciRegex: String) → Self` — durée maximale de l'échange de la commande *Open Secure Session* ;
   - `assignCloseSecureSessionMaxDurationByCsn(maxDuration: Long, csnMin: Long) → Self` et `assignCloseSecureSessionMaxDurationByFci(maxDuration: Long, fciRegex: String) → Self` — durée maximale de l'échange de la commande *Close Secure Session*.
+- **`SymmetricCryptoSecuritySettings`** — deux nouvelles opérations spécifiques :
+  - `assignSvCommandMaxDurationByCsn(maxDuration: Long, csnMin: Long) → Self` et `assignSvCommandMaxDurationByFci(maxDuration: Long, fciRegex: String) → Self` — durée maximale de l'échange de l'une des commandes *SV Reload*, *SV Debit* ou *SV Undebit*.
 
 > **Règle de résolution** (pour une carte donnée, par type d'opération bornée) :
 > 1. **Réglages par CSN** : chaque appel définit une **plage** délimitée par son `csnMin` et le `csnMin` immédiatement supérieur déclaré (ou +∞). Si le CSN de la carte appartient à une plage dont la `maxDuration` est différente de `Long.MAX_VALUE`, cette valeur s'applique.
@@ -301,9 +302,19 @@ Conséquences et précisions :
 
 > La Generic Card API expose ainsi la contre-mesure relai **au niveau de chaque commande individuelle**, cohérent avec son modèle d'usage (séquences d'APDU sans transaction sécurisée explicite).
 
-### 3.5 Justification
+### 3.5 Storage Card API
 
-Une attaque relai introduit un délai significatif et systématique sur les échanges APDU ; surveiller ce délai au niveau du lecteur (Card API), au niveau de la session Calypso (Calypso Card API) et au niveau de chaque commande générique (Generic Card API) permet de couvrir l'ensemble des scénarios d'usage des APIs Terminal.
+- **Nouvelle classe de données `StorageCardSecuritySettings`** (`storagecard.transaction`), avec la propriété `readCommandMaxDurations: Map<StorageCardProductType, Long> = emptyMap()` : durée maximale, en microsecondes, de l'échange d'**une seule commande de lecture**, pour chaque type de produit. Un type absent n'est pas borné. Une même instance peut être partagée par toutes les transactions d'un terminal.
+- **Opération de fabrique modifiée** : `createStorageCardTransactionManager(reader, card, securitySettings) → StorageCardTransactionManager`. Une instance par défaut de `StorageCardSecuritySettings` désactive tout bornage.
+- **Portée** : la borne s'applique aux commandes de lecture préparées sur le gestionnaire de transaction (`prepareReadBlock`, `prepareReadBlocks`, `prepareSt25ReadSystemBlock`) ; elle ne s'applique ni à la sélection, ni aux écritures, ni à l'authentification. Un dépassement lève `StorageCardInvalidCardResponse`, qui porte déjà `blockAddress` et `commandId`.
+
+> **Menace visée** : pour les cartes de stockage, il ne s'agit pas du relais mais de l'**émulation de carte** par un matériel RFID générique, qui ne répond pas à une commande de lecture dans le même temps que la puce du produit attendu.
+
+> Les cartes de stockage n'ont ni FCI ni session sécurisée : le **type de produit** suffit à segmenter le parc, là où la Calypso Card API utilise le CSN et le FCI.
+
+### 3.6 Justification
+
+Le relai comme l'émulation introduisent un écart de durée significatif et systématique sur les échanges APDU ; surveiller cet écart au niveau du lecteur (Card API), des commandes bornées d'une transaction Calypso (Calypso Card API), de chaque commande générique (Generic Card API) et de chaque lecture de carte de stockage (Storage Card API) couvre l'ensemble des scénarios d'usage des API Terminaux.
 
 ---
 
@@ -451,7 +462,7 @@ Nouvelles opérations liées aux Thèmes 2 et 7 : `prepareCommandWithId`, `prepa
 | `prepareMifareClassicAuthenticate(…, int keyNumber)` | `prepareMifareClassicAuthenticateWithKeyNumber(…, keyNumber)` | (idem) |
 | `StorageCardTransactionManager.prepareReadSystemBlock()`, `prepareWriteSystemBlock(byte[])` *(dépréciées)* | *(supprimées)* ; subsistent `prepareSt25ReadSystemBlock()` et `prepareSt25WriteSystemBlock(commandId, data)` | Le préfixe `St25` reflète la nature produit-spécifique du bloc système. |
 | Interface `StorageCardException` (`getBlockAddress()`) | *(supprimée)* ; les erreurs portent `blockAddress: Int?` et `commandId: Int?` | Les informations sont portées directement par chaque erreur. |
-| `SCAuthenticationFailedException extends CardCommunicationException` | `SCAuthenticationFailed` *(sans erreur parente)* | Un échec d'authentification n'est pas une erreur de communication. |
+| `SCAuthenticationFailedException extends CardCommunicationException` | `StorageCardAuthenticationFailed` *(sans erreur parente)* | Un échec d'authentification n'est pas une erreur de communication. |
 
 Par ailleurs, `StorageCard.getBlock`, `getBlocks` et `getSystemBlock` renvoient désormais explicitement `ByteArray?` (`null` si la donnée n'a pas été lue).
 
@@ -514,7 +525,7 @@ Toutes les informations de détection sont regroupées dans la **classe de donn�
 ### 7.5 Reader API — `ObservableCardReader` et résultat de sélection
 
 - `startCardDetection(settings: CardDetectionSettings, eventHandler: CardReaderEventHandler) → Unit` transporte en un seul appel le gestionnaire d'événements et la configuration de détection.
-- Le type de carte détecté est exposé par la propriété **`cardType: CardType`** des résultats de sélection (`SingleCardSelectionResult`, `MultipleCardSelectionResult`, `MultichannelCardSelectionResult`, cf. Thème 9) ; `UNKNOWN` si le type n'a pas pu être identifié.
+- Le type de carte détecté est exposé par la propriété **`cardType: CardType`** des résultats de sélection (`SingleCardSelectionResult`, `SequentialCardSelectionResult`, `MultichannelCardSelectionResult`, cf. Thème 9) ; `UNKNOWN` si le type n'a pas pu être identifié.
 
 ### 7.6 Justification
 
@@ -533,9 +544,9 @@ Toutes les informations de détection sont regroupées dans la **classe de donn�
 
 Plusieurs APIs permettent de **préparer plusieurs commandes** avant de les exécuter en bloc. En production, l'application n'avait pas de moyen direct d'identifier **quelle commande** avait posé problème, ni d'accéder au **résultat d'une commande précise** ; certaines APIs recouraient pour cela à des objets conteneurs mutables (`KeyPairContainer`, `SearchCommandData.getMatchingRecordNumbers()`, `SignatureComputationData.getSignature()`, etc.).
 
-Les nouvelles versions généralisent un mécanisme unique : un **identifiant entier `commandId` fourni par l'application** au moment de la préparation, puis utilisé pour retrouver le résultat de la commande ou pour identifier la commande fautive. Le paramètre `commandId`, **toujours placé en première position**, suit la même convention que `selectionId` dans la Reader API (cf. Thème 9).
+Les nouvelles versions généralisent un mécanisme unique : un **identifiant entier `commandId` fourni par l'application** au moment de la préparation, puis utilisé pour retrouver le résultat de la commande ou pour identifier la commande fautive. Le paramètre `commandId`, **toujours placé en première position**, suit la même convention que `selectionCaseId` dans la Reader API (cf. Thème 9).
 
-> Le nom `commandId` remplace `idCommand` de la version de travail précédente de ce document, par cohérence avec `selectionId`.
+> Le nom `commandId` remplace `idCommand` de la version de travail précédente de ce document, par cohérence avec `selectionCaseId`.
 
 ### 8.2 Generic Card API
 
@@ -614,13 +625,17 @@ Le mode de sélection n'est plus un paramètre : il est porté par le **type du 
 
 | Gestionnaire | Comportement | Exécution | Résultat |
 |---|---|---|---|
-| `SingleCardSelectionManager` | mono-canal ; s'arrête à la première sélection réussie | explicite ou planifiée | `SingleCardSelectionResult` |
-| `MultipleCardSelectionManager` | mono-canal ; traite toutes les sélections, quels que soient les succès intermédiaires | explicite ou planifiée | `MultipleCardSelectionResult` |
-| `MultichannelCardSelectionManager` | cartes ISO 7816-4 multicanal ; chaque sélection réussie occupe son propre canal logique | explicite | `MultichannelCardSelectionResult` |
+| `SingleCardSelectionManager` | mono-canal ; s'arrête au premier cas qui correspond : la première application de la carte, ou la carte elle-même si elle n'héberge pas d'application (carte de stockage) | explicite ou planifiée | `SingleCardSelectionResult` |
+| `SequentialCardSelectionManager` | mono-canal ; sélectionne tour à tour toutes les applications de la carte qui correspondent, seule la dernière restant active ; sans objet pour les cartes de stockage | explicite ou planifiée | `SequentialCardSelectionResult` |
+| `MultichannelCardSelectionManager` | cartes ISO 7816-4 multicanal ; toutes les applications qui correspondent restent actives simultanément, chacune sur son canal logique ; hors périmètre des cartes de stockage | explicite | `MultichannelCardSelectionResult` |
 
-- **Factory** : `createCardSelectionManager()` est remplacée par `createSingleCardSelectionManager()`, `createMultipleCardSelectionManager()` et `createMultichannelCardSelectionManager()`.
+> **Remarque du TC (Stéphane)** : les scénarios discriminent les **applications** d'une **même carte physique** ; l'API conserve le terme *card* parce qu'un cas de sélection vise aussi des cartes sans application, comme les cartes de stockage. Ce point est désormais explicité dans la spec, dans la section du `CardSelectionManager`.
+
+> Par rapport à la version de travail précédente de ce document, `MultipleCardSelectionManager` est renommée `SequentialCardSelectionManager` (de même pour son résultat et son opération de fabrique) : le qualificatif décrit le **mode d'exécution du scénario**, et non un nombre de cartes. De même, `prepareSelection` devient `prepareSelectionCase` et `selectionId` devient `selectionCaseId`.
+
+- **Factory** : `createCardSelectionManager()` est remplacée par `createSingleCardSelectionManager()`, `createSequentialCardSelectionManager()` et `createMultichannelCardSelectionManager()`.
 - **`CardSelectionManager`** devient l'interface commune et ne conserve que les opérations indépendantes du mode :
-  - `prepareSelection(selectionId: Int, cardSelector: CardSelector, cardSelectionExtension: CardSelectionExtension) → Self` — l'identifiant de la sélection est **choisi par l'application** (au lieu d'un index renvoyé par l'API) ; il doit être unique dans le scénario ; les sélections sont exécutées dans l'ordre de préparation ;
+  - `prepareSelectionCase(selectionCaseId: Int, cardSelector: CardSelector, cardSelectionExtension: CardSelectionExtension) → Self` — l'identifiant de la sélection est **choisi par l'application** (au lieu d'un index renvoyé par l'API) ; il doit être unique dans le scénario ; les sélections sont exécutées dans l'ordre de préparation ;
   - `exportCardSelectionScenario() → String` ;
   - `importCardSelectionScenario(cardSelectionScenario: String) → Self` — **remplace** le scénario courant (au lieu de renvoyer l'index de la dernière sélection importée) ;
   - `exportProcessedCardSelectionScenario() → String`.
@@ -631,8 +646,8 @@ Le mode de sélection n'est plus un paramètre : il est porté par le **type du 
 
 | Résultat | Propriétés |
 |---|---|
-| `SingleCardSelectionResult` | `cardType: CardType`, `selectionId: Int?`, `smartCard: SmartCard?` (`null` ensemble si aucune sélection n'a réussi) |
-| `MultipleCardSelectionResult` | `cardType: CardType`, `smartCards: Map<Int, SmartCard>`, `activeSelectionId: Int?` (seule la carte de la dernière sélection réussie reste active) |
+| `SingleCardSelectionResult` | `cardType: CardType`, `selectionCaseId: Int?`, `smartCard: SmartCard?` (`null` ensemble si aucune sélection n'a réussi) |
+| `SequentialCardSelectionResult` | `cardType: CardType`, `smartCards: Map<Int, SmartCard>`, `activeSelectionCaseId: Int?` (seule la carte de la dernière sélection réussie reste active) |
 | `MultichannelCardSelectionResult` | `cardType: CardType`, `smartCards: Map<Int, SmartCard>` (toutes actives, une par canal) |
 
 `CardSelectionResult` (avec `getSmartCards()`, `getActiveSmartCard()`, `getActiveSelectionIndex()`) et `SelectionExecutionPolicy` disparaissent.
@@ -726,7 +741,7 @@ Plusieurs types de données des versions en production mêlaient **données** et
 - **`SamParameters`** est supprimée : `LegacySam.getSamParameters()` renvoie directement `ByteArray?`.
 - **Compteurs** : `getCounter(counterNumber)` et `getCounterCeiling(counterNumber)` sont supprimées (les tables `getCounters()` et `getCounterCeilings()` suffisent) ; `getCounterIncrementAccess(counterNumber)` est remplacée par `getCounterIncrementAccesses() → SortedMap<Int, CounterIncrementAccess>`.
 - **Données de commande** : `LegacyCardCertificateComputationData`, `BasicSignatureComputationData`, `TraceableSignatureComputationData`, `BasicSignatureVerificationData` et `TraceableSignatureVerificationData` deviennent des classes de données d'entrée (propriétés et valeurs par défaut au lieu de setters ; `withSamTraceabilityMode(offset, mode)` devient `samTraceabilityMode` / `traceabilityOffset`, `withoutBusyMode()` devient `busyMode = false`) ; leurs résultats sont lus sur la `LegacySam` par `commandId` (cf. §8.5). `KeyPairContainer` est supprimée. Les opérations `create…Data()` et `createKeyPairContainer()` disparaissent de `LegacySamApiFactory`.
-- **`SecuritySetting`** devient la classe de données **`SecuritySettings`** (`samReader`, `controlSam`), renommée au pluriel comme les réglages de sécurité de la Calypso Card API, à la place de `setControlSamResource(samReader, controlSam)` ; `LegacySamApiFactory.createSecuritySetting()` disparaît.
+- **`SecuritySetting`** devient la classe de données **`LegacySamSecuritySettings`** (`samReader`, `controlSam`), renommée au pluriel comme les réglages de sécurité de la Calypso Card API, et préfixée pour éviter l'homonymie avec le `SecuritySettings` de la Calypso Card API, à la place de `setControlSamResource(samReader, controlSam)` ; `LegacySamApiFactory.createSecuritySetting()` disparaît.
 
 ### 12.4 Card API
 
@@ -778,16 +793,18 @@ Le modèle suit désormais exactement la spécification de la carte : trois comm
 
 ---
 
-## 14. Thème 13 — Tolérance du fichier absent (`6A82h`) en session sécurisée
+## 14. Thème 13 — Tolérance du fichier ou de l'enregistrement absent en session sécurisée
 
 ### 14.1 Motivation
 
-Toutes les cartes Calypso tolèrent désormais le status word `6A82h` (*File Not Found*) en session sécurisée pour les commandes de lecture (*Select File*, *Get Data*, *Read Binary*, *Read Records*, *Read Record Multiple*, *Search Record Multiple*).
+Toutes les cartes Calypso tolèrent désormais les status words `6A82h` (*File Not Found*) et `6A83h` (*Record Not Found*) en session sécurisée pour les commandes de lecture (*Select File*, *Get Data*, *Read Binary*, *Read Records*, *Read Record Multiple*, *Search Record Multiple*). Sur un parc hétérogène, la présence d'un fichier ou d'un enregistrement n'est pas toujours connue à l'avance, et une lecture infructueuse ne devrait pas annuler la session.
+
+La tolérance est **explicitement activée par l'intégrateur** : le comportement par défaut, plus strict, reste l'échec de la transaction en session.
 
 ### 14.2 Calypso Card API
 
-- **Lectures** (`prepareReadBinary`, `prepareReadCounter`, `prepareReadRecords`) : le traitement n'échoue plus si le fichier visé est absent, **dans une session sécurisée comme en dehors** ; la `CalypsoCard` n'est simplement pas remplie. Les autres anomalies (offset invalide, enregistrement ou compteur absent) conservent les deux modes *best-effort* (hors session) et *strict* (en session).
-- **Sélection de fichier** (`prepareSelectFileByLid`, `prepareSelectFileByControl`) : un fichier absent ne fait plus échouer le traitement, en session ou non.
+- **Deux nouveaux réglages de sécurité** : `authorizeFileNotFoundError() → Self` et `authorizeRecordNotFoundError() → Self`, portés par l'interface parente `SecuritySettings` et donc disponibles dans `SymmetricCryptoSecuritySettings` comme dans `AsymmetricCryptoSecuritySettings`. Ils autorisent la carte à répondre `6A82h` ou `6A83h` **en session** sans faire échouer la transaction : la commande concernée n'est simplement pas appliquée à la `CalypsoCard` et la session se poursuit. Par défaut, ils sont désactivés.
+- **Lectures** (`prepareReadBinary`, `prepareReadCounter`, `prepareReadRecords`) et **sélection de fichier** (`prepareSelectFileByLid`, `prepareSelectFileByControl`) : **hors session**, un fichier absent n'a jamais fait échouer le traitement, et ce mode *best-effort* est inchangé ; **en session**, le traitement échoue sauf si le réglage correspondant a été activé. L'offset invalide conserve les deux modes *best-effort* (hors session) et *strict* (en session).
 - **L'erreur `SelectFileException` est supprimée**.
 - Les restrictions d'usage en session de `prepareGetData`, `prepareReadRecord`, `prepareReadRecordsPartially` et `prepareSearchRecords` sont **inchangées**.
 
@@ -822,7 +839,7 @@ Les spécifications apportent en outre des clarifications qui ne changent pas le
 
 - **Card API — règles de construction des APDU** : les commandes doivent être strictement conformes à ISO/IEC 7816-3 ; une commande de cas 4 doit inclure le champ `Le`, dont la valeur `00h` est **recommandée** (elle était auparavant présentée comme obligatoire).
 - **Card API — limitations** : la transmission des commandes *Select Application* par nom de DF (réservée à la `CardSelectionRequest`) et *Get Response* (les status words `61XYh` et `6CXYh` sont traités automatiquement par l'implémentation du lecteur) ne peut pas être demandée.
-- **Card API — anti-relai** : le mécanisme de contrôle du temps d'exécution des échanges APDU est explicitement présenté comme solution de contre-mesure anti-relai (cf. Thème 2).
+- **Card API — contre-mesures temporelles** : le mécanisme de contrôle du temps d'exécution des échanges APDU est explicitement présenté comme solution de contre-mesure face au relai et à l'émulation (cf. Thème 2).
 - **Reader API — cycle de vie des `SmartCard`** : désormais normatif (cf. §2.3.2).
 - **Toutes les APIs — natures des pré-conditions** : un critère explicite distingue *Range* (position dans une collection ou une image mémoire exposée par l'API) et *Argument* (toute autre valeur invalide, y compris les valeurs bornées par le protocole de la carte ou du SAM).
 - **Storage Card API — périmètre** : la section *Scope* liste explicitement les produits supportés (MIFARE Ultralight, MIFARE Classic 1K, MIFARE Classic 4K, ST25 SRT512), identifiés par les valeurs de `StorageCardProductType`.
@@ -857,7 +874,7 @@ Le présent document soumet à la validation du **TC Terminal de la CNA** :
 1. **Le principe** des quatorze thèmes d'évolution (§2 à §15) et la cohérence d'ensemble du chantier (versions 3.0.0 pour Reader / Card / Calypso Card, 1.0.0 pour Definitions, 2.0.0 pour Legacy SAM / Generic Card / Storage Card, 0.2.0 pour Crypto Symmetric, 0.3.0 pour Crypto Asymmetric).
 2. **Les choix de conception** documentés dans les sections « Justification », en particulier :
    - le modèle multicanal explicite reposant sur la `SmartCard(Spi)` comme cible nommée et la hiérarchie à trois niveaux des gestionnaires de transactions (§2) ;
-   - le bornage de durée au niveau APDU, session Calypso et commande générique, avec réglages par CSN et par FCI (§3) ;
+   - le bornage de durée au niveau APDU, session Calypso, commande générique et lecture de carte de stockage, avec réglages par CSN et par FCI (§3) ;
    - la fusion du patron Observateur en une seule SPI `CardReaderEventHandler` (§4) ;
    - l'énumération `SecureSessionState` (§5) ;
    - l'extraction de `RfTechnology` et `CardType` dans la Terminal Reader Definitions API et les paramètres de détection `CardDetectionSettings` (§7) ;
@@ -903,7 +920,7 @@ Cette annexe liste, pour chaque API, le devenir de chaque élément des versions
 
 | Élément en production | Devenir |
 |---|---|
-| `ReaderApiFactory.createCardSelectionManager()` | Supprimée → `createSingleCardSelectionManager()`, `createMultipleCardSelectionManager()`, `createMultichannelCardSelectionManager()` |
+| `ReaderApiFactory.createCardSelectionManager()` | Supprimée → `createSingleCardSelectionManager()`, `createSequentialCardSelectionManager()`, `createMultichannelCardSelectionManager()` |
 | `ReaderApiFactory.createBasicCardSelector()`, `createIsoCardSelector()` | Supprimées (sélecteurs = classes de données) |
 | — | Ajoutée : `ReaderApiFactory.getCardReaderProvider() → CardReaderProvider` ; interface `CardReaderProvider` |
 | `ConfigurableCardReader` (`activateProtocol`, `deactivateProtocol`, `getCurrentProtocol`) | Supprimée |
@@ -920,13 +937,13 @@ Cette annexe liste, pour chaque API, le devenir de chaque élément des versions
 | `ReaderProtocolNotSupportedException` | Supprimée |
 | `reader.selection.InvalidCardResponseException` | Supprimée (doublon) |
 | `CardSelectionManager.setMultipleSelectionMode()`, `prepareReleaseChannel()` | Supprimées |
-| `CardSelectionManager.prepareSelection(CardSelector<?>, CardSelectionExtension) → int` | → `prepareSelection(selectionId: Int, cardSelector: CardSelector, cardSelectionExtension: CardSelectionExtension) → Self` |
+| `CardSelectionManager.prepareSelection(CardSelector<?>, CardSelectionExtension) → int` | → `prepareSelectionCase(selectionCaseId: Int, cardSelector: CardSelector, cardSelectionExtension: CardSelectionExtension) → Self` |
 | `CardSelectionManager.importCardSelectionScenario(String) → int` | → `importCardSelectionScenario(cardSelectionScenario: String) → Self` (remplace le scénario) |
-| `CardSelectionManager.processCardSelectionScenario(CardReader)` | → `processCardSelectionScenario(reader)` sur `SingleCardSelectionManager` / `MultipleCardSelectionManager` ; `processCardSelectionScenario(reader, channelSelectionPolicy)` sur `MultichannelCardSelectionManager` |
+| `CardSelectionManager.processCardSelectionScenario(CardReader)` | → `processCardSelectionScenario(reader)` sur `SingleCardSelectionManager` / `SequentialCardSelectionManager` ; `processCardSelectionScenario(reader, channelSelectionPolicy)` sur `MultichannelCardSelectionManager` |
 | `CardSelectionManager.scheduleCardSelectionScenario(ObservableCardReader, NotificationMode)` | → `scheduleCardSelectionScenario(observableCardReader, cardPresenceNotificationPolicy)` sur les gestionnaires mono-canal |
 | `CardSelectionManager.parseScheduledCardSelectionsResponse(...)` | → sur les gestionnaires mono-canal, renvoie le résultat typé |
 | `CardSelectionManager.importProcessedCardSelectionScenario(String)` | → sur chaque gestionnaire, renvoie le résultat typé |
-| `CardSelectionResult` (`getSmartCards`, `getActiveSmartCard`, `getActiveSelectionIndex`) | Supprimée → `SingleCardSelectionResult`, `MultipleCardSelectionResult`, `MultichannelCardSelectionResult` |
+| `CardSelectionResult` (`getSmartCards`, `getActiveSmartCard`, `getActiveSelectionIndex`) | Supprimée → `SingleCardSelectionResult`, `SequentialCardSelectionResult`, `MultichannelCardSelectionResult` |
 | — | Ajoutée : `ChannelSelectionPolicy` |
 | `CardSelector<T>` (`filterByCardProtocol`, `filterByPowerOnData`) | → interface scellée `CardSelector` ; `filterByCardProtocol` supprimée ; `filterByPowerOnData` → propriété `powerOnDataRegex` ; ajout de la propriété `cardType` |
 | `BasicCardSelector` (interface) | → classe de données (`cardType?`, `powerOnDataRegex?`) |
@@ -992,7 +1009,8 @@ Cette annexe liste, pour chaque API, le devenir de chaque élément des versions
 | — | Ajoutée : `prepareSvUndebit(amount, date, time)` |
 | `SvAction` | Supprimée |
 | `SvOperation.DEBIT` | → `SvOperation.DEBIT_UNDEBIT` |
-| — | Ajoutées : `SymmetricCryptoSecuritySettings.assignOpenSecureSessionMaxDurationByCsn/ByFci(...)`, `assignCloseSecureSessionMaxDurationByCsn/ByFci(...)`, `assignSvCommandMaxDurationByCsn/ByFci(...)` ; `AsymmetricCryptoSecuritySettings.assignOpenSecureSessionMaxDurationByCsn/ByFci(...)`, `assignCloseSecureSessionMaxDurationByCsn/ByFci(...)` |
+| — | Ajoutée : interface `SecuritySettings`, parente de `SymmetricCryptoSecuritySettings` et `AsymmetricCryptoSecuritySettings`, portant `assignOpenSecureSessionMaxDurationByCsn/ByFci(...)`, `assignCloseSecureSessionMaxDurationByCsn/ByFci(...)`, `authorizeFileNotFoundError()` et `authorizeRecordNotFoundError()` |
+| — | Ajoutées : `SymmetricCryptoSecuritySettings.assignSvCommandMaxDurationByCsn/ByFci(...)` ; les bornes de session sont héritées de `SecuritySettings` |
 | `ChannelControl` | Supprimée |
 | `CardIOException`, `ReaderIOException`, `UnexpectedCommandStatusException`, `SelectFileException` | Supprimées |
 | `CardSignatureNotVerifiableException`, `CryptoException`, `CryptoIOException`, `InconsistentDataException`, `InvalidCardSignatureException`, `InvalidCertificateException`, `InvalidPinException`, `SessionBufferOverflowException`, `UnauthorizedKeyException` | → mêmes noms sans suffixe `Exception` |
@@ -1036,7 +1054,7 @@ Cette annexe liste, pour chaque API, le devenir de chaque élément des versions
 | `SignatureVerificationData.isSignatureValid()` | → `LegacySam.isSignatureValid(commandId: Int) → Boolean?` |
 | `BasicSignatureVerificationData`, `TraceableSignatureVerificationData` | → classes de données implémentant `SignatureVerificationData` |
 | `TraceableSignatureVerificationData.withSamTraceabilityMode(int offset, SamTraceabilityMode mode, LegacySamRevocationServiceSpi service)`, `withoutBusyMode()` | → propriétés `traceabilityOffset = 0`, `samTraceabilityMode: SamTraceabilityMode? = null`, `samRevocationService: LegacySamRevocationServiceSpi? = null`, `busyMode = true` |
-| `SecuritySetting.setControlSamResource(samReader, controlSam)` | → classe de données `SecuritySettings` (`samReader`, `controlSam`) ; paramètre `securitySetting` → `securitySettings` dans `createSecureWriteTransactionManager` et `createAsyncTransactionCreatorManager` |
+| `SecuritySetting.setControlSamResource(samReader, controlSam)` | → classe de données `LegacySamSecuritySettings` (`samReader`, `controlSam`) ; paramètre `securitySetting` → `securitySettings` dans `createSecureWriteTransactionManager` et `createAsyncTransactionCreatorManager` |
 | `ReaderIOException`, `SamIOException`, `UnexpectedCommandStatusException` | Supprimées |
 | `InconsistentDataException`, `InvalidSignatureException`, `SamRevokedException` | → `InconsistentData`, `InvalidSignature`, `SamRevoked` |
 
@@ -1089,10 +1107,11 @@ Cette annexe liste, pour chaque API, le devenir de chaque élément des versions
 | `StorageCardTransactionManager` (extends `CardTransactionManager<…>`) | → non générique, retours `Self` |
 | `StorageCardTransactionManager.prepareReadSystemBlock()`, `prepareWriteSystemBlock(byte[])` *(dépréciées)* | Supprimées |
 | `StorageCardTransactionManager.prepareSt25WriteSystemBlock(byte[])` | → `prepareSt25WriteSystemBlock(commandId: Int, data: ByteArray)` |
+| — | Ajoutées : classe de données `StorageCardSecuritySettings` (`readCommandMaxDurations`) ; paramètre `securitySettings` ajouté à `StorageCardApiFactory.createStorageCardTransactionManager(...)` |
 | `StorageCardTransactionManager.prepareWriteBlocks(int, byte[])` | → `prepareWriteBlocks(commandId: Int, fromBlockAddress: Int, data: ByteArray)` |
 | `StorageCardException` (`getBlockAddress`) | Supprimée ; les erreurs portent `blockAddress: Int?` et `commandId: Int?` |
-| `SCAuthenticationFailedException` (extends `CardCommunicationException`) | → `SCAuthenticationFailed` (sans erreur parente) |
-| `SCCardCommunicationException`, `SCInvalidCardResponseException`, `SCReaderCommunicationException` | → `SCCardCommunication`, `SCInvalidCardResponse`, `SCReaderCommunication` (parents inchangés) |
+| `SCAuthenticationFailedException` (extends `CardCommunicationException`) | → `StorageCardAuthenticationFailed` (sans erreur parente) |
+| `SCCardCommunicationException`, `SCInvalidCardResponseException`, `SCReaderCommunicationException` | → `StorageCardCardCommunication`, `StorageCardInvalidCardResponse`, `StorageCardReaderCommunication` (parents inchangés) |
 
 ### A.9 Terminal Reader Definitions API (nouvelle, 1.0.0)
 
