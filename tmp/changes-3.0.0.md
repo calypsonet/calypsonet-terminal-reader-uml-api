@@ -14,7 +14,7 @@ The "before" reference consists of the **latest published versions** of the Keyp
 |---|---|---|---|
 | Terminal Reader API | CNA-TR-API | `keypop-reader-java-api` **2.1.0** | **3.0.0** |
 | Terminal Card API *(internal)* | CNA-TC-API | `keypop-card-java-api` **2.0.1** | **3.0.0** |
-| Terminal Calypso Card API | CNA-TCC-API | `keypop-calypso-card-java-api` **2.2.0** | **3.0.0** |
+| Terminal Calypso Card API | CNA-TCC-API | `keypop-calypso-card-java-api` **2.3.0** | **3.0.0** |
 | Terminal Reader Definitions API *(new)* | CNA-TRD-API | — | **1.0.0** |
 | Terminal Calypso Crypto Legacy SAM API | CNA-TCCL-API | `keypop-calypso-crypto-legacysam-java-api` **1.0.0** | **2.0.0** |
 | Terminal Calypso Crypto Symmetric API | CNA-TCCS-API | `keypop-calypso-crypto-symmetric-java-api` **0.1.1** | **0.2.0** |
@@ -977,7 +977,7 @@ This annex lists, for each API, what becomes of each element of the Java version
 | `CardBrokenCommunicationException`, `ReaderBrokenCommunicationException`, `UnexpectedStatusWordException`, `ParseException` | → `CardBrokenCommunication` (also raised if the card is no longer active), `ReaderBrokenCommunication`, `UnexpectedStatusWord`, `Parse` |
 | — | Added: `ApduExchangeDurationExceeded` error |
 
-### A.3 Terminal Calypso Card API (Java 2.2.0 → 3.0.0)
+### A.3 Terminal Calypso Card API (Java 2.3.0 → 3.0.0)
 
 | Element in production | What it becomes |
 |---|---|
