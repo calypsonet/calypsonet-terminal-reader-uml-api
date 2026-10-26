@@ -14,7 +14,7 @@ The "before" reference consists of the **latest published versions** of the Keyp
 |---|---|---|---|
 | Terminal Reader API | CNA-TR-API | `keypop-reader-java-api` **2.1.0** | **3.0.0** |
 | Terminal Card API *(internal)* | CNA-TC-API | `keypop-card-java-api` **2.0.1** | **3.0.0** |
-| Terminal Calypso Card API | CNA-TCC-API | `keypop-calypso-card-java-api` **2.2.0** | **3.0.0** |
+| Terminal Calypso Card API | CNA-TCC-API | `keypop-calypso-card-java-api` **2.3.0** | **3.0.0** |
 | Terminal Reader Definitions API *(new)* | CNA-TRD-API | — | **1.0.0** |
 | Terminal Calypso Crypto Legacy SAM API | CNA-TCCL-API | `keypop-calypso-crypto-legacysam-java-api` **1.0.0** | **2.0.0** |
 | Terminal Calypso Crypto Symmetric API | CNA-TCCS-API | `keypop-calypso-crypto-symmetric-java-api` **0.1.1** | **0.2.0** |
@@ -753,7 +753,7 @@ Several data types of the production versions mixed **data** and **computations*
 - **`SvCommandSecurityDataApi`** (input/output object) is replaced:
   - the inputs become parameters: `computeSvCommandSecurityData(svGetRequest: ByteArray, svGetResponse: ByteArray, svCommandPartialRequest: ByteArray) → SvCommandSecurityData`;
   - the output is the `SvCommandSecurityData` data class (`serialNumber`, `transactionNumber`, `terminalChallenge`, `terminalSvMac`, non-nullable).
-- `createCardTransactionManager(..., transactionAuditData: MutableList<ByteArray>)`: the audit list is explicitly **mutable** (the crypto module appends its data to it).
+- `createCardTransactionManager(..., exchangedApdus: MutableList<ByteArray>)`: the parameter is renamed — the list receives the exchanged APDUs, not transaction audit data — and is explicitly **mutable** (the crypto module appends its data to it).
 - `cipherPinForPresentation` and `cipherPinForModification` take non-nullable `kif: Byte` and `kvc: Byte` (instead of boxed `Byte`).
 
 ### 12.6 Crypto Asymmetric API
@@ -785,7 +785,7 @@ The Calypso card specification defines three SV commands — *Reload*, *Debit* a
 - `prepareSvDebit(amount: Int, date: ByteArray, time: ByteArray) → Self` — now only performs the debit; amount in `0..32767`.
 - `prepareSvReload(amount: Int, date: ByteArray, time: ByteArray, free: ByteArray) → Self` — amount in `-8388608..8388607` (a negative reload is expressed directly by a negative amount).
 - **The overloads without data** `prepareSvDebit(int)` and `prepareSvReload(int)` are removed: all parameters are **mandatory and non-nullable**; the `date`, `time` and `free` fields (2 bytes each) are recorded in the SV log.
-- Each command requires a prior *SV Get* prepared with the corresponding operation (`DEBIT_UNDEBIT` for debit and undebit, `RELOAD` for reload).
+- Each command requires an **immediately** preceding *SV Get* prepared with the corresponding operation (`DEBIT_UNDEBIT` for debit and undebit, `RELOAD` for reload): no other command may come between them. On an automatic session split, the *SV Get* is re-issued in the new session, right before the SV command.
 
 ### 13.3 Rationale
 
@@ -977,7 +977,7 @@ This annex lists, for each API, what becomes of each element of the Java version
 | `CardBrokenCommunicationException`, `ReaderBrokenCommunicationException`, `UnexpectedStatusWordException`, `ParseException` | → `CardBrokenCommunication` (also raised if the card is no longer active), `ReaderBrokenCommunication`, `UnexpectedStatusWord`, `Parse` |
 | — | Added: `ApduExchangeDurationExceeded` error |
 
-### A.3 Terminal Calypso Card API (Java 2.2.0 → 3.0.0)
+### A.3 Terminal Calypso Card API (Java 2.3.0 → 3.0.0)
 
 | Element in production | What it becomes |
 |---|---|
@@ -1001,6 +1001,7 @@ This annex lists, for each API, what becomes of each element of the Java version
 | `TransactionManager<T>` and generic sub-interfaces | → non-generic, `Self` returns; `TransactionManager` extends `IsoCardTransactionManager` |
 | `TransactionManager.prepareSelectFile(short)` / `(SelectFileControl)` | → `prepareSelectFileByLid` / `prepareSelectFileByControl` |
 | `TransactionManager.prepareSearchRecords(SearchCommandData)` | → `prepareSearchRecords(commandId: Int, data: SearchCommandData)` |
+| `TransactionManager.getTransactionAuditData()` | → `getExchangedApdus()` |
 | `TransactionManager.processCommands(ChannelControl)` | Removed (inherited `CardTransactionManager.processCommands()`) |
 | — | Added: `TransactionManager.getSecureSessionState() → SecureSessionState`; `SecureSessionState` enumeration |
 | `SecureTransactionManager.getCryptoExtension(Class<E>) → E` | → `getCryptoExtension() → CardTransactionCryptoExtension` |
@@ -1066,7 +1067,7 @@ This annex lists, for each API, what becomes of each element of the Java version
 | `SvCommandSecurityDataApi.setSerialNumber`, `setTransactionNumber`, `setTerminalChallenge`, `setTerminalSvMac` (outputs) | → `serialNumber`, `transactionNumber`, `terminalChallenge`, `terminalSvMac` properties of the `SvCommandSecurityData` data class (namespace `calypso.crypto.symmetric.spi`) |
 | `SymmetricCryptoCardTransactionManagerSpi.computeSvCommandSecurityData(SvCommandSecurityDataApi) → void` | → `computeSvCommandSecurityData(svGetRequest, svGetResponse, svCommandPartialRequest) → SvCommandSecurityData` |
 | `SymmetricCryptoCardTransactionManagerSpi.cipherPinForPresentation(…, Byte kif, Byte kvc)`, `cipherPinForModification(…, Byte kif, Byte kvc)` | → non-nullable `kif: Byte`, `kvc: Byte` |
-| `SymmetricCryptoCardTransactionManagerFactorySpi.createCardTransactionManager(…, List<byte[]> transactionAuditData)` | → `transactionAuditData: MutableList<ByteArray>` |
+| `SymmetricCryptoCardTransactionManagerFactorySpi.createCardTransactionManager(…, List<byte[]> transactionAuditData)` | → `exchangedApdus: MutableList<ByteArray>` |
 | `SymmetricCryptoException`, `SymmetricCryptoIOException` | → `SymmetricCrypto`, `SymmetricCryptoIO` |
 
 ### A.6 Terminal Calypso Crypto Asymmetric API (Java 0.2.0 → 0.3.0)
