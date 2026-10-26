@@ -753,7 +753,7 @@ Plusieurs types de données des versions en production mêlaient **données** et
 - **`SvCommandSecurityDataApi`** (objet d'entrée/sortie) est remplacé :
   - les entrées deviennent des paramètres : `computeSvCommandSecurityData(svGetRequest: ByteArray, svGetResponse: ByteArray, svCommandPartialRequest: ByteArray) → SvCommandSecurityData` ;
   - la sortie est la classe de données `SvCommandSecurityData` (`serialNumber`, `transactionNumber`, `terminalChallenge`, `terminalSvMac`, non nullables).
-- `createCardTransactionManager(..., transactionAuditData: MutableList<ByteArray>)` : la liste d'audit est explicitement **modifiable** (le module crypto y ajoute ses données).
+- `createCardTransactionManager(..., exchangedApdus: MutableList<ByteArray>)` : le paramètre est renommé — la liste reçoit les APDU échangées, et non des données d'audit de transaction — et il est explicitement **modifiable** (le module crypto y ajoute ses données).
 - `cipherPinForPresentation` et `cipherPinForModification` prennent `kif: Byte` et `kvc: Byte` non nullables (au lieu de `Byte` boxés).
 
 ### 12.6 Crypto Asymmetric API
@@ -1001,6 +1001,7 @@ Cette annexe liste, pour chaque API, le devenir de chaque élément des versions
 | `TransactionManager<T>` et sous-interfaces génériques | → non génériques, retours `Self` ; `TransactionManager` étend `IsoCardTransactionManager` |
 | `TransactionManager.prepareSelectFile(short)` / `(SelectFileControl)` | → `prepareSelectFileByLid` / `prepareSelectFileByControl` |
 | `TransactionManager.prepareSearchRecords(SearchCommandData)` | → `prepareSearchRecords(commandId: Int, data: SearchCommandData)` |
+| `TransactionManager.getTransactionAuditData()` | → `getExchangedApdus()` |
 | `TransactionManager.processCommands(ChannelControl)` | Supprimée (héritage de `CardTransactionManager.processCommands()`) |
 | — | Ajoutée : `TransactionManager.getSecureSessionState() → SecureSessionState` ; énumération `SecureSessionState` |
 | `SecureTransactionManager.getCryptoExtension(Class<E>) → E` | → `getCryptoExtension() → CardTransactionCryptoExtension` |
@@ -1066,7 +1067,7 @@ Cette annexe liste, pour chaque API, le devenir de chaque élément des versions
 | `SvCommandSecurityDataApi.setSerialNumber`, `setTransactionNumber`, `setTerminalChallenge`, `setTerminalSvMac` (sorties) | → propriétés `serialNumber`, `transactionNumber`, `terminalChallenge`, `terminalSvMac` de la classe de données `SvCommandSecurityData` (namespace `calypso.crypto.symmetric.spi`) |
 | `SymmetricCryptoCardTransactionManagerSpi.computeSvCommandSecurityData(SvCommandSecurityDataApi) → void` | → `computeSvCommandSecurityData(svGetRequest, svGetResponse, svCommandPartialRequest) → SvCommandSecurityData` |
 | `SymmetricCryptoCardTransactionManagerSpi.cipherPinForPresentation(…, Byte kif, Byte kvc)`, `cipherPinForModification(…, Byte kif, Byte kvc)` | → `kif: Byte`, `kvc: Byte` non nullables |
-| `SymmetricCryptoCardTransactionManagerFactorySpi.createCardTransactionManager(…, List<byte[]> transactionAuditData)` | → `transactionAuditData: MutableList<ByteArray>` |
+| `SymmetricCryptoCardTransactionManagerFactorySpi.createCardTransactionManager(…, List<byte[]> transactionAuditData)` | → `exchangedApdus: MutableList<ByteArray>` |
 | `SymmetricCryptoException`, `SymmetricCryptoIOException` | → `SymmetricCrypto`, `SymmetricCryptoIO` |
 
 ### A.6 Terminal Calypso Crypto Asymmetric API (Java 0.2.0 → 0.3.0)

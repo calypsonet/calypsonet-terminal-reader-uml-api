@@ -753,7 +753,7 @@ Several data types of the production versions mixed **data** and **computations*
 - **`SvCommandSecurityDataApi`** (input/output object) is replaced:
   - the inputs become parameters: `computeSvCommandSecurityData(svGetRequest: ByteArray, svGetResponse: ByteArray, svCommandPartialRequest: ByteArray) → SvCommandSecurityData`;
   - the output is the `SvCommandSecurityData` data class (`serialNumber`, `transactionNumber`, `terminalChallenge`, `terminalSvMac`, non-nullable).
-- `createCardTransactionManager(..., transactionAuditData: MutableList<ByteArray>)`: the audit list is explicitly **mutable** (the crypto module appends its data to it).
+- `createCardTransactionManager(..., exchangedApdus: MutableList<ByteArray>)`: the parameter is renamed — the list receives the exchanged APDUs, not transaction audit data — and is explicitly **mutable** (the crypto module appends its data to it).
 - `cipherPinForPresentation` and `cipherPinForModification` take non-nullable `kif: Byte` and `kvc: Byte` (instead of boxed `Byte`).
 
 ### 12.6 Crypto Asymmetric API
@@ -1001,6 +1001,7 @@ This annex lists, for each API, what becomes of each element of the Java version
 | `TransactionManager<T>` and generic sub-interfaces | → non-generic, `Self` returns; `TransactionManager` extends `IsoCardTransactionManager` |
 | `TransactionManager.prepareSelectFile(short)` / `(SelectFileControl)` | → `prepareSelectFileByLid` / `prepareSelectFileByControl` |
 | `TransactionManager.prepareSearchRecords(SearchCommandData)` | → `prepareSearchRecords(commandId: Int, data: SearchCommandData)` |
+| `TransactionManager.getTransactionAuditData()` | → `getExchangedApdus()` |
 | `TransactionManager.processCommands(ChannelControl)` | Removed (inherited `CardTransactionManager.processCommands()`) |
 | — | Added: `TransactionManager.getSecureSessionState() → SecureSessionState`; `SecureSessionState` enumeration |
 | `SecureTransactionManager.getCryptoExtension(Class<E>) → E` | → `getCryptoExtension() → CardTransactionCryptoExtension` |
@@ -1066,7 +1067,7 @@ This annex lists, for each API, what becomes of each element of the Java version
 | `SvCommandSecurityDataApi.setSerialNumber`, `setTransactionNumber`, `setTerminalChallenge`, `setTerminalSvMac` (outputs) | → `serialNumber`, `transactionNumber`, `terminalChallenge`, `terminalSvMac` properties of the `SvCommandSecurityData` data class (namespace `calypso.crypto.symmetric.spi`) |
 | `SymmetricCryptoCardTransactionManagerSpi.computeSvCommandSecurityData(SvCommandSecurityDataApi) → void` | → `computeSvCommandSecurityData(svGetRequest, svGetResponse, svCommandPartialRequest) → SvCommandSecurityData` |
 | `SymmetricCryptoCardTransactionManagerSpi.cipherPinForPresentation(…, Byte kif, Byte kvc)`, `cipherPinForModification(…, Byte kif, Byte kvc)` | → non-nullable `kif: Byte`, `kvc: Byte` |
-| `SymmetricCryptoCardTransactionManagerFactorySpi.createCardTransactionManager(…, List<byte[]> transactionAuditData)` | → `transactionAuditData: MutableList<ByteArray>` |
+| `SymmetricCryptoCardTransactionManagerFactorySpi.createCardTransactionManager(…, List<byte[]> transactionAuditData)` | → `exchangedApdus: MutableList<ByteArray>` |
 | `SymmetricCryptoException`, `SymmetricCryptoIOException` | → `SymmetricCrypto`, `SymmetricCryptoIO` |
 
 ### A.6 Terminal Calypso Crypto Asymmetric API (Java 0.2.0 → 0.3.0)
