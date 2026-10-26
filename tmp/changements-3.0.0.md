@@ -785,7 +785,7 @@ La spécification de la carte Calypso définit trois commandes SV — *Reload*, 
 - `prepareSvDebit(amount: Int, date: ByteArray, time: ByteArray) → Self` — ne fait plus que le débit ; montant dans `0..32767`.
 - `prepareSvReload(amount: Int, date: ByteArray, time: ByteArray, free: ByteArray) → Self` — montant dans `-8388608..8388607` (un rechargement négatif s'exprime directement par un montant négatif).
 - **Les surcharges sans données** `prepareSvDebit(int)` et `prepareSvReload(int)` sont supprimées : tous les paramètres sont **obligatoires et non nullables** ; les champs `date`, `time` et `free` (2 octets chacun) sont enregistrés dans le journal SV.
-- Chaque commande exige un *SV Get* préalable préparé avec l'opération correspondante (`DEBIT_UNDEBIT` pour le débit et l'annulation, `RELOAD` pour le rechargement).
+- Chaque commande exige un *SV Get* **immédiatement** préalable, préparé avec l'opération correspondante (`DEBIT_UNDEBIT` pour le débit et l'annulation, `RELOAD` pour le rechargement) : aucune autre commande ne peut s'intercaler entre les deux. En cas de découpage automatique de session, le *SV Get* est rejoué dans la nouvelle session, juste avant la commande SV.
 
 ### 13.3 Justification
 

@@ -785,7 +785,7 @@ The Calypso card specification defines three SV commands — *Reload*, *Debit* a
 - `prepareSvDebit(amount: Int, date: ByteArray, time: ByteArray) → Self` — now only performs the debit; amount in `0..32767`.
 - `prepareSvReload(amount: Int, date: ByteArray, time: ByteArray, free: ByteArray) → Self` — amount in `-8388608..8388607` (a negative reload is expressed directly by a negative amount).
 - **The overloads without data** `prepareSvDebit(int)` and `prepareSvReload(int)` are removed: all parameters are **mandatory and non-nullable**; the `date`, `time` and `free` fields (2 bytes each) are recorded in the SV log.
-- Each command requires a prior *SV Get* prepared with the corresponding operation (`DEBIT_UNDEBIT` for debit and undebit, `RELOAD` for reload).
+- Each command requires an **immediately** preceding *SV Get* prepared with the corresponding operation (`DEBIT_UNDEBIT` for debit and undebit, `RELOAD` for reload): no other command may come between them. On an automatic session split, the *SV Get* is re-issued in the new session, right before the SV command.
 
 ### 13.3 Rationale
 
