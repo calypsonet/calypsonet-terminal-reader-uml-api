@@ -8,7 +8,7 @@ The purpose of this document is to **present all the evolutions of the Terminal 
 
 ### Compared versions
 
-The "before" reference consists of the **latest published versions** of the Keypop Java modules (production tags). The "after" reference consists of the **normative specifications** (`index.adoc`) and the associated class diagrams (`uml/class-diagram.puml`) of each `calypsonet-terminal-*-uml-api` repository.
+The "before" reference consists of the **latest published versions** of the Keypop Java modules (production tags). The "after" reference consists of the **normative specifications** (`index.adoc`) and the associated class diagrams (`uml/class-diagram.puml`) of each `calypsonet-terminal-*-api-spec` repository.
 
 | API | Specification reference | Keypop Java version in production (before) | Specified version (after) |
 |---|---|---|---|
@@ -48,7 +48,7 @@ Alignment of the Keypop Java implementations with these versions and the writing
 >
 > Concretely, this translates into:
 >
-> - a **new repository**: `calypsonet-terminal-reader-definitions-uml-api` (version `1.0.0-SNAPSHOT`);
+> - a **new repository**: `calypsonet-terminal-reader-definitions-api-spec` (version `1.0.0-SNAPSHOT`);
 > - a **new Keypop Java module**: `keypop-reader-definitions-jvm-api` (to be created, in accordance with the Keypop naming convention);
 > - a declared **dependency** of the `keypop-reader-java-api` module on this new module.
 
@@ -60,22 +60,22 @@ Alignment of the Keypop Java implementations with these versions and the writing
 
 ## Reference documents
 
-Each `calypsonet-terminal-*-uml-api` repository hosted on [github.com/calypsonet](https://github.com/calypsonet/) contains, at its root:
+Each `calypsonet-terminal-*-api-spec` repository hosted on [github.com/calypsonet](https://github.com/calypsonet/) contains, at its root:
 
 - the **normative specification** `index.adoc`;
 - the **class diagram** `uml/class-diagram.puml`, whose content is strictly aligned with the specification.
 
 | Module | Repository | Version |
 |---|---|---|
-| **Terminal Reader API** | [calypsonet-terminal-reader-uml-api](https://github.com/calypsonet/calypsonet-terminal-reader-uml-api) | 3.0.0-SNAPSHOT |
-| **Terminal Card API** *(internal)* | [calypsonet-terminal-card-uml-api](https://github.com/calypsonet/calypsonet-terminal-card-uml-api) | 3.0.0-SNAPSHOT |
-| **Terminal Calypso Card API** | [calypsonet-terminal-calypso-card-uml-api](https://github.com/calypsonet/calypsonet-terminal-calypso-card-uml-api) | 3.0.0-SNAPSHOT |
-| **Terminal Reader Definitions API** *(new)* | [calypsonet-terminal-reader-definitions-uml-api](https://github.com/calypsonet/calypsonet-terminal-reader-definitions-uml-api) | 1.0.0-SNAPSHOT |
-| **Terminal Calypso Crypto Legacy SAM API** | [calypsonet-terminal-calypso-crypto-legacysam-uml-api](https://github.com/calypsonet/calypsonet-terminal-calypso-crypto-legacysam-uml-api) | 2.0.0-SNAPSHOT |
-| **Terminal Calypso Crypto Symmetric API** | [calypsonet-terminal-calypso-crypto-symmetric-uml-api](https://github.com/calypsonet/calypsonet-terminal-calypso-crypto-symmetric-uml-api) | 0.2.0-SNAPSHOT |
-| **Terminal Calypso Crypto Asymmetric API** | [calypsonet-terminal-calypso-crypto-asymmetric-uml-api](https://github.com/calypsonet/calypsonet-terminal-calypso-crypto-asymmetric-uml-api) | 0.3.0-SNAPSHOT |
-| **Terminal Generic Card API** | [calypsonet-terminal-genericcard-uml-api](https://github.com/calypsonet/calypsonet-terminal-genericcard-uml-api) | 2.0.0-SNAPSHOT |
-| **Terminal Storage Card API** | [calypsonet-terminal-storagecard-uml-api](https://github.com/calypsonet/calypsonet-terminal-storagecard-uml-api) | 2.0.0-SNAPSHOT |
+| **Terminal Reader API** | [calypsonet-terminal-reader-api-spec](https://github.com/calypsonet/calypsonet-terminal-reader-api-spec) | 3.0.0-SNAPSHOT |
+| **Terminal Card API** *(internal)* | [calypsonet-terminal-card-api-spec](https://github.com/calypsonet/calypsonet-terminal-card-api-spec) | 3.0.0-SNAPSHOT |
+| **Terminal Calypso Card API** | [calypsonet-terminal-calypso-card-api-spec](https://github.com/calypsonet/calypsonet-terminal-calypso-card-api-spec) | 3.0.0-SNAPSHOT |
+| **Terminal Reader Definitions API** *(new)* | [calypsonet-terminal-reader-definitions-api-spec](https://github.com/calypsonet/calypsonet-terminal-reader-definitions-api-spec) | 1.0.0-SNAPSHOT |
+| **Terminal Calypso Crypto Legacy SAM API** | [calypsonet-terminal-calypso-crypto-legacysam-api-spec](https://github.com/calypsonet/calypsonet-terminal-calypso-crypto-legacysam-api-spec) | 2.0.0-SNAPSHOT |
+| **Terminal Calypso Crypto Symmetric API** | [calypsonet-terminal-calypso-crypto-symmetric-api-spec](https://github.com/calypsonet/calypsonet-terminal-calypso-crypto-symmetric-api-spec) | 0.2.0-SNAPSHOT |
+| **Terminal Calypso Crypto Asymmetric API** | [calypsonet-terminal-calypso-crypto-asymmetric-api-spec](https://github.com/calypsonet/calypsonet-terminal-calypso-crypto-asymmetric-api-spec) | 0.3.0-SNAPSHOT |
+| **Terminal Generic Card API** | [calypsonet-terminal-genericcard-api-spec](https://github.com/calypsonet/calypsonet-terminal-genericcard-api-spec) | 2.0.0-SNAPSHOT |
+| **Terminal Storage Card API** | [calypsonet-terminal-storagecard-api-spec](https://github.com/calypsonet/calypsonet-terminal-storagecard-api-spec) | 2.0.0-SNAPSHOT |
 
 > The former diagrams published in the `…-SNAPSHOT/` folders (`api_class_diagram.svg` and `api_class_diagram_diff.svg`) reflect an **intermediate state** of the work and are no longer up to date; the reference is now the `index.adoc` specification.
 
@@ -487,7 +487,7 @@ The `RfTechnology` and `CardType` enumerations are placed in a **new foundation 
 
 #### Structural consequences
 
-- **New repository**: `calypsonet-terminal-reader-definitions-uml-api` (version `1.0.0-SNAPSHOT`).
+- **New repository**: `calypsonet-terminal-reader-definitions-api-spec` (version `1.0.0-SNAPSHOT`).
 - **New Keypop Java module**: `keypop-reader-definitions-jvm-api` (to be created).
 - Public and transitive **dependency** of the Terminal Reader API on the Terminal Reader Definitions API (the enumerations appear in the properties `BasicCardSelector.cardType`, `IsoCardSelector.cardType`, `CardDetectionSettings.rfTechnologies` and `…CardSelectionResult.cardType`).
 
