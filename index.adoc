@@ -11,7 +11,7 @@
 :doc-classification: Public
 :doc-id: CNA-TR-API
 :doc-ref: YYMMDD-SP-CNATerminalAPI-Reader
-:doc-repo: https://github.com/calypsonet/calypsonet-terminal-reader-uml-api
+:doc-repo: https://github.com/calypsonet/calypsonet-terminal-reader-api-spec
 include::assets/logos/_terminal-api.adoc[]
 include::assets/legal/_license-cc-by-nd-4.0.adoc[]
 //
@@ -300,7 +300,7 @@ is backward-compatible per that API's evolution policy.
 | Reference | Document
 
 | [[ref_cna_trd]] [CNA-TRD-API]
-| https://docs.terminal-api.calypsonet.org/calypsonet-terminal-reader-definitions-uml-api/[_CNA Terminal API -- Reader Definitions_] (SP-CNATerminalAPI-ReaderDefinitions), version {ver-cna-trd}, {organization}. Provides the `RfTechnology` and `CardType` enumerations referenced by this specification.
+| https://docs.terminal-api.calypsonet.org/reader-definitions/[_CNA Terminal API -- Reader Definitions_] (SP-CNATerminalAPI-ReaderDefinitions), version {ver-cna-trd}, {organization}. Provides the `RfTechnology` and `CardType` enumerations referenced by this specification.
 |===
 
 ==== Normative References
