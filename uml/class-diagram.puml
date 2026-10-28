@@ -326,7 +326,7 @@ package reader.transactionApi #C_GREY2 {}
 package reader.transactionApi.transactionSpi #C_GREY3 {}
 
 center footer
-<size:10><color:#566573>Terminal Reader API 3.0 (2026-07-20) — CNA-TR-API — Copyright © Calypso Networks Association — CC BY-ND 4.0 (https://creativecommons.org/licenses/by-nd/4.0/) — https://docs.terminal-api.calypsonet.org</color></size>
+<size:10><color:#566573>Terminal Reader API 3.0 (2026-10-28) — CNA-TR-API — Copyright © Calypso Networks Association — CC BY-ND 4.0 (https://creativecommons.org/licenses/by-nd/4.0/) — https://docs.terminal-api.calypsonet.org</color></size>
 end footer
 
 @enduml
